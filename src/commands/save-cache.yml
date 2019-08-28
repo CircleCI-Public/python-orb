@@ -1,0 +1,11 @@
+description: "Save Pip packages to cache."
+parameters:
+  key:
+    description: "The cache key to use. The key is immutable."
+    type: string
+    default: "pip"
+steps:
+  - save_cache:
+      key: << parameters.key >>-{{ checksum "requirements.txt"  }}
+      paths:
+        - "/home/circleci/.local/lib/"

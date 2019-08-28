@@ -1,0 +1,3 @@
+version: 2.1
+
+description: "Common CircleCI tasks for the Python programming language."

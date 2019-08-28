@@ -1,0 +1,10 @@
+description: "Load cached Pip packages."
+parameters:
+  key:
+    description: "The cache key to use. The key is immutable."
+    type: string
+    default: "pip"
+steps:
+  - restore_cache:
+      keys:
+        - << parameters.key >>-{{ checksum "requirements.txt"  }}
