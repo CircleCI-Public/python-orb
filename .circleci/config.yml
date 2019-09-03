@@ -36,4 +36,6 @@ jobs:
       - checkout
       - run:
           name: "Publish orb via the CircleCI CLI"
-          command: circleci orb publish orb.yml circleci/python@${CIRCLE_TAG}
+          command: |
+            circleci config pack src > src/orb.yml
+            circleci orb publish src/orb.yml circleci/python@${CIRCLE_TAG}
