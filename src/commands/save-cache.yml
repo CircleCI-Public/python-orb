@@ -6,6 +6,6 @@ parameters:
     default: "pip"
 steps:
   - save_cache:
-      key: << parameters.key >>-{{ checksum "requirements.txt"  }}
+      key: << parameters.key >>-{{ .Branch }}-{{ checksum "requirements.txt"  }}
       paths:
         - "/home/circleci/.local/lib/"

@@ -7,4 +7,4 @@ parameters:
 steps:
   - restore_cache:
       keys:
-        - << parameters.key >>-{{ checksum "requirements.txt"  }}
+        - << parameters.key >>-{{ .Branch }}-{{ checksum "requirements.txt"  }}
