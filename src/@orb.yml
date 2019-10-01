@@ -1,3 +1,3 @@
 version: 2.1
 
-description: "Common CircleCI tasks for the Python programming language."
+description: "Common CircleCI tasks for the Python programming language." Repo: https://github.com/CircleCI-Public/python-orb
