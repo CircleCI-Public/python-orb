@@ -1,0 +1,6 @@
+description: "Release build release to PyPi using twine"
+steps:
+  - run:
+      name: "Release to PyPi"
+      command: |
+        twine upload dist/*
