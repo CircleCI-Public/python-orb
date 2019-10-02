@@ -1,0 +1,16 @@
+description: "Run coverage analysis"
+parameters:
+  pytest:
+    description: "Use pytest as test runner."
+    type: boolean
+    default: false
+steps:
+  - run:
+      name: "Coverage run"
+      command: |
+        if << parameters.pytest >>; then
+          coverage run pytest
+        else
+          coverage run -m unittest discover -v
+        fi
+        coverage html
