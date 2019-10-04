@@ -1,4 +1,4 @@
-description: "Release build release to PyPi using twine"
+description: "Upload build release to PyPi using twine"
 steps:
   - run:
       name: "Release to PyPI"
