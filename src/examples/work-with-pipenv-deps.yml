@@ -1,0 +1,21 @@
+description: |
+  An example of working with the pipenv on CircleCI.
+usage:
+  version: 2.1
+  orbs:
+    python: circleci/python@0.1
+  workflows:
+    main:
+      jobs:
+        - build
+  jobs:
+    build:
+      executor: python/default
+      steps:
+        - checkout
+        - python/install-pipenv-deps
+        - run:
+            name: "Test"
+            command: |
+              # pytest would be a dep in Pipenv file
+              pytest
