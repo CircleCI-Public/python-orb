@@ -1,0 +1,20 @@
+description: |
+  An example of working with pipenv installation.
+usage:
+  version: 2.1
+  orbs:
+    python: circleci/python@0.1
+  workflows:
+    main:
+      jobs:
+        - build
+  jobs:
+    build:
+      executor: python/default
+      steps:
+        - checkout
+        - python/install-pipenv
+        - run:
+            name: "Run pipenv"
+            command: |
+              pipenv install
