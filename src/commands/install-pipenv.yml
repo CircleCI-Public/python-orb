@@ -1,0 +1,15 @@
+description: "Install pipenv via Pip."
+parameters:
+  local:
+    description: "Install pipenv for local user, not globally. Defaults to true."
+    type: boolean
+    default: true
+steps:
+  - run:
+      name: "Install pipenv"
+      command: |
+        if << parameters.local >>; then
+          pip install --user pipenv
+        else
+          pip install pipenv
+        fi
