@@ -1,0 +1,11 @@
+description: "Uninstall packages from requirements.txt via Pip."
+parameters:
+  requirements_file:
+    description: Path to requirements.txt dependency file.
+    type: string
+    default: requirements.txt
+steps:
+  - run:
+      name: "Uninstall Dependencies"
+      command: |
+        pip uninstall -y -r << parameters.requirements_file >>
