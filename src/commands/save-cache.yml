@@ -8,4 +8,5 @@ steps:
   - save_cache:
       key: << parameters.key >>-{{ checksum "requirements.txt"  }}
       paths:
+        - "/home/circleci/.local/bin/"
         - "/home/circleci/.local/lib/"
