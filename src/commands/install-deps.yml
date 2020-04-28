@@ -4,7 +4,7 @@ parameters:
     description: "Install packages for local user, not globally. Defaults to true."
     type: boolean
     default: true
-  dependency_file:
+  dependency-file:
     description: "The file to install dependencies from."
     type: string
     default: "requirements.txt"
@@ -13,7 +13,7 @@ steps:
       name: "Install Dependencies"
       command: |
         if << parameters.local >>; then
-          pip install --user -r << parameters.dependency_file >>
+          pip install --user -r << parameters.dependency-file >>
         else
-          pip install -r << parameters.dependency_file >>
+          pip install -r << parameters.dependency-file >>
         fi
