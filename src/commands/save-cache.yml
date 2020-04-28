@@ -4,8 +4,12 @@ parameters:
     description: "The cache key to use. The key is immutable."
     type: string
     default: "pip"
+  lib_path:
+    description: "The path where the requirements are saved to."
+    type: string
+    default: "/home/circleci/.local/lib/"
 steps:
   - save_cache:
       key: << parameters.key >>-{{ checksum "requirements.txt"  }}
       paths:
-        - "/home/circleci/.local/lib/"
+        - << parameters.lib_path >>
