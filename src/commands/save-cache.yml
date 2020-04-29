@@ -4,9 +4,17 @@ parameters:
     description: "The cache key to use. The key is immutable."
     type: string
     default: "pip"
+  dependency-file:
+    description: "The file that the dependencies are installed from."
+    type: string
+    default: "requirements.txt"
+  lib-path:
+    description: "The path where the requirements are saved to."
+    type: string
+    default: "/home/circleci/.local/lib/"
 steps:
   - save_cache:
-      key: << parameters.key >>-{{ checksum "requirements.txt"  }}
+      key: << parameters.key >>-{{ checksum "<<parameters.dependency-file>>"  }}
       paths:
         - "/home/circleci/.local/bin/"
-        - "/home/circleci/.local/lib/"
+        - << parameters.lib-path >>

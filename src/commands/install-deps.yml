@@ -1,15 +1,19 @@
-description: "Install packages from requirements.txt via Pip."
+description: "Install packages from requirements.txt (or any other file) via Pip."
 parameters:
   local:
     description: "Install packages for local user, not globally. Defaults to true."
     type: boolean
     default: true
+  dependency-file:
+    description: "The file to install dependencies from."
+    type: string
+    default: "requirements.txt"
 steps:
   - run:
       name: "Install Dependencies"
       command: |
         if << parameters.local >>; then
-          pip install --user -r requirements.txt
+          pip install --user -r << parameters.dependency-file >>
         else
-          pip install -r requirements.txt
+          pip install -r << parameters.dependency-file >>
         fi
