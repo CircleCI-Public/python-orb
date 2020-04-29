@@ -1,0 +1,8 @@
+description: "Build a distribution package using distutils and setup.py"
+steps:
+  - run:
+      name: "Build distribution package"
+      command: |
+        python setup.py sdist
+        python setup.py bdist_wheel
+        ls -l dist
