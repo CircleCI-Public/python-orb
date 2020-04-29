@@ -1,0 +1,15 @@
+description: "Run python tests using unittest or pytest module."
+parameters:
+  pytest:
+    description: "Use pytest as test runner."
+    type: boolean
+    default: false
+steps:
+  - run:
+      name: "Test"
+      command: |
+        if << parameters.pytest >>; then
+          pytest
+        else
+          python -m unittest discover -v
+        fi
