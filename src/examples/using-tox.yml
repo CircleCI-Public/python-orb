@@ -1,0 +1,29 @@
+description: |
+  An example of working with tox and pyenv on CircleCI to speed up builds.
+usage:
+  version: 2.1
+  orbs:
+    python: circleci/python@0.4.0
+  workflows:
+    main:
+      jobs:
+        - build
+  jobs:
+    build:
+      docker:
+        - image: cimg/python:3.8
+      steps:
+        - checkout
+        # This will cache the other python versions we installed
+        - python/install-packages:
+            pkg-manager: pip
+            args: tox
+            pypi-cache: true
+            venv-cache: false
+            pre-install-steps:
+              - run: pyenv install 3.7.8
+              - run: pyenv install 2.7.18
+              - run: pyenv local 3.8.3 3.7.8 2.7.18
+        - run:
+            name: "Run tox"
+            command: tox

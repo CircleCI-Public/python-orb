@@ -1,11 +1,28 @@
-description: "Uninstall packages from requirements.txt via Pip."
+description: >
+  Uninstall global packages via pip with requirements.txt file. Override the requirements.txt with a string of package names.
+
+# we could also delete this, I can't imagine a need to remove a pacakge
 parameters:
   requirements-file:
     description: Path to requirements.txt dependency file.
     type: string
     default: requirements.txt
+  package-names:
+    description: String list of pacakges to pass to pip uninstall. E.g. `requests urllib3`
+    type: string
+    default: ""
 steps:
-  - run:
-      name: "Uninstall Dependencies"
-      command: |
-        pip uninstall -y -r << parameters.requirements-file >>
+  - unless:
+      condition: <<parameters.package-names>>
+      steps:
+        - run:
+            name: "Uninstall packages with project requirements.txt with pip"
+            command: |
+              pip uninstall -y -r << parameters.requirements-file >>
+  - when:
+      condition: <<parameters.package-names>>
+      steps:
+        - run:
+            name: "Uninstall inline packages with pip"
+            command: |
+              pip uninstall -y << parameters.package-names >>

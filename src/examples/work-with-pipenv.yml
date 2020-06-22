@@ -1,0 +1,22 @@
+description: |
+  An example of working with the Pipenv cache on CircleCI to speed up builds.
+usage:
+  version: 2.1
+  orbs:
+    python: circleci/python@0.4.0
+  workflows:
+    main:
+      jobs:
+        - build
+  jobs:
+    build:
+      executor: python/default
+      steps:
+        - checkout
+        - python/install-packages:
+            pkg-manager: pipenv
+            args: pytest
+        - run:
+            name: "Test it"
+            command: |
+              pipenv run pytest --version

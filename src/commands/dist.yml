@@ -1,5 +1,6 @@
 description: "Build a distribution package using distutils and setup.py"
 steps:
+  - run: pip install wheel
   - run:
       name: "Build distribution package"
       command: |

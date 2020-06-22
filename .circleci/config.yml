@@ -19,17 +19,106 @@ jobs:
   pip-install-test:
     executor: python/default
     steps:
-        - run:
-              name: "Test pip"
-              command: echo "pytest" >> requirements.txt
-        - python/load-cache
-        - python/install-deps
-        - python/save-cache
-        - run:
-            name: "Test"
-            command: |
-              # pytest would be a dep in requirements.txt
-              pytest --version
+      - checkout
+      - python/install-packages:
+          pkg-manager: pip
+      - run:
+          name: "Test"
+          command: |
+            # pytest would be a dep in requirements.txt
+            pytest
+
+  uninstall-deps-test:
+    executor: python/default
+    steps:
+      - python/install-packages:
+          pkg-manager: pip
+          args: pylint
+          pypi-cache: false
+      - run:
+          name: "Test"
+          command: |
+            pylint --version
+      - python/uninstall-deps:
+          package-names: pylint
+      - run:
+          name: "Test"
+          command: |
+            pylint --version || echo "successfully uninstalled"
+      - checkout
+      - python/install-packages:
+          pkg-manager: pip
+      - run:
+          name: "Test"
+          command: |
+            pytest --version
+      - python/uninstall-deps
+      - run:
+          name: "Test"
+          command: |
+            pytest --version || echo "successfully uninstalled"
+
+  dist-test:
+    executor: python/default
+    steps:
+      - checkout
+      - run:
+          name: Create setup.py to test dist command
+          command: |
+            echo 'import setuptools; setuptools.setup(name="tmp-example",version="0.0.1",author="null",author_email="null",url="null",description="null")' > setup.py
+      - python/dist
+
+  pipenv-test:
+    executor: python/default
+    steps:
+      - checkout
+      - run:
+          name: Create Pipfile for test
+          command: echo $'[packages]\npytest = "*"' > Pipfile
+      - python/install-packages
+      - run:
+          command: |
+            cp Pipfile.lock Pipfile.lock.tmp
+            cp Pipfile Pipfile.tmp
+            pipenv run pytest --version
+          name: Ensure pipenv is working and copy lock file for cache testing
+      - python/install-packages:
+          args: "pytest==4.6.1"
+      - run:
+          command: |
+            cp Pipfile.lock.tmp Pipfile.lock
+            cp Pipfile.tmp Pipfile
+          name: Overwrite the lockfile with the one that should load the cache.
+      - python/install-packages
+      - run: pipenv run pytest
+
+  poetry-test:
+    executor: python/default
+    steps:
+      - checkout
+      - python/install-packages:
+          pkg-manager: poetry
+      - run:
+          command: |
+            poetry run pytest
+  tox-test:
+    docker:
+      - image: cimg/python:3.8
+    steps:
+      - checkout
+      # This will cache the other python versions we installed
+      - python/install-packages:
+          pkg-manager: pip
+          args: tox
+          pypi-cache: true
+          venv-cache: false
+          cache-version: v2
+          pre-install-steps:
+            - run: pyenv install -s 3.7.8
+            - run: pyenv local 3.8.3 3.7.8
+      - run:
+          name: "Run tox"
+          command: tox
 
 workflows:
   # This `lint-pack_validate_publish-dev` workflow will run on any commit.
@@ -65,6 +154,23 @@ workflows:
     when: << pipeline.parameters.run-integration-tests >>
     jobs:
       - pip-install-test
+      - pipenv-test
+      - poetry-test
+      - tox-test
+      - dist-test
+      - uninstall-deps-test
+      - python/test:
+          name: job-test-poetry
+          pkg-manager: poetry
+          test-tool: pytest
+      - python/test:
+          name: job-test-pipenv
+          pkg-manager: pipenv
+          args: pytest
+          test-tool: pytest
+      - python/test:
+          name: job-test-pip
+          pkg-manager: pip
       # publish a semver version of the orb. relies on
       # the commit subject containing the text "[semver:patch|minor|major|skip]"
       # as that will determine whether a patch, minor or major
@@ -82,6 +188,13 @@ workflows:
           ssh-fingerprints: 1a:d8:ea:eb:7a:ae:0c:9d:eb:e9:37:0f:66:62:36:9b
           requires:
             - pip-install-test
+            - pipenv-test
+            - poetry-test
+            - job-test-poetry
+            - job-test-pipenv
+            - job-test-pip
+            - dist-test
+            - uninstall-deps-test
           filters:
             branches:
               only: master

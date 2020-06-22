@@ -1,0 +1,110 @@
+description: |
+  Simple drop-in job to setup a python project, run tests and store the test results if possible.
+  Assumes project defines the test pacakge in the dependencies file as applicable.
+
+parameters:
+  version:
+    type: string
+    default: "3.8"
+    description: |
+      A full version tag must be specified. Example: "3.8"
+      For a full list of releases, see the following: https://hub.docker.com/r/cimg/python
+  pkg-manager:
+    type: enum
+    enum: ["pip", "pipenv", "poetry"]
+    default: "pip"
+    description: Select the package manager to use. Default is pip
+  args:
+    type: string
+    default: ""
+    description: Arguments to pass to install command for pipenv and poetry. Override '-r requirements.txt' for pip.
+  setup:
+    type: steps
+    description: Provide any optional steps you would like to run prior to install the python project.
+    default: []
+  test-tool:
+    type: enum
+    enum: ["pytest", "unittest"]
+    default: "unittest"  # default since its not an external requirement
+    description: The tool to run the tests with.
+  venv-cache:
+    type: boolean
+    default: true
+    description: Use the lockfile to cache the virtualenv. Not used with pip as pkg-manager.
+  pypi-cache:
+    type: boolean
+    default: true
+    description: Keep all versions of pypi and site-pacakge caches for faster rebuilding overall.
+  cache-version:
+    type: string
+    default: v1
+    description: Change the default cache version if you need to clear the cache for any reason.
+  include-branch-in-cache-key:
+    type: boolean
+    default: true
+    description: >
+      If true, this cache bucket will only apply to jobs within the same branch.
+
+executor:
+  name: default
+  tag: << parameters.version >>
+
+steps:
+  - checkout
+  - steps: << parameters.setup >>
+  - install-packages:
+      pkg-manager: <<parameters.pkg-manager>>
+      cache-version: <<parameters.cache-version>>
+      pypi-cache: <<parameters.pypi-cache>>
+      venv-cache: <<parameters.venv-cache>>
+      include-branch-in-cache-key: <<parameters.include-branch-in-cache-key>>
+      args: <<parameters.args>>
+  - when:
+      condition:
+        equal: ["unittest", << parameters.test-tool >>]
+      steps:
+        - when:
+            condition:
+              or:
+                - equal: [poetry, << parameters.pkg-manager >>]
+                - equal: [pipenv, << parameters.pkg-manager >>]
+            steps:
+              - run:
+                  name: Run tests with <<parameters.pkg-manager>> run
+                  command: <<parameters.pkg-manager>> run python -m unittest
+        - when:
+            condition:
+              equal: [pip, << parameters.pkg-manager >>]
+            steps:
+              - run:
+                  name: Run tests with global python env
+                  # the unittest module only looks for things in the path
+                  # add the project to the path
+                  command: |
+                    export PYTHONPATH=$PWD:$PYTHONPATH
+                    python -m unittest
+  - when:
+      condition:
+        equal: ["pytest", << parameters.test-tool >>]
+      steps:
+        - run:
+            name: Create test-report directory
+            command: mkdir test-report
+        - when:
+            condition:
+              or:
+                - equal: [poetry, << parameters.pkg-manager >>]
+                - equal: [pipenv, << parameters.pkg-manager >>]
+            steps:
+              - run:
+                  name: Run tests with <<parameters.pkg-manager>> run
+                  command: <<parameters.pkg-manager>> run pytest --junit-xml=test-report/report.xml
+        - when:
+            condition:
+              equal: [pip, << parameters.pkg-manager >>]
+            steps:
+              - run:
+                  name: Run tests with global python env
+                  command: pytest --junit-xml=test-report/report.xml
+        - store_test_results:
+            path: test-report

@@ -1,0 +1,177 @@
+description: >
+  Setup a python environment and install the packages for your project either globally with pip or in a virtualenv with poetry or pipenv.
+  With pip as pkg-manager, if you do not provide args, the command will assume `-r requirements.txt`.
+  For poetry and pipenv, no args are provided. Expect the default caching locations for packages and virtualenvs on a debian system with pyenv.
+
+parameters:
+  pkg-manager:
+    type: enum
+    enum: [poetry, pipenv, pip]
+    default: pipenv
+    description: Which package management tool to use, pipenv, pip or poetry.
+  args:
+    type: string
+    default: ""
+    description: Arguments to pass to install command for pipenv and poetry. Override '-r requirements.txt' for pip.
+  venv-cache:
+    type: boolean
+    default: true
+    description: Use the lockfile to cache the virtualenv. Not used with pip as pkg-manager.
+  pypi-cache:
+    type: boolean
+    default: true
+    description: Keep all versions of pypi and site-pacakge caches for faster rebuilding overall.
+  cache-version:
+    type: string
+    default: v1
+    description: Change the default cache version if you need to clear the cache for any reason.
+  include-branch-in-cache-key:
+    type: boolean
+    default: true
+    description: >
+      If true, this cache bucket will only apply to jobs within the same branch.
+  pre-install-steps:
+    type: steps
+    default: []
+    description: >
+      Steps needed between restoring the cacheand the install step.
+
+steps:
+  - when:
+      condition: << parameters.pypi-cache >>
+      steps:
+        - when:
+            condition:
+              equal: [pipenv, << parameters.pkg-manager >>]
+            steps:
+              - restore_cache:
+                  keys:
+                    - -pypi-<<parameters.cache-version>>-<<#parameters.include-branch-in-cache-key>>{{ .Branch }}-<</parameters.include-branch-in-cache-key>>{{ checksum "Pipfile.lock" }}
+        - when:
+            condition:
+              equal: [poetry, << parameters.pkg-manager >>]
+            steps:
+              - restore_cache:
+                  keys:
+                    - -pypi-<<parameters.cache-version>>-<<#parameters.include-branch-in-cache-key>>{{ .Branch }}-<</parameters.include-branch-in-cache-key>>{{ checksum "poetry.lock" }}
+        - when:
+            condition:
+              equal: [pip, << parameters.pkg-manager >>]
+            steps:
+              - restore_cache:
+                  keys:
+                    - -pypi-<<parameters.cache-version>>-<<#parameters.include-branch-in-cache-key>>{{ .Branch }}-<</parameters.include-branch-in-cache-key>>{{ checksum "requirements.txt" }}
+                    - -pypi-<<parameters.cache-version>>-<<#parameters.include-branch-in-cache-key>>{{ .Branch }}-<</parameters.include-branch-in-cache-key>>
+  - when:
+      condition: << parameters.venv-cache >>
+      steps:
+        - when:
+            condition:
+              equal: [pipenv, << parameters.pkg-manager >>]
+            steps:
+              - restore_cache:
+                  keys:
+                    - -venv-<<parameters.cache-version>>-<<#parameters.include-branch-in-cache-key>>{{ .Branch }}-<</parameters.include-branch-in-cache-key>>{{ checksum "Pipfile.lock" }}
+        - when:
+            condition:
+              equal: [poetry, << parameters.pkg-manager >>]
+            steps:
+              - restore_cache:
+                  keys:
+                    - -venv-<<parameters.cache-version>>-<<#parameters.include-branch-in-cache-key>>{{ .Branch }}-<</parameters.include-branch-in-cache-key>>{{ checksum "poetry.lock" }}
+  - steps: <<parameters.pre-install-steps>>
+  - when:
+      condition:
+        equal: [pipenv, << parameters.pkg-manager >>]
+      steps:
+        - run:
+            name: "Install dependencies with pipenv using project Pipfile or inline packages"
+            command: |
+              pipenv install << parameters.args >>
+  - when:
+      condition:
+        equal: [poetry, << parameters.pkg-manager >>]
+      steps:
+        - run:
+            name: "Install dependencies with poetry using project pyproject.toml"
+            command: |
+              poetry install << parameters.args >>
+  - when:
+      condition:
+        and:
+          - equal: ["", << parameters.args >>]
+          - equal: [pip, << parameters.pkg-manager >>]
+      steps:
+        - run:
+            name: "Install dependencies with pip using project requirements.txt"
+            command: |
+              pip install -r requirements.txt
+  - when:
+      condition:
+        and:
+          - not:
+              equal: ["", << parameters.args >>]
+          - equal: [pip, << parameters.pkg-manager >>]
+      steps:
+        - run:
+            name: "Install dependencies with pip install"
+            command: |
+              pip install << parameters.args >>
+  - when:
+      condition: << parameters.venv-cache >>
+      steps:
+        - when:
+            condition:
+              equal: [pipenv, << parameters.pkg-manager >>]
+            steps:
+              - save_cache:
+                  key: -venv-<<parameters.cache-version>>-<<#parameters.include-branch-in-cache-key>>{{ .Branch }}-<</parameters.include-branch-in-cache-key>>{{ checksum "Pipfile.lock" }}
+                  paths:
+                    - /home/circleci/.local/share/virtualenvs
+        - when:
+            condition:
+              equal: [poetry, << parameters.pkg-manager >>]
+            steps:
+              - save_cache:
+                  key: -venv-<<parameters.cache-version>>-<<#parameters.include-branch-in-cache-key>>{{ .Branch }}-<</parameters.include-branch-in-cache-key>>{{ checksum "poetry.lock" }}
+                  paths:
+                    - /home/circleci/.cache/pypoetry/virtualenvs
+  - when:
+      condition: << parameters.pypi-cache >>
+      steps:
+        - when:
+            condition:
+              equal: [pipenv, << parameters.pkg-manager >>]
+            steps:
+              - save_cache:
+                  key: -pypi-<<parameters.cache-version>>-<<#parameters.include-branch-in-cache-key>>{{ .Branch }}-<</parameters.include-branch-in-cache-key>>{{ checksum "Pipfile.lock" }}
+                  paths:
+                    # pipenv caches a pypi mirror and the site-pacakges
+                    - "/home/circleci/.cache/pip"
+                    - "/home/circleci/.cache/pipenv"
+        - when:
+            condition:
+              equal: [poetry, << parameters.pkg-manager >>]
+            steps:
+              - save_cache:
+                  key: -pypi-<<parameters.cache-version>>-<<#parameters.include-branch-in-cache-key>>{{ .Branch }}-<</parameters.include-branch-in-cache-key>>{{ checksum "poetry.lock" }}
+                  paths:
+                    # poetry only maintains a pypi mirror
+                    - /home/circleci/.cache/pip
+        - when:
+            condition:
+              equal: [pip, << parameters.pkg-manager >>]
+            steps:
+              - save_cache:
+                  key: -pypi-<<parameters.cache-version>>-<<#parameters.include-branch-in-cache-key>>{{ .Branch }}-<</parameters.include-branch-in-cache-key>>{{ checksum "requirements.txt" }}
+                  paths:
+                    # depending on how pip is used, store the pypi mirror, pyenv 'global' the site-packages, and user site-pacakges
+                    - /home/circleci/.cache/pip
+                    - /home/circleci/.pyenv/versions/
+                    - /home/circleci/.local/lib/
+              - save_cache:
+                  key: -pypi-<<parameters.cache-version>>-<<#parameters.include-branch-in-cache-key>>{{ .Branch }}-<</parameters.include-branch-in-cache-key>>
+                  paths:
+                    - /home/circleci/.cache/pip
+                    - /home/circleci/.pyenv/versions/
+                    - /home/circleci/.local/lib/
