@@ -1,0 +1,19 @@
+description: "Save virtualenv created by pipenv to the cache"
+parameters:
+  key:
+    description: "The cache key to use. The key is immutable."
+    type: string
+    default: "venv"
+  dependency-file:
+    description: "The file that the dependencies are locked with."
+    type: string
+    default: "Pipfile.lock"
+  lib-path:
+    description: "The path where the virtualenv is created. Currently pipenv's default."
+    type: string
+    default: "/home/circleci/.local/share/virtualenvs"
+steps:
+  - save_cache:
+      key: << parameters.key >>-{{ checksum "<<parameters.dependency-file>>"  }}
+      paths:
+        - << parameters.lib-path >>
