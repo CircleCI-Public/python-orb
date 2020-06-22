@@ -1,0 +1,54 @@
+description: >
+  Setup a pipenv environment with 'pipenv install'
+
+executor:
+  name: default
+  tag: << parameters.version >>
+
+parameters:
+  args:
+    description: "Run pipenv install with args"
+    type: string
+    default: ""
+  venv-cache:
+    description: "Use the lockfile to save the deps. If the lockfile changes we reinstall anyway."
+    type: boolean
+    default: false
+  pypi-cache:
+    description: "Keep the global pipenv and pip package caches for faster rebuilding overall."
+    type: boolean
+    default: true
+  app-dir:
+    type: string
+    default: "~/project"
+    description: Path to the directory containing your package.json file. Not needed if package.json lives in the root.
+  version:
+    type: string
+    default: "3.8"
+    description: |
+      A full version tag must be specified. Example: "3.8"
+      For a full list of releases, see the following: https://hub.docker.com/r/cimg/python
+steps:
+  - attach_workspace:
+      at: << parameters.app-dir >>
+  - checkout
+  - when:
+      condition: << parameters.pypi-cache >>
+      steps:
+        - load-cache:
+            dependency-file: Pipfile.lock
+  - when:
+      condition: << parameters.venv-cache >>
+      steps:
+        - load-venv-cache
+  - install-deps-pipenv:
+      args: << parameters.args >>
+  - when:
+      condition: << parameters.venv-cache >>
+      steps:
+        - save-venv-cache
+  - when:
+      condition: << parameters.pypi-cache >>
+      steps:
+        - save-cache:
+            dependency-file: Pipfile.lock

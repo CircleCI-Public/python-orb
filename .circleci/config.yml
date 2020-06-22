@@ -31,6 +31,34 @@ jobs:
               # pytest would be a dep in requirements.txt
               pytest --version
 
+  install-deps-pipenv-test:
+    executor: python/default
+    steps:
+      - checkout
+      - run:
+          name: Create Pipfile for test
+          command: echo $'[packages]\npytest = "*"' > Pipfile
+      - python/install-deps-pipenv
+      - python/save-venv-cache
+      - python/save-cache:
+          dependency-file: Pipfile.lock
+      - run:
+          command: |
+            cp Pipfile.lock Pipfile.lock.tmp
+            cp Pipfile Pipfile.tmp
+            pipenv run pytest --version
+          name: Ensure pipenv is working and copy lock file for cache testing
+          # replace this with pipenv-orb/pipenv-run when that's available
+      - python/install-deps-pipenv:
+          args: "pytest==4.6.1"
+      - run:
+          command: |
+            cp Pipfile.lock.tmp Pipfile.lock
+            cp Pipfile.tmp Pipfile
+          name: Overwrite the lockfile with the one that should load the cache.
+      - python/load-venv-cache
+      - python/install-deps-pipenv
+
 workflows:
   # This `lint-pack_validate_publish-dev` workflow will run on any commit.
   lint_pack-validate_publish-dev:
@@ -65,6 +93,9 @@ workflows:
     when: << pipeline.parameters.run-integration-tests >>
     jobs:
       - pip-install-test
+      - install-deps-pipenv-test
+      - python/pipenv-install:
+          args: "requests==2.2.0"
       # publish a semver version of the orb. relies on
       # the commit subject containing the text "[semver:patch|minor|major|skip]"
       # as that will determine whether a patch, minor or major
@@ -82,6 +113,8 @@ workflows:
           ssh-fingerprints: 1a:d8:ea:eb:7a:ae:0c:9d:eb:e9:37:0f:66:62:36:9b
           requires:
             - pip-install-test
+            - install-deps-pipenv-test
+            - python/pipenv-install
           filters:
             branches:
               only: master

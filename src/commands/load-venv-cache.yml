@@ -1,13 +1,13 @@
-description: "Load cached Pip packages."
+description: "Load cached virtualenv"
 parameters:
   key:
     description: "The cache key to use. The key is immutable."
     type: string
-    default: "pip"
+    default: "venv"
   dependency-file:
-    description: "The filename used to cache the pip packages. If you're using pipenv, you'll want to provide Pipfile.lock"
+    description: "The filename use in the key for the venv cache. If you are creating venv's manually use requirements.txt or setup.py"
     type: string
-    default: "requirements.txt"
+    default: "Pipfile.lock"
 steps:
   - restore_cache:
       keys:
