@@ -13,7 +13,7 @@ parameters:
     default: false
   dev-orb-version:
     type: string
-    default: "dev:Alpha"
+    default: "dev:alpha"
 
 jobs:
   pip-install-test:
@@ -45,6 +45,7 @@ workflows:
 
       - orb-tools/publish-dev:
           orb-name: circleci/python
+          context: orb-publishing
           requires:
             - orb-tools/pack
 
@@ -71,11 +72,13 @@ workflows:
       # e.g. [semver:patch] will cause a patch version to be published.
       - orb-tools/dev-promote-prod-from-commit-subject:
           orb-name: circeci/python
-
-          add-pr-comment: false
-          fail-if-semver-not-indicated: false
+          context: orb-publishing
+          add-pr-comment: true
+          fail-if-semver-not-indicated: true
           publish-version-tag: true
-          ssh-fingerprints: x
+          bot-token-variable: GHI_TOKEN
+          bot-user: cpe-bot
+          ssh-fingerprints: 5f:4f:fc:be:b9:00:f1:20:e1:25:1d:1b:0f:b2:af:b9
           requires:
             - pip-install-test
           filters:
