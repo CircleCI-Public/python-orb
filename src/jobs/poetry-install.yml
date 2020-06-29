@@ -1,5 +1,5 @@
 description: >
-  Setup a pipenv environment with 'pipenv install'
+  Setup a poetry based environment with 'poetry install'
 
 executor:
   name: default
@@ -7,7 +7,7 @@ executor:
 
 parameters:
   args:
-    description: "Run pipenv install with args"
+    description: "Run poetry install with args"
     type: string
     default: ""
   venv-cache:
@@ -33,7 +33,7 @@ steps:
       at: << parameters.app-dir >>
   - checkout
   - install-advanced:
-      tool: pipenv
+      tool: poetry
       args: << parameters.args >>
       pypi-cache: << parameters.pypi-cache >>
       venv-cache: << parameters.venv-cache >>

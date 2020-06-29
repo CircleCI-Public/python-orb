@@ -59,6 +59,28 @@ jobs:
       - python/load-venv-cache
       - python/install-deps-pipenv
 
+  install-deps-poetry-test:
+    executor: python/default
+    steps:
+      - checkout
+      - python/load-venv-cache:
+          dependency-file: poetry.lock
+      - python/install-deps-poetry
+      - python/save-venv-cache:
+          dependency-file: poetry.lock
+          lib-path: /home/circleci/.cache/pypoetry/
+      - run:
+          command: |
+            poetry run pytest --version
+
+  install-advanced-test:
+    executor: python/default
+    steps:
+      - checkout
+      - python/install-advanced:
+          tool: poetry
+
+
 workflows:
   # This `lint-pack_validate_publish-dev` workflow will run on any commit.
   lint_pack-validate_publish-dev:
@@ -96,6 +118,11 @@ workflows:
       - install-deps-pipenv-test
       - python/pipenv-install:
           args: "requests==2.2.0"
+      - install-deps-poetry-test
+      - install-advanced-test:
+          requires:
+            - install-deps-poetry-test
+      # - python/poetry-install
       # publish a semver version of the orb. relies on
       # the commit subject containing the text "[semver:patch|minor|major|skip]"
       # as that will determine whether a patch, minor or major
@@ -115,6 +142,8 @@ workflows:
             - pip-install-test
             - install-deps-pipenv-test
             - python/pipenv-install
+            - install-deps-poetry-test
+            # - python/poetry-install
           filters:
             branches:
               only: master

@@ -1,0 +1,12 @@
+# Example toml for integration testing - this is not used by the orb in anyway
+[tool.poetry]
+authors=["Test"]
+name="test"
+description="none"
+version = "0.0.1"
+
+[tool.poetry.dependencies]
+python = "*"
+
+[tool.poetry.dev-dependencies]
+pytest = "*"

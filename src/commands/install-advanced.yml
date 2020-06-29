@@ -1,0 +1,98 @@
+description: >
+  Setup a virtualenv with an advanced tool like pipenv and poetry
+
+parameters:
+  tool:
+    description: Which advanced environment tool to use, pipenv or poetry.
+    type: string
+    default: pipenv
+  args:
+    description: Run install command with args
+    type: string
+    default: ""
+  venv-cache:
+    description: Use the lockfile to save the deps. If the lockfile changes we reinstall anyway.
+    type: boolean
+    default: true
+  pypi-cache:
+    description: Keep the global pipenv and pip package caches for faster rebuilding overall.
+    type: boolean
+    default: true
+
+steps:
+  - when:
+      condition:
+        and:
+          - << parameters.pypi-cache >>
+          - equal: [pipenv, << parameters.tool >>]
+      steps:
+        - load-cache:
+            dependency-file: Pipfile.lock
+  - when:
+      condition:
+        and:
+          - << parameters.pypi-cache >>
+          - equal: [poetry, << parameters.tool >>]
+      steps:
+        - load-cache:
+            dependency-file: poetry.lock
+  - when:
+      condition:
+        and:
+          - << parameters.venv-cache >>
+          - equal: [pipenv, << parameters.tool >>]
+      steps:
+        - load-venv-cache
+  - when:
+      condition:
+        and:
+          - << parameters.venv-cache >>
+          - equal: [poetry, << parameters.tool >>]
+      steps:
+        - load-venv-cache:
+            dependency-file: poetry.lock
+  - when:
+      condition:
+        equal: [pipenv, << parameters.tool >>]
+      steps:
+        - install-deps-pipenv:
+            args: << parameters.args >>
+  - when:
+      condition:
+        equal: [pipenv, << parameters.tool >>]
+      steps:
+        - install-deps-poetry:
+            args: << parameters.args >>
+  - when:
+      condition:
+        and:
+          - << parameters.venv-cache >>
+          - equal: [pipenv, << parameters.tool >>]
+      steps:
+        - save-venv-cache
+  - when:
+      condition:
+        and:
+          - << parameters.venv-cache >>
+          - equal: [poetry, << parameters.tool >>]
+      steps:
+        - save-venv-cache:
+            dependency-file: poetry.lock
+            lib-path: /home/circleci/.cache/pypoetry/virtualenvs/
+  - when:
+      condition:
+        and:
+          - << parameters.pypi-cache >>
+          - equal: [pipenv, << parameters.tool >>]
+      steps:
+        - save-cache:
+            dependency-file: Pipfile.lock
+  - when:
+      condition:
+        and:
+          - << parameters.pypi-cache >>
+          - equal: [poetry, << parameters.tool >>]
+      steps:
+        - save-cache:
+            dependency-file: poetry.lock
+            lib-path: /home/circleci/.cache/pypoetry/cache/
