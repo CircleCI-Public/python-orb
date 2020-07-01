@@ -1,41 +1,86 @@
 version: 2.1
 
 orbs:
-  cli: circleci/circleci-cli@0.1
+  python: circleci/python@<<pipeline.parameters.dev-orb-version>>
+  orb-tools: circleci/orb-tools@9.0
 
-workflows:
-  main:
-    jobs:
-      - test:
-          filters:
-            tags:
-              # Simplified SemVer regex
-              only: /^\d+\.\d+\.\d+$/
-      - publish:
-          filters:
-            branches:
-              ignore: /.*/
-            tags:
-              # Simplified SemVer regex
-              only: /^\d+\.\d+\.\d+$/
-          context: orb-publishing
+# Pipeline parameters
+parameters:
+  # These pipeline parameters are required by the "trigger-integration-tests-workflow"
+  # job, by default.
+  run-integration-tests:
+    type: boolean
+    default: false
+  dev-orb-version:
+    type: string
+    default: "dev:alpha"
 
 jobs:
-  test:
-    executor: cli/default
+  pip-install-test:
+    executor: python/default
     steps:
-      - checkout
-      - run:
-          name: "Test & Validate Orb"
-          command: |
-            circleci config pack src > src/orb.yml
-            circleci orb validate src/orb.yml
-  publish:
-    executor: cli/default
-    steps:
-      - checkout
-      - run:
-          name: "Publish orb via the CircleCI CLI"
-          command: |
-            circleci config pack src > src/orb.yml
-            circleci orb publish src/orb.yml circleci/python@${CIRCLE_TAG}
+        - run:
+              name: "Test pip"
+              command: echo "pytest >> requirements.txt"
+        - python/load-cache
+        - python/install-deps
+        - python/save-cache
+        - run:
+            name: "Test"
+            command: |
+              # pytest would be a dep in requirements.txt
+              pytest
+
+workflows:
+  # This `lint-pack_validate_publish-dev` workflow will run on any commit.
+  lint_pack-validate_publish-dev:
+    unless: << pipeline.parameters.run-integration-tests >>
+    jobs:
+      - orb-tools/lint
+      # pack your orb YAML files to a single orb.yml
+      # validate the orb.yml file to ensure it is well-formed
+      - orb-tools/pack:
+          requires:
+            - orb-tools/lint
+
+      - orb-tools/publish-dev:
+          orb-name: circleci/python
+          context: orb-publishing
+          requires:
+            - orb-tools/pack
+
+      # trigger an integration workflow to test the
+      # dev:${CIRCLE_SHA1:0:7} version of your orb
+      - orb-tools/trigger-integration-tests-workflow:
+          name: trigger-integration-dev
+          requires:
+            - orb-tools/publish-dev
+
+  # This `integration-tests_prod-release` workflow will only run
+  # when the run-integration-tests pipeline parameter is set to true.
+  # It is meant to be triggered by the "trigger-integration-tests-workflow"
+  # job, and run tests on <your orb>@dev:${CIRCLE_SHA1:0:7}.
+  integration-tests_prod-release:
+    when: << pipeline.parameters.run-integration-tests >>
+    jobs:
+      - pip-install-test
+      # publish a semver version of the orb. relies on
+      # the commit subject containing the text "[semver:patch|minor|major|skip]"
+      # as that will determine whether a patch, minor or major
+      # version will be published or if publishing should
+      # be skipped.
+      # e.g. [semver:patch] will cause a patch version to be published.
+      - orb-tools/dev-promote-prod-from-commit-subject:
+          orb-name: circeci/python
+          context: orb-publishing
+          add-pr-comment: true
+          fail-if-semver-not-indicated: true
+          publish-version-tag: true
+          bot-token-variable: GHI_TOKEN
+          bot-user: cpe-bot
+          ssh-fingerprints: 5f:4f:fc:be:b9:00:f1:20:e1:25:1d:1b:0f:b2:af:b9
+          requires:
+            - pip-install-test
+          filters:
+            branches:
+              only: master
