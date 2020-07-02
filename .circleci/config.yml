@@ -21,7 +21,7 @@ jobs:
     steps:
         - run:
               name: "Test pip"
-              command: echo "pytest >> requirements.txt"
+              command: echo "pytest" >> requirements.txt
         - python/load-cache
         - python/install-deps
         - python/save-cache
@@ -29,7 +29,7 @@ jobs:
             name: "Test"
             command: |
               # pytest would be a dep in requirements.txt
-              pytest
+              pytest --version
 
 workflows:
   # This `lint-pack_validate_publish-dev` workflow will run on any commit.
@@ -53,6 +53,7 @@ workflows:
       # dev:${CIRCLE_SHA1:0:7} version of your orb
       - orb-tools/trigger-integration-tests-workflow:
           name: trigger-integration-dev
+          context: orb-publishing
           requires:
             - orb-tools/publish-dev
 
