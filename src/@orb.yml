@@ -1,5 +1,5 @@
 description: |
-  Common CircleCI tasks for the Python programming language. View this orb's source:  https://github.com/CircleCI-Public/python-orb
+  Common CircleCI tasks for the Python programming language.
 display:
   source_url: https://github.com/circleci-public/python-orb
 version: 2.1
