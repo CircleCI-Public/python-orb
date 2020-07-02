@@ -79,7 +79,7 @@ workflows:
           publish-version-tag: true
           bot-token-variable: GHI_TOKEN
           bot-user: cpe-bot
-          ssh-fingerprints: 5f:4f:fc:be:b9:00:f1:20:e1:25:1d:1b:0f:b2:af:b9
+          ssh-fingerprints: 1a:d8:ea:eb:7a:ae:0c:9d:eb:e9:37:0f:66:62:36:9b
           requires:
             - pip-install-test
           filters:
