@@ -2,7 +2,7 @@ version: 2.1
 
 orbs:
   python: circleci/python@<<pipeline.parameters.dev-orb-version>>
-  orb-tools: circleci/orb-tools@9.0
+  orb-tools: circleci/orb-tools@9.1
 
 # Pipeline parameters
 parameters:
@@ -72,7 +72,7 @@ workflows:
       # be skipped.
       # e.g. [semver:patch] will cause a patch version to be published.
       - orb-tools/dev-promote-prod-from-commit-subject:
-          orb-name: circeci/python
+          orb-name: circleci/python
           context: orb-publishing
           add-pr-comment: true
           fail-if-semver-not-indicated: true
