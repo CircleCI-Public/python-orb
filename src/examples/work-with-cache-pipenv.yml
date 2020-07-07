@@ -3,7 +3,7 @@ description: |
 usage:
   version: 2.1
   orbs:
-    python: circleci/python@x.y.z
+    python: circleci/python@0.3.3
   workflows:
     main:
       jobs:
@@ -15,7 +15,7 @@ usage:
         - checkout
         - python/load-venv-cache
         - python/pipenv-install:
-            # pytest couuld also be an arg in Pipfile
+            # pytest could also be an arg in Pipfile
             args: "pytest"
         - python/save-venv-cache
         - run:
