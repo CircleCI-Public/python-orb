@@ -63,11 +63,11 @@ jobs:
   pipenv-test:
     executor: python/default
     steps:
-      - checkout
       - run:
           name: Create Pipfile for test
           command: echo $'[packages]\npytest = "*"' > Pipfile
-      - python/install-packages
+      - python/install-packages:
+          cache-version: v2
       - run:
           command: |
             cp Pipfile.lock Pipfile.lock.tmp
@@ -80,8 +80,10 @@ jobs:
             cp Pipfile.lock.tmp Pipfile.lock
             cp Pipfile.tmp Pipfile
           name: Overwrite the lockfile with the one that should load the cache.
-      - python/install-packages
-      - run: pipenv run pytest --version
+      - python/install-packages:
+          cache-version: v2
+      - run:
+          command: pipenv run pytest --version
 
   poetry-test:
     executor: python/default
