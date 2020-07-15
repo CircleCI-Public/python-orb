@@ -22,10 +22,12 @@ jobs:
       - checkout
       - python/install-packages:
           pkg-manager: pip
-          app-dir: ~/projects/sample
+          app-dir: ~/project/sample
       - run:
           name: "Test"
+          workding_directory: ~/project/sample
           command: |
+            ls -l
             # pytest would be a dep in requirements.txt
             pytest
 
@@ -35,14 +37,14 @@ jobs:
       - checkout
       - python/install-packages:
           pkg-manager: pip
-          app-dir: ~/projects/sample
+          app-dir: ~/project/sample
           pypi-cache: false
       - run:
           name: "Test"
           command: |
             pytest --version
       - python/uninstall-deps:
-          package-names: pylint
+          package-names: pytest
       - run:
           name: "Test"
           command: |
@@ -86,10 +88,10 @@ jobs:
     steps:
       - checkout
       - python/install-packages:
-          app-dir: ~/projects/sample
+          app-dir: ~/project/sample
           pkg-manager: poetry
       - run:
-          working_directory: ~/projects/sample
+          working_directory: ~/project/sample
           command: |
             poetry run pytest
 
@@ -135,14 +137,17 @@ workflows:
           name: job-test-poetry
           pkg-manager: poetry
           test-tool: pytest
+          app-dir: ~/project/sample
       - python/test:
           name: job-test-pipenv
           pkg-manager: pipenv
           args: pytest
           test-tool: pytest
+          app-dir: ~/project/sample
       - python/test:
           name: job-test-pip
           pkg-manager: pip
+          app-dir: ~/project/sample
       # publish a semver version of the orb. relies on
       # the commit subject containing the text "[semver:patch|minor|major|skip]"
       # as that will determine whether a patch, minor or major
