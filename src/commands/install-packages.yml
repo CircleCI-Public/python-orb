@@ -1,6 +1,6 @@
 description: >
   Setup a python environment and install the packages for your project either globally with pip or in a virtualenv with poetry or pipenv.
-  With pip as pkg-manager, if you do not provide args, the command will assume `-r requirements.txt`.
+  With pip as pkg-manager, the command will assume `-r requirements.txt`.
   For poetry and pipenv, no args are provided. Expect the default caching locations for packages and virtualenvs on a debian system with pyenv.
 
 parameters:
@@ -12,7 +12,11 @@ parameters:
   args:
     type: string
     default: ""
-    description: Arguments to pass to install command for pipenv and poetry. Override '-r requirements.txt' for pip.
+    description: Arguments to pass to install command for pipenv and poetry. For pip args are after `-r requirements.txt` as package index options.
+  app-dir:
+    type: string
+    default: "~/project"
+    description: Path to the directory containing your python project. Not needed if dependency file lives in the root.
   venv-cache:
     type: boolean
     default: true
@@ -86,6 +90,7 @@ steps:
       steps:
         - run:
             name: "Install dependencies with pipenv using project Pipfile or inline packages"
+            working_directory: <<parameters.app-dir>>
             command: |
               pipenv install << parameters.args >>
   - when:
@@ -94,29 +99,18 @@ steps:
       steps:
         - run:
             name: "Install dependencies with poetry using project pyproject.toml"
+            working_directory: <<parameters.app-dir>>
             command: |
               poetry install << parameters.args >>
   - when:
       condition:
-        and:
-          - equal: ["", << parameters.args >>]
-          - equal: [pip, << parameters.pkg-manager >>]
+        equal: [pip, << parameters.pkg-manager >>]
       steps:
         - run:
             name: "Install dependencies with pip using project requirements.txt"
+            working_directory: <<parameters.app-dir>>
             command: |
-              pip install -r requirements.txt
-  - when:
-      condition:
-        and:
-          - not:
-              equal: ["", << parameters.args >>]
-          - equal: [pip, << parameters.pkg-manager >>]
-      steps:
-        - run:
-            name: "Install dependencies with pip install"
-            command: |
-              pip install << parameters.args >>
+              pip install -r requirements.txt << parameters.args >>
   - when:
       condition: << parameters.venv-cache >>
       steps:
@@ -166,12 +160,6 @@ steps:
                   key: -pypi-<<parameters.cache-version>>-<<#parameters.include-branch-in-cache-key>>{{ .Branch }}-<</parameters.include-branch-in-cache-key>>{{ checksum "requirements.txt" }}
                   paths:
                     # depending on how pip is used, store the pypi mirror, pyenv 'global' the site-packages, and user site-pacakges
-                    - /home/circleci/.cache/pip
-                    - /home/circleci/.pyenv/versions/
-                    - /home/circleci/.local/lib/
-              - save_cache:
-                  key: -pypi-<<parameters.cache-version>>-<<#parameters.include-branch-in-cache-key>>{{ .Branch }}-<</parameters.include-branch-in-cache-key>>
-                  paths:
                     - /home/circleci/.cache/pip
                     - /home/circleci/.pyenv/versions/
                     - /home/circleci/.local/lib/

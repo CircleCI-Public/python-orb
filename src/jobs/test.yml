@@ -1,6 +1,7 @@
 description: |
   Simple drop-in job to setup a python project, run tests and store the test results if possible.
-  Assumes project defines the test pacakge in the dependencies file as applicable.
+  If test-tool is pytest, the job assumes the project defines pytest in the dependency file.
+  Otherwise, use the built in unittest module as the test-tool.
 
 parameters:
   version:
@@ -14,6 +15,10 @@ parameters:
     enum: ["pip", "pipenv", "poetry"]
     default: "pip"
     description: Select the package manager to use. Default is pip
+  app-dir:
+    type: string
+    default: "~/project"
+    description: Path to the directory containing your python project. Not needed if dependency file lives in the root.
   args:
     type: string
     default: ""
@@ -53,6 +58,7 @@ steps:
   - checkout
   - steps: << parameters.setup >>
   - install-packages:
+      app-dir: <<parameters.app-dir>>
       pkg-manager: <<parameters.pkg-manager>>
       cache-version: <<parameters.cache-version>>
       pypi-cache: <<parameters.pypi-cache>>
@@ -77,6 +83,7 @@ steps:
               equal: [pip, << parameters.pkg-manager >>]
             steps:
               - run:
+                  working_directory: <<parameters.app-dir>>
                   name: Run tests with global python env
                   # the unittest module only looks for things in the path
                   # add the project to the path
@@ -89,6 +96,7 @@ steps:
       steps:
         - run:
             name: Create test-report directory
+            working_directory: <<parameters.app-dir>>
             command: mkdir test-report
         - when:
             condition:
@@ -98,6 +106,7 @@ steps:
             steps:
               - run:
                   name: Run tests with <<parameters.pkg-manager>> run
+                  working_directory: <<parameters.app-dir>>
                   command: <<parameters.pkg-manager>> run pytest --junit-xml=test-report/report.xml
         - when:
             condition:
@@ -105,6 +114,7 @@ steps:
             steps:
               - run:
                   name: Run tests with global python env
+                  working_directory: <<parameters.app-dir>>
                   command: pytest --junit-xml=test-report/report.xml
         - store_test_results:
             path: test-report

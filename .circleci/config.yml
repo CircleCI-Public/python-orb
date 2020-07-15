@@ -22,6 +22,7 @@ jobs:
       - checkout
       - python/install-packages:
           pkg-manager: pip
+          app-dir: ~/projects/sample
       - run:
           name: "Test"
           command: |
@@ -31,28 +32,17 @@ jobs:
   uninstall-deps-test:
     executor: python/default
     steps:
+      - checkout
       - python/install-packages:
           pkg-manager: pip
-          args: pylint
+          app-dir: ~/projects/sample
           pypi-cache: false
       - run:
           name: "Test"
           command: |
-            pylint --version
+            pytest --version
       - python/uninstall-deps:
           package-names: pylint
-      - run:
-          name: "Test"
-          command: |
-            pylint --version || echo "successfully uninstalled"
-      - checkout
-      - python/install-packages:
-          pkg-manager: pip
-      - run:
-          name: "Test"
-          command: |
-            pytest --version
-      - python/uninstall-deps
       - run:
           name: "Test"
           command: |
@@ -82,43 +72,26 @@ jobs:
             cp Pipfile Pipfile.tmp
             pipenv run pytest --version
           name: Ensure pipenv is working and copy lock file for cache testing
-      - python/install-packages:
-          args: "pytest==4.6.1"
+      - run: pipenv install pytest==4.6.1
       - run:
           command: |
             cp Pipfile.lock.tmp Pipfile.lock
             cp Pipfile.tmp Pipfile
           name: Overwrite the lockfile with the one that should load the cache.
       - python/install-packages
-      - run: pipenv run pytest
+      - run: pipenv run pytest --version
 
   poetry-test:
     executor: python/default
     steps:
       - checkout
       - python/install-packages:
+          app-dir: ~/projects/sample
           pkg-manager: poetry
       - run:
+          working_directory: ~/projects/sample
           command: |
             poetry run pytest
-  tox-test:
-    docker:
-      - image: cimg/python:3.8
-    steps:
-      - checkout
-      # This will cache the other python versions we installed
-      - python/install-packages:
-          pkg-manager: pip
-          args: tox
-          pypi-cache: true
-          venv-cache: false
-          cache-version: v2
-          pre-install-steps:
-            - run: pyenv install -s 3.7.8
-            - run: pyenv local 3.8.3 3.7.8
-      - run:
-          name: "Run tox"
-          command: tox
 
 workflows:
   # This `lint-pack_validate_publish-dev` workflow will run on any commit.
@@ -156,7 +129,6 @@ workflows:
       - pip-install-test
       - pipenv-test
       - poetry-test
-      - tox-test
       - dist-test
       - uninstall-deps-test
       - python/test:
