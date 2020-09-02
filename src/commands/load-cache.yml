@@ -1,6 +1,6 @@
 description: "Load cached Pip packages."
 parameters:
-  key:
+  cache-key:
     description: "The cache key to use. The key is immutable."
     type: string
     default: "pip"
@@ -11,4 +11,4 @@ parameters:
 steps:
   - restore_cache:
       keys:
-        - << parameters.key >>-{{ checksum "<<parameters.dependency-file>>" }}
+        - << parameters.cache-key >>-{{ checksum "<<parameters.dependency-file>>" }}

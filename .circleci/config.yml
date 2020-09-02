@@ -22,9 +22,11 @@ jobs:
         - run:
               name: "Test pip"
               command: echo "pytest" >> requirements.txt
-        - python/load-cache
+        - python/load-cache:
+              cache-key: v1
         - python/install-deps
-        - python/save-cache
+        - python/save-cache:
+              cache-key: v1
         - run:
             name: "Test"
             command: |
