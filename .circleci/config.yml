@@ -35,11 +35,9 @@ jobs:
     executor: python/default
     steps:
       - checkout
-      - run:
-          name: Move to setup.py
-          command: |
-            cd ~/project/sample_pip
-      - python/dist
+      - python/dist:
+          app-dir: ~/project/sample_pip
+
 
   pipenv-test:
     executor: python/default
