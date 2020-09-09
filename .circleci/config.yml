@@ -44,6 +44,7 @@ jobs:
   pipenv-test:
     executor: python/default
     steps:
+      - checkout
       - python/install-packages:
           app-dir: ~/project/sample_pipenv
           cache-version: v2
@@ -123,17 +124,17 @@ workflows:
           name: job-test-poetry
           pkg-manager: poetry
           test-tool: pytest
-          app-dir: ~/project/sample
+          app-dir: ~/project/sample_poetry
       - python/test:
           name: job-test-pipenv
           pkg-manager: pipenv
           args: pytest
           test-tool: pytest
-          app-dir: ~/project/sample
+          app-dir: ~/project/sample_pipenv
       - python/test:
           name: job-test-pip
           pkg-manager: pip
-          app-dir: ~/project/sample
+          app-dir: ~/project/sample_pip
       # publish a semver version of the orb. relies on
       # the commit subject containing the text "[semver:patch|minor|major|skip]"
       # as that will determine whether a patch, minor or major
