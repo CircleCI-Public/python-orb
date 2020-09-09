@@ -24,7 +24,7 @@ parameters:
   pypi-cache:
     type: boolean
     default: true
-    description: Keep all versions of pypi and site-pacakge caches for faster rebuilding overall.
+    description: Keep all versions of pypi and site-package caches for faster rebuilding overall.
   cache-version:
     type: string
     default: v1
@@ -38,7 +38,7 @@ parameters:
     type: steps
     default: []
     description: >
-      Steps needed between restoring the cacheand the install step.
+      Steps needed between restoring the cache and the install step.
 
 steps:
   - when:

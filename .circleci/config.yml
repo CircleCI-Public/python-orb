@@ -22,78 +22,63 @@ jobs:
       - checkout
       - python/install-packages:
           pkg-manager: pip
-          app-dir: ~/project/sample
+          app-dir: ~/project/sample_pip
       - run:
           name: "Test"
-          workding_directory: ~/project/sample
+          working_directory: ~/project/sample_pip
           command: |
             ls -l
             # pytest would be a dep in requirements.txt
             pytest
-
-  uninstall-deps-test:
-    executor: python/default
-    steps:
-      - checkout
-      - python/install-packages:
-          pkg-manager: pip
-          app-dir: ~/project/sample
-          pypi-cache: false
-      - run:
-          name: "Test"
-          command: |
-            pytest --version
-      - python/uninstall-deps:
-          package-names: pytest
-      - run:
-          name: "Test"
-          command: |
-            pytest --version || echo "successfully uninstalled"
 
   dist-test:
     executor: python/default
     steps:
       - checkout
       - run:
-          name: Create setup.py to test dist command
+          name: Move to setup.py
           command: |
-            echo 'import setuptools; setuptools.setup(name="tmp-example",version="0.0.1",author="null",author_email="null",url="null",description="null")' > setup.py
+            cd ~/project/sample_pip
       - python/dist
 
   pipenv-test:
     executor: python/default
     steps:
-      - run:
-          name: Create Pipfile for test
-          command: echo $'[packages]\npytest = "*"' > Pipfile
       - python/install-packages:
+          app-dir: ~/project/sample_pipenv
           cache-version: v2
       - run:
+          working_directory: ~/project/sample_pipenv
           command: |
             cp Pipfile.lock Pipfile.lock.tmp
             cp Pipfile Pipfile.tmp
             pipenv run pytest --version
           name: Ensure pipenv is working and copy lock file for cache testing
-      - run: pipenv install pytest==4.6.1
       - run:
+          command: pipenv install pytest==4.6.1
+          working_directory: ~/project/sample_pipenv
+      - run:
+          working_directory: ~/project/sample_pipenv
           command: |
             cp Pipfile.lock.tmp Pipfile.lock
             cp Pipfile.tmp Pipfile
           name: Overwrite the lockfile with the one that should load the cache.
       - python/install-packages:
+          app-dir: ~/project/sample_pipenv
           cache-version: v2
       - run:
-          command: pipenv run pytest --version
+          command: pipenv run pytest
+          working_directory: ~/project/sample_pipenv
 
   poetry-test:
     executor: python/default
     steps:
       - checkout
       - python/install-packages:
-          app-dir: ~/project/sample
+          app-dir: ~/project/sample_poetry
           pkg-manager: poetry
       - run:
-          working_directory: ~/project/sample
+          working_directory: ~/project/sample_poetry
           command: |
             poetry run pytest
 
@@ -134,7 +119,6 @@ workflows:
       - pipenv-test
       - poetry-test
       - dist-test
-      - uninstall-deps-test
       - python/test:
           name: job-test-poetry
           pkg-manager: poetry
