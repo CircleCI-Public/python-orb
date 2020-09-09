@@ -157,7 +157,6 @@ workflows:
             - job-test-pipenv
             - job-test-pip
             - dist-test
-            - uninstall-deps-test
           filters:
             branches:
               only: master
