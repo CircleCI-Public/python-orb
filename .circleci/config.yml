@@ -19,17 +19,67 @@ jobs:
   pip-install-test:
     executor: python/default
     steps:
-        - run:
-              name: "Test pip"
-              command: echo "pytest" >> requirements.txt
-        - python/load-cache
-        - python/install-deps
-        - python/save-cache
-        - run:
-            name: "Test"
-            command: |
-              # pytest would be a dep in requirements.txt
-              pytest --version
+      - checkout
+      - python/install-packages:
+          pkg-manager: pip
+          app-dir: ~/project/sample_pip
+      - run:
+          name: "Test"
+          working_directory: ~/project/sample_pip
+          command: |
+            ls -l
+            # pytest would be a dep in requirements.txt
+            pytest
+
+  dist-test:
+    executor: python/default
+    steps:
+      - checkout
+      - python/dist:
+          app-dir: ~/project/sample_pip
+
+
+  pipenv-test:
+    executor: python/default
+    steps:
+      - checkout
+      - python/install-packages:
+          app-dir: ~/project/sample_pipenv
+          cache-version: v2
+      - run:
+          working_directory: ~/project/sample_pipenv
+          command: |
+            cp Pipfile.lock Pipfile.lock.tmp
+            cp Pipfile Pipfile.tmp
+            pipenv run pytest --version
+          name: Ensure pipenv is working and copy lock file for cache testing
+      - run:
+          command: pipenv install pytest==4.6.1
+          working_directory: ~/project/sample_pipenv
+      - run:
+          working_directory: ~/project/sample_pipenv
+          command: |
+            cp Pipfile.lock.tmp Pipfile.lock
+            cp Pipfile.tmp Pipfile
+          name: Overwrite the lockfile with the one that should load the cache.
+      - python/install-packages:
+          app-dir: ~/project/sample_pipenv
+          cache-version: v2
+      - run:
+          command: pipenv run pytest
+          working_directory: ~/project/sample_pipenv
+
+  poetry-test:
+    executor: python/default
+    steps:
+      - checkout
+      - python/install-packages:
+          app-dir: ~/project/sample_poetry
+          pkg-manager: poetry
+      - run:
+          working_directory: ~/project/sample_poetry
+          command: |
+            poetry run pytest
 
 workflows:
   # This `lint-pack_validate_publish-dev` workflow will run on any commit.
@@ -65,6 +115,24 @@ workflows:
     when: << pipeline.parameters.run-integration-tests >>
     jobs:
       - pip-install-test
+      - pipenv-test
+      - poetry-test
+      - dist-test
+      - python/test:
+          name: job-test-poetry
+          pkg-manager: poetry
+          test-tool: pytest
+          app-dir: ~/project/sample_poetry
+      - python/test:
+          name: job-test-pipenv
+          pkg-manager: pipenv
+          args: pytest
+          test-tool: pytest
+          app-dir: ~/project/sample_pipenv
+      - python/test:
+          name: job-test-pip
+          pkg-manager: pip
+          app-dir: ~/project/sample_pip
       # publish a semver version of the orb. relies on
       # the commit subject containing the text "[semver:patch|minor|major|skip]"
       # as that will determine whether a patch, minor or major
@@ -82,6 +150,12 @@ workflows:
           ssh-fingerprints: 1a:d8:ea:eb:7a:ae:0c:9d:eb:e9:37:0f:66:62:36:9b
           requires:
             - pip-install-test
+            - pipenv-test
+            - poetry-test
+            - job-test-poetry
+            - job-test-pipenv
+            - job-test-pip
+            - dist-test
           filters:
             branches:
               only: master

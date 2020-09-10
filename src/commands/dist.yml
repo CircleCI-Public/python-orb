@@ -1,6 +1,14 @@
 description: "Build a distribution package using distutils and setup.py"
+
+parameters:
+  app-dir:
+    type: string
+    default: "~/project"
+    description: Path to the directory containing your python project. Not needed if 'setup.py' lives in root project dir
 steps:
+  - run: pip install wheel
   - run:
+      working_directory: << parameters.app-dir >>
       name: "Build distribution package"
       command: |
         python setup.py sdist
