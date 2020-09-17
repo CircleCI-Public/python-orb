@@ -15,6 +15,10 @@ parameters:
     enum: ["pip", "pipenv", "poetry"]
     default: "pip"
     description: Select the package manager to use. Default is pip
+  pip-dependency-file:
+    type: string
+    default: requirements.txt
+    description: Name of the requirements file that needs to be installed with pip. Prepended with `app-dir`. If using pipenv or poetry, this is ignored.
   app-dir:
     type: string
     default: "~/project"
@@ -65,6 +69,7 @@ steps:
       venv-cache: <<parameters.venv-cache>>
       include-branch-in-cache-key: <<parameters.include-branch-in-cache-key>>
       args: <<parameters.args>>
+      pip-dependency-file: <<parameters.pip-dependency-file>>
   - when:
       condition:
         equal: ["unittest", << parameters.test-tool >>]
