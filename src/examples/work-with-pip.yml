@@ -3,7 +3,7 @@ description: |
 usage:
   version: 2.1
   orbs:
-    python: circleci/python@1.0.0
+    python: circleci/python@1.1.0
   workflows:
     main:
       jobs:
@@ -16,6 +16,10 @@ usage:
         # Install requirements.txt
         - python/install-packages:
             pkg-manager: pip
+        # Install dev-requirements.txt
+        - python/install-packages:
+            pkg-manager: pip
+            pip-dependency-file: dev-requirements.txt
         # install pytest to run tests
         - python/install-packages:
             pkg-manager: pip

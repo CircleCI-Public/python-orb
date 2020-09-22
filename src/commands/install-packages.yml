@@ -66,7 +66,9 @@ steps:
                     - -pypi-<<parameters.cache-version>>-<<#parameters.include-branch-in-cache-key>>{{ .Branch }}-<</parameters.include-branch-in-cache-key>>{{ checksum "<< parameters.app-dir >>/poetry.lock" }}
         - when:
             condition:
-              equal: [pip, << parameters.pkg-manager >>]
+              or:
+                - equal: [pip, << parameters.pkg-manager >>]
+                - equal: [pip-dist, << parameters.pkg-manager >>]
             steps:
               - restore_cache:
                   keys:
@@ -169,7 +171,9 @@ steps:
                     - /home/circleci/.cache/pip
         - when:
             condition:
-              equal: [pip, << parameters.pkg-manager >>]
+              or:
+                - equal: [pip, << parameters.pkg-manager >>]
+                - equal: [pip-dist, << parameters.pkg-manager >>]
             steps:
               - save_cache:
                   key: -pypi-<<parameters.cache-version>>-<<#parameters.include-branch-in-cache-key>>{{ .Branch }}-<</parameters.include-branch-in-cache-key>>{{ checksum "<< parameters.app-dir >>/<<parameters.pip-dependency-file>>" }}
