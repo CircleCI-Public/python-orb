@@ -8,7 +8,7 @@ parameters:
     type: enum
     enum: [poetry, pipenv, pip, pip-dist]
     default: pipenv
-    description: Which package management tool to use, pipenv, pip or poetry with dependency file. Use, pip-dist, to install a dist package.
+    description: Which package management tool to use, pipenv, pip or poetry with dependency file. Use, pip-dist, to install with project setup.py.
   args:
     type: string
     default: ""
