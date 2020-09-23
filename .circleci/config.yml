@@ -133,6 +133,11 @@ workflows:
           name: job-test-pip
           pkg-manager: pip
           app-dir: ~/project/sample_pip
+      - python/test:
+          name: job-test-pip-dist
+          pkg-manager: pip-dist
+          app-dir: ~/project/sample_pip
+          pip-dependency-file: setup.py
       # publish a semver version of the orb. relies on
       # the commit subject containing the text "[semver:patch|minor|major|skip]"
       # as that will determine whether a patch, minor or major

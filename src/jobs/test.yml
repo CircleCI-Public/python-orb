@@ -12,9 +12,13 @@ parameters:
       For a full list of releases, see the following: https://hub.docker.com/r/cimg/python
   pkg-manager:
     type: enum
-    enum: ["pip", "pipenv", "poetry"]
+    enum: ["pip", "pipenv", "poetry", "pip-dist"]
     default: "pip"
     description: Select the package manager to use. Default is pip
+  pip-dependency-file:
+    type: string
+    default: requirements.txt
+    description: Name of the requirements file that needs to be installed with pip. Prepended with `app-dir`. If using pipenv or poetry, this is ignored.
   app-dir:
     type: string
     default: "~/project"
@@ -65,6 +69,7 @@ steps:
       venv-cache: <<parameters.venv-cache>>
       include-branch-in-cache-key: <<parameters.include-branch-in-cache-key>>
       args: <<parameters.args>>
+      pip-dependency-file: <<parameters.pip-dependency-file>>
   - when:
       condition:
         equal: ["unittest", << parameters.test-tool >>]
@@ -80,7 +85,9 @@ steps:
                   command: <<parameters.pkg-manager>> run python -m unittest
         - when:
             condition:
-              equal: [pip, << parameters.pkg-manager >>]
+              or:
+                - equal: [pip, << parameters.pkg-manager >>]
+                - equal: [pip-dist, << parameters.pkg-manager >>]
             steps:
               - run:
                   working_directory: <<parameters.app-dir>>
@@ -110,7 +117,9 @@ steps:
                   command: <<parameters.pkg-manager>> run pytest --junit-xml=test-report/report.xml
         - when:
             condition:
-              equal: [pip, << parameters.pkg-manager >>]
+              or:
+                - equal: [pip, << parameters.pkg-manager >>]
+                - equal: [pip-dist, << parameters.pkg-manager >>]
             steps:
               - run:
                   name: Run tests with global python env
