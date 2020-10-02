@@ -45,6 +45,11 @@ parameters:
     default: []
     description: >
       Steps needed between restoring the cache and the install step.
+  include-python-in-cache-key:
+    type: boolean
+    default: true
+    description: >
+      If true, this cache bucket will checksum the pyenv python binary with the cache-key.
 
 steps:
   - when:
@@ -56,14 +61,14 @@ steps:
             steps:
               - restore_cache:
                   keys:
-                    - -pypi-<<parameters.cache-version>>-<<#parameters.include-branch-in-cache-key>>{{ .Branch }}-<</parameters.include-branch-in-cache-key>>{{ checksum "<< parameters.app-dir >>/Pipfile.lock" }}
+                    - -pypi-<<parameters.cache-version>>-<<#parameters.include-branch-in-cache-key>>{{ .Branch }}-<</parameters.include-branch-in-cache-key>>{{ checksum "<< parameters.app-dir >>/Pipfile.lock" }}-<<#parameters.include-python-in-cache-key>>{{ checksum "/home/circleci/.pyenv/version" }}-<</parameters.include-python-in-cache-key>>
         - when:
             condition:
               equal: [poetry, << parameters.pkg-manager >>]
             steps:
               - restore_cache:
                   keys:
-                    - -pypi-<<parameters.cache-version>>-<<#parameters.include-branch-in-cache-key>>{{ .Branch }}-<</parameters.include-branch-in-cache-key>>{{ checksum "<< parameters.app-dir >>/poetry.lock" }}
+                    - -pypi-<<parameters.cache-version>>-<<#parameters.include-branch-in-cache-key>>{{ .Branch }}-<</parameters.include-branch-in-cache-key>>{{ checksum "<< parameters.app-dir >>/poetry.lock" }}-<<#parameters.include-python-in-cache-key>>{{ checksum "/home/circleci/.pyenv/version" }}-<</parameters.include-python-in-cache-key>>
         - when:
             condition:
               or:
@@ -72,8 +77,7 @@ steps:
             steps:
               - restore_cache:
                   keys:
-                    - -pypi-<<parameters.cache-version>>-<<#parameters.include-branch-in-cache-key>>{{ .Branch }}-<</parameters.include-branch-in-cache-key>>{{ checksum "<< parameters.app-dir >>/<<parameters.pip-dependency-file>>" }}
-                    - -pypi-<<parameters.cache-version>>-<<#parameters.include-branch-in-cache-key>>{{ .Branch }}-<</parameters.include-branch-in-cache-key>>
+                    - -pypi-<<parameters.cache-version>>-<<#parameters.include-branch-in-cache-key>>{{ .Branch }}-<</parameters.include-branch-in-cache-key>>{{ checksum "<< parameters.app-dir >>/<<parameters.pip-dependency-file>>" }}-<<#parameters.include-python-in-cache-key>>{{ checksum "/home/circleci/.pyenv/version" }}-<</parameters.include-python-in-cache-key>>
   - when:
       condition: << parameters.venv-cache >>
       steps:
@@ -83,14 +87,14 @@ steps:
             steps:
               - restore_cache:
                   keys:
-                    - -venv-<<parameters.cache-version>>-<<#parameters.include-branch-in-cache-key>>{{ .Branch }}-<</parameters.include-branch-in-cache-key>>{{ checksum "<< parameters.app-dir >>/Pipfile.lock" }}
+                    - -venv-<<parameters.cache-version>>-<<#parameters.include-branch-in-cache-key>>{{ .Branch }}-<</parameters.include-branch-in-cache-key>>{{ checksum "<< parameters.app-dir >>/Pipfile.lock" }}-<<#parameters.include-python-in-cache-key>>{{ checksum "/home/circleci/.pyenv/version" }}-<</parameters.include-python-in-cache-key>>
         - when:
             condition:
               equal: [poetry, << parameters.pkg-manager >>]
             steps:
               - restore_cache:
                   keys:
-                    - -venv-<<parameters.cache-version>>-<<#parameters.include-branch-in-cache-key>>{{ .Branch }}-<</parameters.include-branch-in-cache-key>>{{ checksum "<< parameters.app-dir >>/poetry.lock" }}
+                    - -venv-<<parameters.cache-version>>-<<#parameters.include-branch-in-cache-key>>{{ .Branch }}-<</parameters.include-branch-in-cache-key>>{{ checksum "<< parameters.app-dir >>/poetry.lock" }}-<<#parameters.include-python-in-cache-key>>{{ checksum "/home/circleci/.pyenv/version" }}-<</parameters.include-python-in-cache-key>>
   - steps: <<parameters.pre-install-steps>>
   - when:
       condition:
@@ -136,7 +140,7 @@ steps:
               equal: [pipenv, << parameters.pkg-manager >>]
             steps:
               - save_cache:
-                  key: -venv-<<parameters.cache-version>>-<<#parameters.include-branch-in-cache-key>>{{ .Branch }}-<</parameters.include-branch-in-cache-key>>{{ checksum "<< parameters.app-dir >>/Pipfile.lock" }}
+                  key: -venv-<<parameters.cache-version>>-<<#parameters.include-branch-in-cache-key>>{{ .Branch }}-<</parameters.include-branch-in-cache-key>>{{ checksum "<< parameters.app-dir >>/Pipfile.lock" }}-<<#parameters.include-python-in-cache-key>>{{ checksum "/home/circleci/.pyenv/version" }}-<</parameters.include-python-in-cache-key>>
                   paths:
                     - /home/circleci/.local/share/virtualenvs
         - when:
@@ -144,7 +148,7 @@ steps:
               equal: [poetry, << parameters.pkg-manager >>]
             steps:
               - save_cache:
-                  key: -venv-<<parameters.cache-version>>-<<#parameters.include-branch-in-cache-key>>{{ .Branch }}-<</parameters.include-branch-in-cache-key>>{{ checksum "<< parameters.app-dir >>/poetry.lock" }}
+                  key: -venv-<<parameters.cache-version>>-<<#parameters.include-branch-in-cache-key>>{{ .Branch }}-<</parameters.include-branch-in-cache-key>>{{ checksum "<< parameters.app-dir >>/poetry.lock" }}-<<#parameters.include-python-in-cache-key>>{{ checksum "/home/circleci/.pyenv/version" }}-<</parameters.include-python-in-cache-key>>
                   paths:
                     - /home/circleci/.cache/pypoetry/virtualenvs
   - when:
@@ -155,7 +159,7 @@ steps:
               equal: [pipenv, << parameters.pkg-manager >>]
             steps:
               - save_cache:
-                  key: -pypi-<<parameters.cache-version>>-<<#parameters.include-branch-in-cache-key>>{{ .Branch }}-<</parameters.include-branch-in-cache-key>>{{ checksum "<< parameters.app-dir >>/Pipfile.lock" }}
+                  key: -pypi-<<parameters.cache-version>>-<<#parameters.include-branch-in-cache-key>>{{ .Branch }}-<</parameters.include-branch-in-cache-key>>{{ checksum "<< parameters.app-dir >>/Pipfile.lock" }}-<<#parameters.include-python-in-cache-key>>{{ checksum "/home/circleci/.pyenv/version" }}-<</parameters.include-python-in-cache-key>>
                   paths:
                     # pipenv caches a pypi mirror and the site-pacakges
                     - "/home/circleci/.cache/pip"
@@ -165,7 +169,7 @@ steps:
               equal: [poetry, << parameters.pkg-manager >>]
             steps:
               - save_cache:
-                  key: -pypi-<<parameters.cache-version>>-<<#parameters.include-branch-in-cache-key>>{{ .Branch }}-<</parameters.include-branch-in-cache-key>>{{ checksum "<< parameters.app-dir >>/poetry.lock" }}
+                  key: -pypi-<<parameters.cache-version>>-<<#parameters.include-branch-in-cache-key>>{{ .Branch }}-<</parameters.include-branch-in-cache-key>>{{ checksum "<< parameters.app-dir >>/poetry.lock" }}-<<#parameters.include-python-in-cache-key>>{{ checksum "/home/circleci/.pyenv/version" }}-<</parameters.include-python-in-cache-key>>
                   paths:
                     # poetry only maintains a pypi mirror
                     - /home/circleci/.cache/pip
@@ -176,7 +180,7 @@ steps:
                 - equal: [pip-dist, << parameters.pkg-manager >>]
             steps:
               - save_cache:
-                  key: -pypi-<<parameters.cache-version>>-<<#parameters.include-branch-in-cache-key>>{{ .Branch }}-<</parameters.include-branch-in-cache-key>>{{ checksum "<< parameters.app-dir >>/<<parameters.pip-dependency-file>>" }}
+                  key: -pypi-<<parameters.cache-version>>-<<#parameters.include-branch-in-cache-key>>{{ .Branch }}-<</parameters.include-branch-in-cache-key>>{{ checksum "<< parameters.app-dir >>/<<parameters.pip-dependency-file>>" }}-<<#parameters.include-python-in-cache-key>>{{ checksum "/home/circleci/.pyenv/version" }}-<</parameters.include-python-in-cache-key>>
                   paths:
                     # depending on how pip is used, store the pypi mirror, pyenv 'global' the site-packages, and user site-pacakges
                     - /home/circleci/.cache/pip
