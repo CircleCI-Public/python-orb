@@ -139,7 +139,7 @@ workflows:
           name: job-test-pip-dist
           pkg-manager: pip-dist
           app-dir: ~/project/sample_pip
-          include-python-in-cache-key: false
+          pip-dependency-file: setup.py
           post-steps:
             - run:
                 name: Attempt to set the other python version - this should fail, but if the cache is broken, this will succeed.
