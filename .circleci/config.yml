@@ -23,7 +23,6 @@ jobs:
       - python/install-packages:
           pkg-manager: pip
           app-dir: ~/project/sample_pip
-          include-python-in-cache-key: false
       - run:
           name: "Test"
           working_directory: ~/project/sample_pip
