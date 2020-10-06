@@ -53,6 +53,11 @@ parameters:
     default: true
     description: >
       If true, this cache bucket will only apply to jobs within the same branch.
+  include-python-in-cache-key:
+    type: boolean
+    default: true
+    description: >
+      If true, this cache bucket will checksum the pyenv python version with the cache-key
 
 executor:
   name: default
@@ -70,6 +75,7 @@ steps:
       include-branch-in-cache-key: <<parameters.include-branch-in-cache-key>>
       args: <<parameters.args>>
       pip-dependency-file: <<parameters.pip-dependency-file>>
+      include-python-in-cache-key: <<parameters.include-python-in-cache-key>>
   - when:
       condition:
         equal: ["unittest", << parameters.test-tool >>]
