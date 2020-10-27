@@ -132,4 +132,4 @@ steps:
                   working_directory: <<parameters.app-dir>>
                   command: pytest --junit-xml=test-report/report.xml
         - store_test_results:
-            path: test-report
+            path: <<#parameters.app-dir>><<parameters.app-dir>>/<</parameters.app-dir>>test-report

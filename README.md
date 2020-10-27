@@ -1,7 +1,7 @@
 # Python Orb [![CircleCI Build Status](https://circleci.com/gh/CircleCI-Public/python-orb.svg?style=shield "CircleCI Build Status")](https://circleci.com/gh/CircleCI-Public/python-orb) [![CircleCI Orb Version](https://img.shields.io/badge/endpoint.svg?url=https://badges.circleci.io/orb/circleci/python)][reg-page] [![GitHub License](https://img.shields.io/badge/license-MIT-lightgrey.svg)](https://raw.githubusercontent.com/CircleCI-Public/python-orb/master/LICENSE) [![CircleCI Community](https://img.shields.io/badge/community-CircleCI%20Discuss-343434.svg)](https://discuss.circleci.com/c/ecosystem/orbs)
 
 A python Orb for CircleCI.
-This orb allows you to do common python related tasks on CircleCI such as setup a pipenv or poetry env, manage global python depdendencies, cache virtualenvs or global python packages.
+This orb allows you to do common python related tasks on CircleCI such as setup a pipenv or poetry env, manage global python dependencies, cache virtualenvs or global python packages.
 
 
 ## Usage
