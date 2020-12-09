@@ -1,7 +1,8 @@
 description: >
   Setup a python environment and install the packages for your project either globally with pip or in a virtualenv with poetry or pipenv.
   With pip as pkg-manager, the command will assume `-r requirements.txt`.
-  For poetry and pipenv, no args are provided. Expect the default caching locations for packages and virtualenvs on a debian system with pyenv.
+  With poetry as pkg-manager, the command will assume `--no-ansi`.
+  For pipenv, no args are provided. Expect the default caching locations for packages and virtualenvs on a debian system with pyenv.
 
 parameters:
   pkg-manager:
@@ -12,7 +13,9 @@ parameters:
   args:
     type: string
     default: ""
-    description: Arguments to pass to install command for pipenv and poetry. For pip, args are after `-r requirements.txt` as package index options.
+    description: |
+      Arguments to pass to install command for pipenv and poetry. For pip, args are after `-r requirements.txt` as package index options.
+      For poetry, args are after `--no-ansi` as output option.
   pip-dependency-file:
     type: string
     default: requirements.txt
@@ -113,7 +116,7 @@ steps:
             name: "Install dependencies with poetry using project pyproject.toml"
             working_directory: << parameters.app-dir >>
             command: |
-              poetry install << parameters.args >>
+              poetry install --no-ansi << parameters.args >>
   - when:
       condition:
         equal: [pip, << parameters.pkg-manager >>]
