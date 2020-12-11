@@ -14,7 +14,7 @@ parameters:
     type: string
     default: ""
     description: |
-      Arguments to pass to install command for pipenv and poetry. For pip, args are after `-r requirements.txt` as package index options.
+      Arguments to pass to install command for pipenv and poetry. For pip, arguments are after the command, `pip install -r requirements.txt <args>`.
       For poetry, args are after `--no-ansi` as output option.
   pip-dependency-file:
     type: string
@@ -22,6 +22,7 @@ parameters:
     description: |
       Name of the requirements file that needs to be installed with pip. Prepended with `app-dir`. If using pipenv or poetry, this is ignored.
       If using `pip-dist`, use this to use the cache checksum against the `setup.py` if desired.
+      If `pip-dependency-file` is set to an empty string, no dependency file is used in the `pip install` command.
   app-dir:
     type: string
     default: "~/project"
@@ -119,13 +120,20 @@ steps:
               poetry install --no-ansi << parameters.args >>
   - when:
       condition:
-        equal: [pip, << parameters.pkg-manager >>]
+        # if pip == pkgmanager and args != "" or pip-depencyfile != ""
+        and:
+          - equal: [pip, << parameters.pkg-manager >>]
+          - or:
+            # true if no arguements
+            - <<parameters.args>>
+            # true if dep file
+            - <<parameters.pip-dependency-file>>
       steps:
         - run:
             name: "Install dependencies with pip using project <<parameters.pip-dependency-file>>"
             working_directory: <<parameters.app-dir>>
             command: |
-              pip install -r <<parameters.pip-dependency-file>> << parameters.args >>
+              pip install <<#parameters.pip-dependency-file>>-r <<parameters.pip-dependency-file>><</parameters.pip-dependency-file>> << parameters.args >>
   - when:
       condition:
         equal: [pip-dist, << parameters.pkg-manager >>]
