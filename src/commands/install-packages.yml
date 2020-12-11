@@ -116,10 +116,13 @@ steps:
               poetry install << parameters.args >>
   - when:
       condition:
+        # if pip == pkgmanager and args != "" or pip-depencyfile != ""
         and:
           - equal: [pip, << parameters.pkg-manager >>]
-          - and:
-            - not: <<parameters.args>>
+          - or:
+            # true if no arguements
+            - <<parameters.args>>
+            # true if dep file
             - <<parameters.pip-dependency-file>>
       steps:
         - run:
