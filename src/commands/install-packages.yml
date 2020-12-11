@@ -52,6 +52,7 @@ parameters:
       If true, this cache bucket will checksum the pyenv python version with the cache-key.
 
 steps:
+  - run: echo <<parameters.args>> && echo <<parameters.pip-dependency-file>>
   - when:
       condition: << parameters.pypi-cache >>
       steps:
