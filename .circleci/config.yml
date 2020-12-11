@@ -27,8 +27,21 @@ jobs:
           name: "Test"
           working_directory: ~/project/sample_pip
           command: |
-            ls -l
-            # pytest would be a dep in requirements.txt
+            pytest
+
+  pip-install-test-args:
+    executor: python/default
+    steps:
+      - checkout
+      - python/install-packages:
+          pkg-manager: pip
+          app-dir: ~/project/sample_pip
+          args: pytest
+          pip-dependency-file: ""
+      - run:
+          name: "Test"
+          working_directory: ~/project/sample_pip
+          command: |
             pytest
 
   dist-test:
@@ -115,6 +128,7 @@ workflows:
     when: << pipeline.parameters.run-integration-tests >>
     jobs:
       - pip-install-test
+      - pip-install-test-args
       - pipenv-test
       - poetry-test
       - dist-test
@@ -170,6 +184,7 @@ workflows:
           ssh-fingerprints: 1a:d8:ea:eb:7a:ae:0c:9d:eb:e9:37:0f:66:62:36:9b
           requires:
             - pip-install-test
+            - pip-install-test-args
             - pipenv-test
             - poetry-test
             - job-test-poetry
