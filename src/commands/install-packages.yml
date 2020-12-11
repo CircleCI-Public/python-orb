@@ -119,8 +119,9 @@ steps:
       condition:
         and:
           - equal: [pip, << parameters.pkg-manager >>]
-          - not: <<parameters.args>>
-          - not: <<parameters.pip-dependency-file>>
+          - and:
+            - not: <<parameters.args>>
+            - <<parameters.pip-dependency-file>>
       steps:
         - run:
             name: "Install dependencies with pip using project <<parameters.pip-dependency-file>>"
