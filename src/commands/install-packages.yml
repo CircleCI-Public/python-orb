@@ -116,13 +116,18 @@ steps:
               poetry install << parameters.args >>
   - when:
       condition:
-        equal: [pip, << parameters.pkg-manager >>]
+        and:
+          - equal: [pip, << parameters.pkg-manager >>]
+          - not:
+              equal: ["", <<parameters.args>>]
+          - not:
+              equal: ["", <<parameters.pip-dependency-file>>]
       steps:
         - run:
             name: "Install dependencies with pip using project <<parameters.pip-dependency-file>>"
             working_directory: <<parameters.app-dir>>
             command: |
-              pip install -r <<parameters.pip-dependency-file>> << parameters.args >>
+              pip install <<#parameters.pip-dependency-file>>-r <<parameters.pip-dependency-file>><</parameters.pip-dependency-file>> << parameters.args >>
   - when:
       condition:
         equal: [pip-dist, << parameters.pkg-manager >>]
