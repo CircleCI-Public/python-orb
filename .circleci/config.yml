@@ -134,6 +134,11 @@ workflows:
           pkg-manager: pip
           app-dir: ~/project/sample_pip
       - python/test:
+          name: job-test-pip-no-reqs
+          pkg-manager: pip
+          pip-dependency-file: ""
+          app-dir: ~/project/sample_pip
+      - python/test:
           version: 3.8.2
           name: job-test-pip-dist
           pkg-manager: pip-dist
