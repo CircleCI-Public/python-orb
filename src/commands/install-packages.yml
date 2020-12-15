@@ -9,7 +9,7 @@ parameters:
     type: enum
     enum: [poetry, pipenv, pip, pip-dist]
     default: pipenv
-    description: Which package management tool to use, pipenv, pip or poetry with dependency file. Use, pip-dist, to install with project setup.py.
+    description: Which package management tool to use, pipenv, pip or poetry with dependency file. Use `pip-dist` to install with project setup.py.
   args:
     type: string
     default: ""
@@ -120,11 +120,11 @@ steps:
               poetry install --no-ansi << parameters.args >>
   - when:
       condition:
-        # if pip == pkgmanager and args != "" or pip-depencyfile != ""
+        # if pip == pkgmanager and args != "" or pip-dependency-file != ""
         and:
           - equal: [pip, << parameters.pkg-manager >>]
           - or:
-            # true if no arguements
+            # true if no arguments
             - <<parameters.args>>
             # true if dep file
             - <<parameters.pip-dependency-file>>
