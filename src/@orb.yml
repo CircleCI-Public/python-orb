@@ -1,5 +1,6 @@
 description: |
   Common CircleCI tasks for the Python programming language.
+  Arm64 V8 compatible.
 display:
   source_url: https://github.com/circleci-public/python-orb
 version: 2.1
