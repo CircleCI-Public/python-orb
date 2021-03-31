@@ -25,7 +25,7 @@ parameters:
       If `pip-dependency-file` is set to an empty string, no dependency file is used in the `pip install` command.
   app-dir:
     type: string
-    default: "~/project"
+    default: "."
     description: Path to the directory containing your python project. Not needed if dependency file lives in the root.
   venv-cache:
     type: boolean
