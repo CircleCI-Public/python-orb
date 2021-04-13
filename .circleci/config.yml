@@ -180,8 +180,8 @@ workflows:
           fail-if-semver-not-indicated: true
           publish-version-tag: true
           bot-token-variable: GHI_TOKEN
-          bot-user: cpe-bot
-          ssh-fingerprints: 1a:d8:ea:eb:7a:ae:0c:9d:eb:e9:37:0f:66:62:36:9b
+          bot-user: orb-publisher
+          ssh-fingerprints: 87:de:b9:01:e7:97:eb:9e:57:f3:de:e0:9a:7b:e1:fe
           requires:
             - pip-install-test
             - pip-install-test-args
