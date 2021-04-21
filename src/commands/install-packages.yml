@@ -10,6 +10,12 @@ parameters:
     enum: [poetry, pipenv, pip, pip-dist]
     default: pipenv
     description: Which package management tool to use, pipenv, pip or poetry with dependency file. Use `pip-dist` to install with project setup.py.
+  path-args:
+    type: string
+    default: "."
+    description: |
+      If using `pip-dist` these are the arguments after the command `pip install -e` that is by default set to `.`.  Use of this parameter allows
+      for multiple paths to be specified.  This is important when extra paths are required to install extra packages referenced via `extras_requires`.
   args:
     type: string
     default: ""
@@ -142,7 +148,7 @@ steps:
             name: "Install dependencies with pip using project setup.py"
             working_directory: <<parameters.app-dir>>
             command: |
-              pip install -e . << parameters.args >>
+              pip install -e << parameters.path-args >> << parameters.args >>
   - when:
       condition: << parameters.venv-cache >>
       steps:
