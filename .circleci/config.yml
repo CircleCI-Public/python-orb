@@ -181,7 +181,7 @@ workflows:
           publish-version-tag: true
           bot-token-variable: GHI_TOKEN
           bot-user: orb-publisher
-          ssh-fingerprints: 87:de:b9:01:e7:97:eb:9e:57:f3:de:e0:9a:7b:e1:fe
+          ssh-fingerprints: a3:57:82:bf:38:55:a7:9b:69:7b:d0:79:8f:fa:61:01
           requires:
             - pip-install-test
             - pip-install-test-args
