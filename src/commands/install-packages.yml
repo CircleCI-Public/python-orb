@@ -60,6 +60,11 @@ parameters:
     default: true
     description: >
       If true, this cache bucket will checksum the pyenv python version with the cache-key.
+  pipenv-venv-in-project:
+    type: boolean
+    default: false
+    description: >
+      If true, pipenv is given as `pkg-manager` and `venv-cache` is enabled, the virtualenv is expected in the project directory instead of `/home/circleci/.local/share/virtualenvs`.
 
 steps:
   - when:
@@ -159,7 +164,7 @@ steps:
               - save_cache:
                   key: -venv-<<parameters.cache-version>>-<<#parameters.include-branch-in-cache-key>>{{ .Branch }}-<</parameters.include-branch-in-cache-key>>{{ checksum "<< parameters.app-dir >>/Pipfile.lock" }}-<<#parameters.include-python-in-cache-key>>{{ checksum "/home/circleci/.pyenv/version" }}-<</parameters.include-python-in-cache-key>>
                   paths:
-                    - /home/circleci/.local/share/virtualenvs
+                    - <<# parameters.pipenv-venv-in-project >><< parameters.app-dir >>/.venv<</ parameters.pipenv-venv-in-project >><<^ parameters.pipenv-venv-in-project >>/home/circleci/.local/share/virtualenvs<</ parameters.pipenv-venv-in-project >>
         - when:
             condition:
               equal: [poetry, << parameters.pkg-manager >>]
