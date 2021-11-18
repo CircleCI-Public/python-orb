@@ -36,6 +36,10 @@ parameters:
     enum: ["pytest", "unittest"]
     default: "unittest"  # default since its not an external requirement
     description: The tool to run the tests with.
+  test-tool-args:
+    type: string
+    default: ""
+    description: Arguments to pass to test tool, i.e. discovery settings for unittest - 'discover -s tests_dir'.
   venv-cache:
     type: boolean
     default: true
@@ -88,7 +92,7 @@ steps:
             steps:
               - run:
                   name: Run tests with <<parameters.pkg-manager>> run
-                  command: <<parameters.pkg-manager>> run python -m unittest
+                  command: <<parameters.pkg-manager>> run python -m unittest << parameters.test-tool-args >>
         - when:
             condition:
               or:
@@ -102,7 +106,7 @@ steps:
                   # add the project to the path
                   command: |
                     export PYTHONPATH=$PWD:$PYTHONPATH
-                    python -m unittest
+                    python -m unittest << parameters.test-tool-args >>
   - when:
       condition:
         equal: ["pytest", << parameters.test-tool >>]
@@ -120,7 +124,7 @@ steps:
               - run:
                   name: Run tests with <<parameters.pkg-manager>> run
                   working_directory: <<parameters.app-dir>>
-                  command: <<parameters.pkg-manager>> run pytest --junit-xml=test-report/report.xml
+                  command: <<parameters.pkg-manager>> run pytest --junit-xml=test-report/report.xml << parameters.test-tool-args >>
         - when:
             condition:
               or:
@@ -130,6 +134,6 @@ steps:
               - run:
                   name: Run tests with global python env
                   working_directory: <<parameters.app-dir>>
-                  command: pytest --junit-xml=test-report/report.xml
+                  command: pytest --junit-xml=test-report/report.xml << parameters.test-tool-args >>
         - store_test_results:
             path: <<#parameters.app-dir>><<parameters.app-dir>>/<</parameters.app-dir>>test-report
