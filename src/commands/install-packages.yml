@@ -87,7 +87,7 @@ steps:
             steps:
               - restore_cache:
                   keys:
-                    - -pypi-<<parameters.cache-version>>-<<#parameters.include-branch-in-cache-key>>{{ .Branch }}-<</parameters.include-branch-in-cache-key>>{{ checksum "<< parameters.app-dir >>/<<parameters.pip-dependency-file>>" }}-<<#parameters.include-python-in-cache-key>>{{ checksum "/home/circleci/.pyenv/version" }}-<</parameters.include-python-in-cache-key>>
+                    - -pypi-<<parameters.cache-version>>-<<#parameters.include-branch-in-cache-key>>{{ .Branch }}-<</parameters.include-branch-in-cache-key>><<#parameters.pip-dependency-file>>{{ checksum "<< parameters.app-dir >>/<<parameters.pip-dependency-file>>" }}-<</parameters.pip-dependency-file>><<#parameters.include-python-in-cache-key>>{{ checksum "/home/circleci/.pyenv/version" }}-<</parameters.include-python-in-cache-key>>
   - when:
       condition: << parameters.venv-cache >>
       steps:
@@ -197,7 +197,7 @@ steps:
                 - equal: [pip-dist, << parameters.pkg-manager >>]
             steps:
               - save_cache:
-                  key: -pypi-<<parameters.cache-version>>-<<#parameters.include-branch-in-cache-key>>{{ .Branch }}-<</parameters.include-branch-in-cache-key>>{{ checksum "<< parameters.app-dir >>/<<parameters.pip-dependency-file>>" }}-<<#parameters.include-python-in-cache-key>>{{ checksum "/home/circleci/.pyenv/version" }}-<</parameters.include-python-in-cache-key>>
+                  key: -pypi-<<parameters.cache-version>>-<<#parameters.include-branch-in-cache-key>>{{ .Branch }}-<</parameters.include-branch-in-cache-key>><<#parameters.pip-dependency-file>>{{ checksum "<< parameters.app-dir >>/<<parameters.pip-dependency-file>>" }}<</parameters.pip-dependency-file>>-<<#parameters.include-python-in-cache-key>>{{ checksum "/home/circleci/.pyenv/version" }}-<</parameters.include-python-in-cache-key>>
                   paths:
                     # depending on how pip is used, store the pypi mirror, pyenv 'global' the site-packages, and user site-pacakges
                     - /home/circleci/.cache/pip
