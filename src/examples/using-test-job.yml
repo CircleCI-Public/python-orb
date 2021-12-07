@@ -21,4 +21,4 @@ usage:
       steps:
         - checkout
         - python/dist
-        - run: pip install twine && twine upload
+        - run: pip install twine && twine upload dist/*
