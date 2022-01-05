@@ -23,6 +23,10 @@ parameters:
     type: string
     default: "~/project"
     description: Path to the directory containing your python project. Not needed if dependency file lives in the root.
+  module-src-dir:
+    type: string
+    default: "src"
+    description: Path relative to app-dir which contains module source.
   args:
     type: string
     default: ""
@@ -34,7 +38,7 @@ parameters:
   test-tool:
     type: enum
     enum: ["pytest", "unittest"]
-    default: "unittest"  # default since its not an external requirement
+    default: "unittest" # default since its not an external requirement
     description: The tool to run the tests with.
   test-tool-args:
     type: string
@@ -102,11 +106,9 @@ steps:
               - run:
                   working_directory: <<parameters.app-dir>>
                   name: Run tests with global python env
-                  # the unittest module only looks for things in the path
-                  # add the project to the path
-                  command: |
-                    export PYTHONPATH=$PWD:$PYTHONPATH
-                    python -m unittest << parameters.test-tool-args >>
+                  environment:
+                    PYTHONPATH: << parameters.app-dir >>/<< parameters.module-src-dir >>
+                  command: python -m unittest << parameters.test-tool-args >>
   - when:
       condition:
         equal: ["pytest", << parameters.test-tool >>]
@@ -134,6 +136,8 @@ steps:
               - run:
                   name: Run tests with global python env
                   working_directory: <<parameters.app-dir>>
+                  environment:
+                    PYTHONPATH: << parameters.app-dir >>/<< parameters.module-src-dir >>
                   command: pytest --junit-xml=test-report/report.xml << parameters.test-tool-args >>
         - store_test_results:
             path: <<#parameters.app-dir>><<parameters.app-dir>>/<</parameters.app-dir>>test-report
