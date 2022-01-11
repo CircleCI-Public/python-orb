@@ -89,16 +89,16 @@ steps:
       args: <<parameters.args>>
       pip-dependency-file: <<parameters.pip-dependency-file>>
       include-python-in-cache-key: <<parameters.include-python-in-cache-key>>
-
   - when:
-      condition: << parameters.ensure-test-tool >>
+      condition: <<parameters.ensure-test-tool>>
       steps:
         - run:
+            working_directory: <<parameters.app-dir>>
             name: Ensuring test tool is installed
             command: <<include(scripts/ensure-test-tool.sh)>>
             environment:
-              PYTHON_ORB_PKG_MNGR: << parameters.pkg-manager >>
-              PYTHON_ORB_TEST_TOOL: << parameters.test-tool >>
+              PYTHON_ORB_PKG_MNGR: <<parameters.pkg-manager>>
+              PYTHON_ORB_TEST_TOOL: <<parameters.test-tool>>
   - when:
       condition:
         equal: ["unittest", << parameters.test-tool >>]
