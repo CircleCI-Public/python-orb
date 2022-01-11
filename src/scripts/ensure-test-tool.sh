@@ -1,7 +1,3 @@
-PYTHON_ORB_PKG_MNGR="pipenv"
-
-PYTHON_ORB_TEST_TOOL="pytest"
-
 case $PYTHON_ORB_PKG_MNGR in
     pip)
         REQUIREMENTS_PATH="requirements.txt"

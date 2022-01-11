@@ -29,6 +29,16 @@ jobs:
           command: |
             pytest
 
+  pip-install-test-no-packages:
+    executor: python/default
+    steps:
+      - checkout
+      - run:
+          name: "Test"
+          working_directory: ~/project/sample_pip
+          command: |
+            pytest
+
   pip-install-test-args:
     executor: python/default
     steps:
