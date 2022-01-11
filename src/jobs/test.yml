@@ -66,6 +66,11 @@ parameters:
     default: true
     description: >
       If true, this cache bucket will checksum the pyenv python version with the cache-key
+  ensure-test-tool:
+    type: boolean
+    default: true
+    description: >
+      If true, a step will be ran to ensure the configured test tool is installed.
 
 executor:
   name: default
@@ -84,6 +89,13 @@ steps:
       args: <<parameters.args>>
       pip-dependency-file: <<parameters.pip-dependency-file>>
       include-python-in-cache-key: <<parameters.include-python-in-cache-key>>
+
+  - when:
+      condition: << parameters.ensure-test-tool >>
+      steps:
+        - run:
+            name: Ensuring test tool is installed
+            command: << include(scripts/ensure-test-tool.sh) >>
   - when:
       condition:
         equal: ["unittest", << parameters.test-tool >>]
