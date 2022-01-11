@@ -2,7 +2,7 @@ version: 2.1
 
 orbs:
   python: circleci/python@<<pipeline.parameters.dev-orb-version>>
-  orb-tools: circleci/orb-tools@9.1
+  orb-tools: circleci/orb-tools@10.0
 
 # Pipeline parameters
 parameters:
