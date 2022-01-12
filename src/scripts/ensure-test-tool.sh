@@ -31,3 +31,5 @@ if [ "${PYTHON_ORB_TEST_TOOL}" != "unittest" ]; then
         echo "INFO: Detected test package: $DETECT_TEST_TOOL"
     fi
 fi
+
+exit 0 # should always pass
