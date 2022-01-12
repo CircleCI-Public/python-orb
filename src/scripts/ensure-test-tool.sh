@@ -12,7 +12,7 @@ case $PARAM_PKG_MNGR in
     ;;
 esac
 
-set -x
+set -e
 
 if [ -f ${REQUIREMENTS_PATH} ]; then
     echo "INFO: Detected dependency file: $REQUIREMENTS_PATH"
