@@ -38,7 +38,7 @@ parameters:
   test-tool:
     type: enum
     enum: ["pytest", "unittest"]
-    default: "unittest" # default since its not an external requirement
+    default: "pytest"
     description: The tool to run the tests with.
   test-tool-args:
     type: string
