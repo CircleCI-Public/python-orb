@@ -97,8 +97,8 @@ steps:
             name: Ensuring test tool is installed
             command: <<include(scripts/ensure-test-tool.sh)>>
             environment:
-              PYTHON_ORB_PKG_MNGR: <<parameters.pkg-manager>>
-              PYTHON_ORB_TEST_TOOL: <<parameters.test-tool>>
+              PARAM_PKG_MNGR: <<parameters.pkg-manager>>
+              PARAM_TEST_TOOL: <<parameters.test-tool>>
   - when:
       condition:
         equal: ["unittest", << parameters.test-tool >>]
