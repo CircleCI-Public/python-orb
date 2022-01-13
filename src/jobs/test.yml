@@ -102,7 +102,7 @@ steps:
             name: Ensuring test tool is installed
             command: <<include(scripts/ensure-test-tool.sh)>>
             environment:
-              PARAM_PKG_MNGR: <<parameters.pkg-manager>
+              PARAM_PKG_MNGR: <<parameters.pkg-manager>>
               PARAM_TEST_TOOL: <<parameters.test-tool>>
               PARAM_FAIL_IF_MISSING_TOOL: <<parameters.fail-if-missing-tool>>>
   - when:
