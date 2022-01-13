@@ -145,29 +145,29 @@ workflows:
       - python/test:
           name: job-test-poetry
           pkg-manager: poetry
-          test-tool: pytest
           app-dir: ~/project/sample_poetry
       - python/test:
           name: job-test-pipenv
           pkg-manager: pipenv
           args: pytest
-          test-tool: pytest
           app-dir: ~/project/sample_pipenv
       - python/test:
           name: job-test-pip
           pkg-manager: pip
+          test-tool: unittest
           app-dir: ~/project/sample_pip
       - python/test:
           name: job-test-pip-no-reqs
           pkg-manager: pip
           pip-dependency-file: ""
+          test-tool: unittest
           app-dir: ~/project/sample_pip
       - python/test:
           version: 3.8.2
           name: job-test-pip-dist
           pkg-manager: pip-dist
           app-dir: ~/project/sample_pip
-          pip-dependency-file: setup.py
+          # pip-dependency-file: setup.py
           post-steps:
             - run:
                 name: Attempt to set the other python version - this should fail, but if the cache is broken, this will succeed.
