@@ -66,6 +66,11 @@ parameters:
     default: true
     description: >
       If true, this cache bucket will checksum the pyenv python version with the cache-key
+  fail-if-missing-tool:
+    type: boolean
+    default: false
+    description: >
+      If true, this job will fail if the test tool was not found. If false, it will automatically install to recover.
   ensure-test-tool:
     type: boolean
     default: true
@@ -97,8 +102,9 @@ steps:
             name: Ensuring test tool is installed
             command: <<include(scripts/ensure-test-tool.sh)>>
             environment:
-              PARAM_PKG_MNGR: <<parameters.pkg-manager>>
+              PARAM_PKG_MNGR: <<parameters.pkg-manager>
               PARAM_TEST_TOOL: <<parameters.test-tool>>
+              PARAM_FAIL_IF_MISSING_TOOL: <<parameters.fail-if-missing-tool>>>
   - when:
       condition:
         equal: ["unittest", << parameters.test-tool >>]
