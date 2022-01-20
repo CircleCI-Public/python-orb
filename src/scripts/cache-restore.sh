@@ -1,5 +1,5 @@
 restore_paths() {
-    for file in ./*; do
+    for file in ${1}; do
         decoded=$(basename "${file}" | base64 -d)
         mv file "${decoded}"
     done
