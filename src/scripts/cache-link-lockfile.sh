@@ -17,6 +17,11 @@ if [ ! -f "/tmp/lockfile" ]; then
     if [ -z "${LOCK_FILE}" ]; then
         echo "ERROR: Could not determine lockfile path for ${DETECT_PKG_MNGR:-PARAM_PKG_MNGR}"
     else
+      if [ -f "${LOCK_FILE}" ]; then
+        echo "INFO: Linking ${LOCK_FILE} to /tmp/lockfile"
         ln "${LOCK_FILE}" "/tmp/lockfile"
+      else
+        echo "ERROR: Could not find lockfile at ${LOCK_FILE}"
+      fi
     fi
 fi
