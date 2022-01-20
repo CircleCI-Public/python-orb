@@ -25,7 +25,7 @@ link_paths() {
         decoded=$(echo "${encoded}" | base64 -d)
         
         if [ -f "${decoded}" ]; then
-            ln -s "${decoded}" "${1}/${encoded}"
+            ln "${decoded}" "${1}/${encoded}"
         fi
     done
 }
@@ -38,5 +38,8 @@ if [ "${PARAM_PYPI_CACHE}" = "1" ]; then
     link_paths "/tmp/pypi_cache" "${CACHE_PATHS}"
 fi
 
-unlink "${LOCK_FILE}"
-ln -s "${LOCK_FILE}" "/tmp/lockfile"
+if [ -f "${LOCK_FILE}" ]; then
+    unlink "${LOCK_FILE}"
+fi
+
+ln "${LOCK_FILE}" "/tmp/lockfile"
