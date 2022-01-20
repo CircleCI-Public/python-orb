@@ -14,6 +14,9 @@ parameters:
   dev-orb-version:
     type: string
     default: "dev:alpha"
+  cache-version:
+    type: string
+    default: v3
 
 jobs:
   pip-install-test:
@@ -22,7 +25,7 @@ jobs:
       - checkout
       - python/install-packages:
           pkg-manager: pip
-          cache-version: v2
+          cache-version: << pipeline.parameters.cache-version >>
           app-dir: ~/project/sample_pip
       - run:
           name: "Test"
@@ -47,7 +50,7 @@ jobs:
       - python/install-packages:
           pkg-manager: pip
           app-dir: ~/project/sample_pip
-          cache-version: v2
+          cache-version: << pipeline.parameters.cache-version >>
           args: pytest
           pip-dependency-file: ""
       - run:
@@ -70,7 +73,7 @@ jobs:
       - python/install-packages:
           app-dir: ~/project/sample_pipenv
           pkg-manager: "pipenv"
-          cache-version: v2
+          cache-version: << pipeline.parameters.cache-version >>
       - run:
           working_directory: ~/project/sample_pipenv
           command: |
@@ -90,7 +93,7 @@ jobs:
       - python/install-packages:
           app-dir: ~/project/sample_pipenv
           pkg-manager: "pipenv"
-          cache-version: v2
+          cache-version: << pipeline.parameters.cache-version >>
       - run:
           command: pipenv run pytest
           working_directory: ~/project/sample_pipenv
@@ -101,7 +104,7 @@ jobs:
       - checkout
       - python/install-packages:
           app-dir: ~/project/sample_poetry
-          cache-version: v2
+          cache-version: << pipeline.parameters.cache-version >>
           pkg-manager: poetry
       - run:
           working_directory: ~/project/sample_poetry
@@ -149,46 +152,46 @@ workflows:
       - python/test:
           name: job-test-poetry
           pkg-manager: poetry
-          cache-version: v2
+          cache-version: << pipeline.parameters.cache-version >>
           app-dir: ~/project/sample_poetry
       - python/test:
           name: job-test-pipenv
           pkg-manager: pipenv
-          cache-version: v2
+          cache-version: << pipeline.parameters.cache-version >>
           args: pytest
           app-dir: ~/project/sample_pipenv
       - python/test:
           name: job-test-pip
           pkg-manager: pip
-          cache-version: v2
+          cache-version: << pipeline.parameters.cache-version >>
           test-tool: unittest
           app-dir: ~/project/sample_pip
       - python/test:
           name: job-auto-test-poetry
-          cache-version: v2
+          cache-version: << pipeline.parameters.cache-version >>
           app-dir: ~/project/sample_poetry
       - python/test:
           name: job-auto-test-pipenv
           args: pytest
-          cache-version: v2
+          cache-version: << pipeline.parameters.cache-version >>
           app-dir: ~/project/sample_pipenv
       - python/test:
           name: job-auto-test-pip
           test-tool: unittest
-          cache-version: v2
+          cache-version: << pipeline.parameters.cache-version >>
           app-dir: ~/project/sample_pip
       - python/test:
           name: job-test-pip-no-reqs
           pkg-manager: pip
           pip-dependency-file: ""
           test-tool: unittest
-          cache-version: v2
+          cache-version: << pipeline.parameters.cache-version >>
           app-dir: ~/project/sample_pip
       - python/test:
           version: 3.8.2
           name: job-test-pip-dist
           pkg-manager: pip-dist
-          cache-version: v2
+          cache-version: << pipeline.parameters.cache-version >>
           app-dir: ~/project/sample_pip
           # pip-dependency-file: setup.py
           post-steps:

@@ -2,14 +2,14 @@ restore_paths() {
     if [ -f "${1}" ]; then
         rm -rf "${1}"
     fi
-    
+
     mkdir -p "${1}"
     
     if [ -d "${1}" ]; then
         for file in "${1}"/*; do
+            echo "INFO: Restoring ${file}"
             decoded=$(basename "${file}" | base64 -d)
             mv "${file}" "${decoded}"
-            echo "INFO: Restoring ${file} to ${decoded}"
         done
     fi
 }
