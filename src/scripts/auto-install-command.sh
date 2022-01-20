@@ -1,7 +1,7 @@
 # shellcheck source=detect-env.sh
 source "$AUTO_DETECT_ENV_SCRIPT"
 
-case ${DETECT_PKG_MNGR:-PARAM_PKG_MNGR} in
+case ${DETECT_PKG_MNGR:-${PARAM_PKG_MNGR}} in
     pip)
         PYTHON_INSTALL_ARGS="-r ${PARAM_APP_DIR}/${PARAM_DEPENDENCY_FILE:-requirements.txt}"
     ;;

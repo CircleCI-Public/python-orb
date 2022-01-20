@@ -1,4 +1,7 @@
-case ${DETECT_PKG_MNGR:-PARAM_PKG_MNGR} in
+# shellcheck source=detect-env.sh
+source "$AUTO_DETECT_ENV_SCRIPT"
+
+case ${DETECT_PKG_MNGR:-${PARAM_PKG_MNGR}} in
     pip)
         REQUIREMENTS_PATH=${PARAM_REQUIREMENTS_PATH:-requirements.txt}
     ;;
@@ -17,7 +20,7 @@ esac
 if [ -f ${REQUIREMENTS_PATH} ]; then
     echo "INFO: Detected dependency file: $REQUIREMENTS_PATH"
 else
-    echo "WARNING: No dependency file for ${DETECT_PKG_MNGR:-PARAM_PKG_MNGR} found. ${REQUIREMENTS_PATH} expected."
+    echo "WARNING: No dependency file for ${DETECT_PKG_MNGR:-${PARAM_PKG_MNGR}} found. ${REQUIREMENTS_PATH} expected."
 fi
 
 # Automatically install test package. unittest is preinstalled and not required.
