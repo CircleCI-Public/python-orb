@@ -81,6 +81,7 @@ steps:
                   fi
                   echo "INFO: Detected Package Manager ${DETECT_PKG_MNGR}"
               fi' > /tmp/detect-env.sh
+        chmod +x /tmp/detect-env.sh
         echo 'export AUTO_DETECT_ENV_SCRIPT="/tmp/detect-env.sh"' >> $BASH_ENV
   # restore caches
   - when:
