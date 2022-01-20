@@ -97,11 +97,13 @@ steps:
               PARAM_DEPENDENCY_FILE: << parameters.pip-dependency-file >>
               PARAM_PYPI_CACHE: << parameters.pypi-cache >>
             command: <<include(scripts/cache-link-lockfile.sh)>>
+            working_directory: << parameters.app-dir >>
         - restore_cache:
             keys:
               - -pypi-<<parameters.cache-version>>-<<#parameters.include-branch-in-cache-key>>{{ .Branch }}-<</parameters.include-branch-in-cache-key>>{{ checksum "/tmp/lockfile" }}-<<#parameters.include-python-in-cache-key>>{{ checksum "/home/circleci/.pyenv/version" }}-<</parameters.include-python-in-cache-key>>
         - run:
             name: Move restored cache
+            working_directory: << parameters.app-dir >>
             environment:
               PARAM_PYPI_CACHE: << parameters.pypi-cache >>
             command: <<include(scripts/cache-restore.sh)>>
@@ -194,6 +196,7 @@ steps:
       steps:
         - run:
             name: Link virtual environment to cache directory
+            working_directory: << parameters.app-dir >>
             environment:
               PARAM_PKG_MNGR: << parameters.pkg-manager >>
               PARAM_APP_DIR: << parameters.app-dir >>
@@ -209,6 +212,7 @@ steps:
       steps:
         - run:
             name: Link dependencies to cache directory
+            working_directory: << parameters.app-dir >>
             environment:
               PARAM_PKG_MNGR: << parameters.pkg-manager >>
               PARAM_APP_DIR: << parameters.app-dir >>
