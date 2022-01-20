@@ -5,7 +5,7 @@ restore_paths() {
     
     mkdir -p "${1}"
     
-    if [ -d "${1}" ] && [ -n "$(ls -A 2>/dev/null)" ]; then
+    if [ -d "${1}" ] && [ -n "$(ls -A "${1}" 2>/dev/null)" ]; then
         for file in "${1}"/*; do
             echo "INFO: Restoring ${file}"
             decoded=$(basename "${file}" | base64 -d)
