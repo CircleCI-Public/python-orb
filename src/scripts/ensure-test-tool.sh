@@ -1,25 +1,23 @@
-case $PARAM_PKG_MNGR in
+case ${DETECT_PKG_MNGR:-PARAM_PKG_MNGR} in
     pip)
-        REQUIREMENTS_PATH="requirements.txt"
+        REQUIREMENTS_PATH=${PARAM_REQUIREMENTS_PATH:-requirements.txt}
     ;;
     pip-dist)
-        PYTHON_INSTALL_ARGS="-e"
         REQUIREMENTS_PATH="requirements.txt"
     ;;
     pipenv) # TODO: use PIPENV_PIPFILE
         REQUIREMENTS_PATH="Pipfile"
-        PYTHON_ENV_TOOL="pipenv"
     ;;
     poetry)
+        PYTHON_INSTALL_ARGS="--no-ansi"
         REQUIREMENTS_PATH="pyproject.toml"
-        PYTHON_ENV_TOOL="poetry"
     ;;
 esac
 
 if [ -f ${REQUIREMENTS_PATH} ]; then
     echo "INFO: Detected dependency file: $REQUIREMENTS_PATH"
 else
-    echo "WARNING: No dependency file for ${PARAM_PKG_MNGR} found. ${REQUIREMENTS_PATH} expected."
+    echo "WARNING: No dependency file for ${DETECT_PKG_MNGR:-PARAM_PKG_MNGR} found. ${REQUIREMENTS_PATH} expected."
 fi
 
 # Automatically install test package. unittest is preinstalled and not required.
@@ -28,7 +26,8 @@ if [ "${PARAM_TEST_TOOL}" != "unittest" ]; then
     awk 'NR > 2 { print $1 }' | grep "^${PARAM_TEST_TOOL}$")
     
     NOT_DETECTED=$?
-    if [ $NOT_DETECTED -gt 0 ] && [ "${PARAM_FAIL_IF_MISSING_TOOL}" -eq 0 ]; then
+    
+    if [ $NOT_DETECTED -gt 0 ] && [ "${PARAM_FAIL_IF_MISSING_TOOL}" -eq 1 ]; then
         exit 0
     fi
     

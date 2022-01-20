@@ -12,8 +12,8 @@ parameters:
       For a full list of releases, see the following: https://hub.docker.com/r/cimg/python
   pkg-manager:
     type: enum
-    enum: ["pip", "pipenv", "poetry", "pip-dist"]
-    default: "pip"
+    enum: [auto, pip, pipenv, poetry, pip-dist]
+    default: "auto"
     description: Select the package manager to use. Default is pip
   pip-dependency-file:
     type: string
@@ -23,6 +23,10 @@ parameters:
     type: string
     default: "~/project"
     description: Path to the directory containing your python project. Not needed if dependency file lives in the root.
+  setup-file-path:
+    type: string
+    default: ""
+    description: Path to the setup.py file.
   module-src-dir:
     type: string
     default: "src"
@@ -103,11 +107,33 @@ steps:
             command: <<include(scripts/ensure-test-tool.sh)>>
             environment:
               PARAM_PKG_MNGR: <<parameters.pkg-manager>>
+              PARAM_SETUP_FILE_PATH: <<parameters.setup-file-path>>>
               PARAM_TEST_TOOL: <<parameters.test-tool>>
               PARAM_FAIL_IF_MISSING_TOOL: <<parameters.fail-if-missing-tool>>>
   - when:
       condition:
-        equal: ["unittest", << parameters.test-tool >>]
+        equal: [auto, << parameters.pkg-manager >>]
+      steps:
+        - run:
+            name: Create test-report directory
+            working_directory: <<parameters.app-dir>>
+            command: mkdir test-report
+        - run:
+            name: Run tests with auto-detected packages run
+            environment:
+              PYTHONPATH: << parameters.app-dir >>/<< parameters.module-src-dir >>
+              PARAM_PKG_MNGR: <<parameters.pkg-manager>>
+              PARAM_ADDITIONAL_ARGS: <<parameters.test-tool-args>>
+              PARAM_TEST_TOOL: <<parameters.test-tool>>
+            command: <<include(scripts/auto-test-command.sh)>>
+        - store_test_results:
+            path: <<#parameters.app-dir>><<parameters.app-dir>>/<</parameters.app-dir>>test-report
+  - when:
+      condition:
+        and:
+          - equal: ["unittest", << parameters.test-tool >>]
+          - not:
+              equal: [auto, << parameters.pkg-manager >>]
       steps:
         - when:
             condition:
@@ -132,7 +158,10 @@ steps:
                   command: python -m unittest << parameters.test-tool-args >>
   - when:
       condition:
-        equal: ["pytest", << parameters.test-tool >>]
+        and:
+          - equal: ["pytest", << parameters.test-tool >>]
+          - not:
+              equal: [auto, << parameters.pkg-manager >>]
       steps:
         - run:
             name: Create test-report directory

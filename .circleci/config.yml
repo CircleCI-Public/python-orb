@@ -61,13 +61,13 @@ jobs:
       - python/dist:
           app-dir: ~/project/sample_pip
 
-
   pipenv-test:
     executor: python/default
     steps:
       - checkout
       - python/install-packages:
           app-dir: ~/project/sample_pipenv
+          pkg-manager: "pipenv"
           cache-version: v2
       - run:
           working_directory: ~/project/sample_pipenv
@@ -87,6 +87,7 @@ jobs:
           name: Overwrite the lockfile with the one that should load the cache.
       - python/install-packages:
           app-dir: ~/project/sample_pipenv
+          pkg-manager: "pipenv"
           cache-version: v2
       - run:
           command: pipenv run pytest
@@ -157,6 +158,17 @@ workflows:
           test-tool: unittest
           app-dir: ~/project/sample_pip
       - python/test:
+          name: job-auto-test-poetry
+          app-dir: ~/project/sample_poetry
+      - python/test:
+          name: job-auto-test-pipenv
+          args: pytest
+          app-dir: ~/project/sample_pipenv
+      - python/test:
+          name: job-auto-test-pip
+          test-tool: unittest
+          app-dir: ~/project/sample_pip
+      - python/test:
           name: job-test-pip-no-reqs
           pkg-manager: pip
           pip-dependency-file: ""
@@ -200,6 +212,9 @@ workflows:
             - job-test-poetry
             - job-test-pipenv
             - job-test-pip
+            - job-auto-test-poetry
+            - job-auto-test-pipenv
+            - job-auto-test-pip
             - dist-test
           filters:
             branches:
