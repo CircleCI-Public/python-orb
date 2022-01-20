@@ -41,7 +41,7 @@ if [ "${PARAM_PYPI_CACHE}" = "1" ]; then
 fi
 
 if [ -f "/tmp/lockfile" ]; then
-    unlink "${LOCK_FILE}"
+    unlink "/tmp/lockfile"
 fi
 
 if [ -f "${LOCK_FILE}" ]; then
