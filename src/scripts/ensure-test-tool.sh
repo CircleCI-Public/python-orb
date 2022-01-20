@@ -26,12 +26,12 @@ fi
 # Automatically install test package. unittest is preinstalled and not required.
 if [ "${PARAM_TEST_TOOL}" != "unittest" ]; then
     DETECT_TEST_TOOL=$(eval "${PYTHON_ENV_TOOL:+$PYTHON_ENV_TOOL run} pip --disable-pip-version-check list" |
-    awk 'NR > 2 { print $1 }' | grep "^${PARAM_TEST_TOOL}$")
+    awk 'NR > 2 && NF > 0 { print $1 }' | grep "^${PARAM_TEST_TOOL}$")
     
     NOT_DETECTED=$?
     
-    if [ $NOT_DETECTED -gt 0 ] && [ "${PARAM_FAIL_IF_MISSING_TOOL}" -eq 1 ]; then
-        exit 0
+    if (( NOT_DETECTED > 0 )) && [ "${PARAM_FAIL_IF_MISSING_TOOL}" = true ]; then
+        exit $NOT_DETECTED
     fi
     
     # If the test package is not detected, install using PYTHON_INSTALL_TOOL
@@ -43,8 +43,8 @@ if [ "${PARAM_TEST_TOOL}" != "unittest" ]; then
         echo "INFO: Detected test package: $DETECT_TEST_TOOL"
     fi
     
-    # If the test package is not detected and PARAM_FAIL_IF_MISSING_TOOL is 0, succeed anyways
-    if [ $NOT_DETECTED -gt 0 ] && [ "${PARAM_FAIL_IF_MISSING_TOOL}" -eq 0 ]; then
+    # exit with test package install result, or exit 0 if param fail is set to false
+    if (( NOT_DETECTED > 0 )) && [ "${PARAM_FAIL_IF_MISSING_TOOL}" = false ]; then
         exit ${INSTALL_RESULT:-0}
     fi
 fi
