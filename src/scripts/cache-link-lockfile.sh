@@ -1,4 +1,5 @@
-"$AUTO_DETECT_ENV_SCRIPT"
+# shellcheck source=detect-env.sh
+source "$AUTO_DETECT_ENV_SCRIPT"
 
 if [ ! -f "/tmp/lockfile" ]; then
     case ${DETECT_PKG_MNGR:-PARAM_PKG_MNGR} in

@@ -1,4 +1,5 @@
-"$AUTO_DETECT_ENV_SCRIPT"
+# shellcheck source=detect-env.sh
+source "$AUTO_DETECT_ENV_SCRIPT"
 
 if [ "${PARAM_TEST_TOOL}" = "pytest" ]; then
     INSTALL_COMMAND="pytest --junit-xml=test-report/report.xml << parameters.test-tool-args >>"
