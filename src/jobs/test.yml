@@ -120,6 +120,7 @@ steps:
             command: mkdir test-report
         - run:
             name: Run tests with auto-detected packages run
+            working_directory: <<parameters.app-dir>>
             environment:
               PYTHONPATH: << parameters.app-dir >>/<< parameters.module-src-dir >>
               PARAM_PKG_MNGR: <<parameters.pkg-manager>>

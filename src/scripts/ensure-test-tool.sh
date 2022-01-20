@@ -10,10 +10,12 @@ case ${DETECT_PKG_MNGR:-${PARAM_PKG_MNGR}} in
     ;;
     pipenv) # TODO: use PIPENV_PIPFILE
         REQUIREMENTS_PATH="Pipfile"
+        PYTHON_ENV_TOOL="pipenv"
     ;;
     poetry)
         PYTHON_INSTALL_ARGS="--no-ansi"
         REQUIREMENTS_PATH="pyproject.toml"
+        PYTHON_ENV_TOOL="poetry"
     ;;
 esac
 
@@ -26,7 +28,7 @@ fi
 # Automatically install test package. unittest is preinstalled and not required.
 if [ "${PARAM_TEST_TOOL}" != "unittest" ]; then
     DETECT_TEST_TOOL=$(eval "${PYTHON_ENV_TOOL:+$PYTHON_ENV_TOOL run} pip --disable-pip-version-check list" |
-    awk 'NR > 2 && NF > 0 { print $1 }' | grep "^${PARAM_TEST_TOOL}$")
+    awk 'NR > 2 && NF > 0 { print $1 }' | grep "^${PARAM_TEST_TOOL}$") 2> error.txt
     
     NOT_DETECTED=$?
     
@@ -43,7 +45,7 @@ if [ "${PARAM_TEST_TOOL}" != "unittest" ]; then
         echo "INFO: Detected test package: $DETECT_TEST_TOOL"
     fi
     
-    # exit with test package install result, or exit 0 if param fail is set to false
+    # Exit with test package install result, or exit 0 if param fail is set to false
     if (( NOT_DETECTED > 0 )) && [ "${PARAM_FAIL_IF_MISSING_TOOL}" = false ]; then
         exit ${INSTALL_RESULT:-0}
     fi
