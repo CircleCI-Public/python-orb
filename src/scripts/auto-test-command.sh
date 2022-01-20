@@ -2,7 +2,7 @@
 source "$AUTO_DETECT_ENV_SCRIPT"
 
 if [ "${PARAM_TEST_TOOL}" = "pytest" ]; then
-    INSTALL_COMMAND="pytest --junit-xml=test-report/report.xml << parameters.test-tool-args >>"
+    INSTALL_COMMAND="pytest --junit-xml=test-report/report.xml ${PARAM_ADDITIONAL_ARGS}"
 else 
     INSTALL_COMMAND="python -m unittest ${PARAM__ARGS}"
 fi

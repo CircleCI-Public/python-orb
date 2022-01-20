@@ -123,7 +123,7 @@ steps:
             environment:
               PYTHONPATH: << parameters.app-dir >>/<< parameters.module-src-dir >>
               PARAM_PKG_MNGR: <<parameters.pkg-manager>>
-              PARAM_ADDITIONAL_ARGS: <<parameters.test-tool-args>>
+              PARAM_TEST_TOOL_ARGS: <<parameters.test-tool-args>>
               PARAM_TEST_TOOL: <<parameters.test-tool>>
             command: <<include(scripts/auto-test-command.sh)>>
         - store_test_results:
