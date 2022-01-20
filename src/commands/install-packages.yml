@@ -33,6 +33,10 @@ parameters:
     type: string
     default: "."
     description: Path to the directory containing your python project. Not needed if dependency file lives in the root.
+  no_output_timeout:
+    type: string
+    default: "10m"
+    description: Elapsed time the command can run without output. Passed to install command.
   venv-cache:
     type: boolean
     default: true
@@ -139,6 +143,7 @@ steps:
         - run:
             name: "Install dependencies with automatically determined project package manager"
             working_directory: << parameters.app-dir >>
+            no_output_timeout: << parameters.no_output_timeout >>
             environment:
               PARAM_PKG_MNGR: << parameters.pkg-manager >>
               PARAM_APP_DIR: << parameters.app-dir >>
