@@ -79,7 +79,6 @@ steps:
                       export DETECT_PKG_MNGR="poetry"
                       export PYTHON_ENV_TOOL="poetry"
                   fi
-                  
                   echo "INFO: Detected Package Manager ${DETECT_PKG_MNGR}"
               fi' > /tmp/detect-env.sh
         echo 'export AUTO_DETECT_ENV_SCRIPT="/tmp/detect-env.sh"' >> $BASH_ENV
