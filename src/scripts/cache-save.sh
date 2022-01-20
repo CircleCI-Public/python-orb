@@ -1,5 +1,6 @@
 # shellcheck source=detect-env.sh
 source "$AUTO_DETECT_ENV_SCRIPT"
+eval PARAM_APP_DIR="${PARAM_APP_DIR}"
 
 case ${DETECT_PKG_MNGR:-${PARAM_PKG_MNGR}} in
     pip | pip-dist)
