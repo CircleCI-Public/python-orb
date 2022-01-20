@@ -65,7 +65,7 @@ steps:
   - run:
       name: "Export automatic environment detection script"
       command: | # detect-env.sh
-        echo '"if [ "${PARAM_PKG_MNGR}" = "auto" ]; then
+        echo 'if [ "${PARAM_PKG_MNGR}" = "auto" ]; then
                   if [ -f "requirements.txt" ]; then
                       if [ -f "${PARAM_SETUP_FILE_PATH:-setup.py}" ]; then
                           export DETECT_PKG_MNGR="pip-dist"
