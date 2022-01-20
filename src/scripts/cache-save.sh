@@ -20,7 +20,6 @@ case ${DETECT_PKG_MNGR:-${PARAM_PKG_MNGR}} in
 esac
 
 link_paths() {
-    echo 
     mkdir -p "${1}"
     
     for encoded in $(echo "${2}" | jq -r '.[] | @base64'); do
