@@ -20,7 +20,7 @@ case ${DETECT_PKG_MNGR:-${PARAM_PKG_MNGR}} in
 esac
 
 link_paths() {
-  
+    
     mkdir "${1}"
     
     for encoded in $(echo "${2}" | jq -r '.[] | @base64'); do
@@ -40,8 +40,10 @@ if [ "${PARAM_PYPI_CACHE}" = "1" ]; then
     link_paths "/tmp/pypi_cache" "${CACHE_PATHS}"
 fi
 
-if [ -f "${LOCK_FILE}" ]; then
+if [ -f "/tmp/lockfile" ]; then
     unlink "${LOCK_FILE}"
 fi
 
-ln "${LOCK_FILE}" "/tmp/lockfile"
+if [ -f "${LOCK_FILE}" ]; then
+    ln "${LOCK_FILE}" "/tmp/lockfile"
+fi

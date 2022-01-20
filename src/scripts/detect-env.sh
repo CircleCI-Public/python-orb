@@ -1,4 +1,3 @@
-set -x
 if [ "${PARAM_PKG_MNGR}" = "auto" ]; then
     if [ -f "requirements.txt" ]; then
         if [ -f "${PARAM_SETUP_FILE_PATH:-setup.py}" ]; then
