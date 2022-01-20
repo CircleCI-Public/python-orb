@@ -2,15 +2,17 @@
 source "$AUTO_DETECT_ENV_SCRIPT"
 
 if [ ! -f "/tmp/lockfile" ]; then
+    eval PARAM_APP_DIR="${PARAM_APP_DIR}"
+
     case ${DETECT_PKG_MNGR:-${PARAM_PKG_MNGR}} in
         pip | pip-dist)
-            LOCK_FILE=$(realpath "${PARAM_APP_DIR}"/"${PARAM_DEPENDENCY_FILE:-requirements.txt}")
+            LOCK_FILE="${PARAM_APP_DIR}/${PARAM_DEPENDENCY_FILE:-requirements.txt}"
         ;;
         pipenv)
-            LOCK_FILE=$(realpath "${PARAM_APP_DIR}"/Pipfile.lock)
+            LOCK_FILE="${PARAM_APP_DIR}/Pipfile.lock"
         ;;
         poetry)
-            LOCK_FILE=$(realpath "${PARAM_APP_DIR}"/poetry.lock)
+            LOCK_FILE="${PARAM_APP_DIR}/poetry.lock"
         ;;
     esac
     
