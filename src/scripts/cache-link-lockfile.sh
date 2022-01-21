@@ -21,7 +21,7 @@ if [ ! -f "/tmp/lockfile" ]; then
     else
       if [ -f "${LOCK_FILE}" ]; then
         echo "INFO: Linking ${LOCK_FILE} to /tmp/lockfile"
-        ln "${LOCK_FILE}" "/tmp/lockfile"
+        ln -s "${LOCK_FILE}" "/tmp/lockfile"
       else
         echo "WARNING: Could not find lockfile at ${LOCK_FILE}"
       fi
