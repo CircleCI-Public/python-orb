@@ -29,7 +29,7 @@ link_paths() {
             echo "Linking ${decoded} to ${1}/${encoded}"
             cp -a "${decoded}" "${1}/${encoded}"
         fi
-
+        
         ls -la "${1}"
     done
 }
