@@ -24,11 +24,13 @@ link_paths() {
     
     for encoded in $(echo "${2}" | jq -r '.[] | @base64'); do
         decoded=$(echo "${encoded}" | base64 -d)
-        echo "Linking ${decoded} to ${1}/${encoded}"
-
+        
         if [ -f "${decoded}" ]; then
+            echo "Linking ${decoded} to ${1}/${encoded}"
             cp -a "${decoded}" "${1}/${encoded}"
         fi
+
+        ls -la "${1}"
     done
 }
 

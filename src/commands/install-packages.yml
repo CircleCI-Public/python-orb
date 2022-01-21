@@ -195,7 +195,10 @@ steps:
             command: |
               pip install -e << parameters.path-args >> << parameters.args >>
   - when:
-      condition: << parameters.venv-cache >>
+      condition:
+        or: 
+          - << parameters.venv-cache >>
+          - << parameters.pypi-cache >>
       steps:
         - run:
             name: Link virtual environment to cache directory
@@ -211,7 +214,7 @@ steps:
             paths:
               - /tmp/venv_cache
   - when:
-      condition: << parameters.pypi-cache >>
+      condition:
       steps:
         - run:
             name: Link dependencies to cache directory
