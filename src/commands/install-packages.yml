@@ -196,7 +196,7 @@ steps:
               pip install -e << parameters.path-args >> << parameters.args >>
   - when:
       condition:
-        or: 
+        or:
           - << parameters.venv-cache >>
           - << parameters.pypi-cache >>
       steps:
