@@ -10,6 +10,7 @@ restore_paths() {
             echo "INFO: Restoring ${file}"
             decoded=$(basename "${file}" | base64 -d)
             mv "${file}" "${decoded}"
+            ls -la "${decoded}"
         done
     fi
 }
