@@ -163,6 +163,7 @@ workflows:
       - python/test:
           name: job-test-pip
           pkg-manager: pip
+          venv-cache: false
           cache-version: pip-<< pipeline.parameters.cache-version >>
           test-tool: unittest
           app-dir: ~/project/sample_pip
@@ -178,6 +179,7 @@ workflows:
       - python/test:
           name: job-auto-test-pip
           test-tool: unittest
+          venv-cache: false
           cache-version: pip-auto-<< pipeline.parameters.cache-version >>
           app-dir: ~/project/sample_pip
       - python/test:
@@ -185,6 +187,7 @@ workflows:
           pkg-manager: pip
           pip-dependency-file: ""
           test-tool: unittest
+          venv-cache: false
           cache-version: pip-noreqs-<< pipeline.parameters.cache-version >>
           app-dir: ~/project/sample_pip
       - python/test:
