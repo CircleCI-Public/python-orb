@@ -152,46 +152,46 @@ workflows:
       - python/test:
           name: job-test-poetry
           pkg-manager: poetry
-          cache-version: << pipeline.parameters.cache-version >>
+          cache-version: poetry-<< pipeline.parameters.cache-version >>
           app-dir: ~/project/sample_poetry
       - python/test:
           name: job-test-pipenv
           pkg-manager: pipenv
-          cache-version: << pipeline.parameters.cache-version >>
+          cache-version: pipenv-<< pipeline.parameters.cache-version >>
           args: pytest
           app-dir: ~/project/sample_pipenv
       - python/test:
           name: job-test-pip
           pkg-manager: pip
-          cache-version: << pipeline.parameters.cache-version >>
+          cache-version: pip-<< pipeline.parameters.cache-version >>
           test-tool: unittest
           app-dir: ~/project/sample_pip
       - python/test:
           name: job-auto-test-poetry
-          cache-version: << pipeline.parameters.cache-version >>
+          cache-version: poetry-auto-<< pipeline.parameters.cache-version >>
           app-dir: ~/project/sample_poetry
       - python/test:
           name: job-auto-test-pipenv
           args: pytest
-          cache-version: << pipeline.parameters.cache-version >>
+          cache-version: poetry-auto-<< pipeline.parameters.cache-version >>
           app-dir: ~/project/sample_pipenv
       - python/test:
           name: job-auto-test-pip
           test-tool: unittest
-          cache-version: << pipeline.parameters.cache-version >>
+          cache-version: pip-auto-<< pipeline.parameters.cache-version >>
           app-dir: ~/project/sample_pip
       - python/test:
           name: job-test-pip-no-reqs
           pkg-manager: pip
           pip-dependency-file: ""
           test-tool: unittest
-          cache-version: << pipeline.parameters.cache-version >>
+          cache-version: pip-noreqs-<< pipeline.parameters.cache-version >>
           app-dir: ~/project/sample_pip
       - python/test:
           version: 3.8.2
           name: job-test-pip-dist
           pkg-manager: pip-dist
-          cache-version: << pipeline.parameters.cache-version >>
+          cache-version: pip-dist-<< pipeline.parameters.cache-version >>
           app-dir: ~/project/sample_pip
           # pip-dependency-file: setup.py
           post-steps:
