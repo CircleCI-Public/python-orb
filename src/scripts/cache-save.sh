@@ -27,7 +27,7 @@ link_paths() {
         echo "Linking ${decoded} to ${1}/${encoded}"
 
         if [ -f "${decoded}" ]; then
-            ln "${decoded}" "${1}/${encoded}"
+            cp -a "${decoded}" "${1}/${encoded}"
         fi
     done
 }
