@@ -27,7 +27,12 @@ link_paths() {
         
         if [ -f "${decoded}" ]; then
             echo "Linking ${decoded} to ${1}/${encoded}"
-            cp -a "${decoded}" "${1}/${encoded}"
+            ln "${decoded}" "${1}/${encoded}"
+            elif [ -d "${decoded}" ]; then
+            echo "Sym Linking ${decoded} to ${1}/${encoded}"
+            ln -s "${decoded}" "${1}/${encoded}"
+        else
+            echo "Could not find ${decoded}. Skipping..."
         fi
         
         ls -la "${1}"
