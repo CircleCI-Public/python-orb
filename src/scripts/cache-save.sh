@@ -25,12 +25,9 @@ link_paths() {
     for encoded in $(echo "${2}" | jq -r '.[] | @base64'); do
         decoded=$(echo "${encoded}" | base64 -d)
         
-        if [ -f "${decoded}" ]; then
-            echo "Linking ${decoded} to ${1}/${encoded}"
-            ln "${decoded}" "${1}/${encoded}"
-            elif [ -d "${decoded}" ]; then
-            echo "Sym Linking ${decoded} to ${1}/${encoded}"
-            ln -s "${decoded}" "${1}/${encoded}"
+        if [ -f "${decoded}" ] || [ -d "${decoded}" ];; then
+            echo "Copying ${decoded} to ${1}/${encoded}"
+            cp -a "${decoded}" "${1}/${encoded}"
         else
             echo "Could not find ${decoded}. Skipping..."
         fi
