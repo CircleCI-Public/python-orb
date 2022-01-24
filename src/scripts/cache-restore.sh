@@ -1,22 +1,19 @@
 restore_paths() {
-    if [ -f "${1}" ]; then
-        rm -rf "${1}"
-    fi
-    
-    mkdir -p "${1}"
-    
     if [ -d "${1}" ] && [ -n "$(ls -A "${1}" 2>/dev/null)" ]; then
         for file in "${1}"/*; do
             echo "INFO: Restoring ${file}"
             decoded=$(basename "${file}" | base64 -d)
             parent_dir=$(dirname ${decoded})
-
-            if [ ! -d "${parent_dir}" ]; then 
+            
+            # make sure the parent directories exist
+            if [ ! -d "${parent_dir}" ]; then
                 mkdir -p "${parent_dir}"
             fi
-
-            mv "${file}" "${decoded}"
-            ls -la "${decoded}"
+            
+            # make sure there isn't anything there already
+            if [[ ! -f "${decoded}" && ! -d "${decoded}" ]]; then
+                mv "${file}" "${decoded}"
+            fi
         done
     fi
 }
