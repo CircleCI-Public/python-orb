@@ -9,7 +9,14 @@ case ${DETECT_PKG_MNGR:-${PARAM_PKG_MNGR}} in
     ;;
     pipenv) # TODO: use PIPENV_PIPFILE
         LOCK_FILE="${PARAM_APP_DIR}/Pipfile.lock"
-        VENV_PATHS='[ "/home/circleci/.local/share/virtualenvs" ]'
+        PIPENV_VENV_PATH="${WORKON_HOME:-'/home/circleci/.local/share/virtualenvs'}"
+
+        if [ -z "${PIPENV_VENV_IN_PROJECT }" ]; then
+            VENV_PATHS="[ \"${PIPENV_VENV_PATH}\" ]"
+        else
+            VENV_PATHS="[ \"${PARAM_APP_DIR}/.venvs\" ]"
+        fi
+        
         CACHE_PATHS='[ "/home/circleci/.cache/pip", "/home/circleci/.cache/pipenv" ]'
     ;;
     poetry)
@@ -18,6 +25,10 @@ case ${DETECT_PKG_MNGR:-${PARAM_PKG_MNGR}} in
         CACHE_PATHS='[ "/home/circleci/.cache/pip" ]'
     ;;
 esac
+
+if [ -z "${PARAM_VENV_PATH}" ]; then
+    VENV_PATHS="${PARAM_VENV_PATH}"
+fi
 
 CACHE_DIR="/tmp/pycache"
 mkdir -p "${CACHE_DIR}"

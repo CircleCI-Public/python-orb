@@ -45,6 +45,10 @@ parameters:
     type: boolean
     default: true
     description: Keep all versions of pypi and site-package caches for faster rebuilding overall.
+  venv-path:
+    type: string
+    default: ""
+    description: Override venv path. As json array - ex '[ "path", "path2" ]'
   cache-version:
     type: string
     default: v1
@@ -102,6 +106,7 @@ steps:
               PARAM_DEPENDENCY_FILE: << parameters.pip-dependency-file >>
               PARAM_PYPI_CACHE: << parameters.pypi-cache >>
               PARAM_VENV_CACHE: << parameters.venv-cache >>
+              PARAM_VENV_PATH: << parameters.venv-path >>
             command: <<include(scripts/cache-link-lockfile.sh)>>
             working_directory: << parameters.app-dir >>
         - restore_cache:
@@ -189,6 +194,7 @@ steps:
               PARAM_DEPENDENCY_FILE: << parameters.pip-dependency-file >>
               PARAM_VENV_CACHE: << parameters.venv-cache >>
               PARAM_PYPI_CACHE: << parameters.pypi-cache >>
+              PARAM_VENV_PATH: << parameters.venv-path >>
             command: <<include(scripts/cache-save.sh)>>
         - save_cache:
             key: <<parameters.cache-version>>-pycache-<<#parameters.include-branch-in-cache-key>>{{ .Branch }}-<</parameters.include-branch-in-cache-key>>{{ checksum "/tmp/pycache/lockfile" }}-<<#parameters.include-python-in-cache-key>>{{ checksum "/home/circleci/.pyenv/version" }}-<</parameters.include-python-in-cache-key>>
