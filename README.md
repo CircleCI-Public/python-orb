@@ -3,27 +3,22 @@
 A python Orb for CircleCI.
 This orb allows you to do common python related tasks on CircleCI such as setup a pipenv or poetry env, manage global python dependencies, cache virtualenvs or global python packages.
 
-
 ## Usage
 
 Example use as well as a list of available executors, commands, and jobs are available on this orb's [registry page][reg-page].
-
 
 ## Resources
 
 [CircleCI Orb Registry Page][reg-page] - The official registry page of this orb for all versions, executors, commands, and jobs described.
 [CircleCI Orb Docs](https://circleci.com/docs/2.0/orb-intro/#section=configuration) - Docs for using and creating CircleCI Orbs.
 
-
 ## Contributing
+
 We welcome [issues](https://github.com/CircleCI-Public/python-orb/issues) to and [pull requests](https://github.com/CircleCI-Public/python-orb/pulls) against this repository!
 For further questions/comments about this or other orbs, visit the Orb Category of [CircleCI Discuss](https://discuss.circleci.com/c/orbs).
 
 ### Publishing
 
-New versions of this orb are published by pushing a [SemVer git tag](https://semver.org/) by the [Community & Partner Engineering Team](mailto:community-partner@circleci.com
-).
-
-
+New versions of this orb are published by pushing a [SemVer git tag](https://semver.org/) by the [Community & Partner Engineering Team](mailto:community-partner@circleci.com).
 
 [reg-page]: https://circleci.com/orbs/registry/orb/circleci/python

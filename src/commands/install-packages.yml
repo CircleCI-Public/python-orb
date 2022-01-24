@@ -89,7 +89,7 @@ steps:
         echo 'export AUTO_DETECT_ENV_SCRIPT="/tmp/detect-env.sh"' >> $BASH_ENV
   # restore caches
   - when:
-      condition: 
+      condition:
         or:
           - << parameters.pypi-cache >>
           - << parameters.venv-cache >>
@@ -199,7 +199,7 @@ steps:
             command: |
               pip install -e << parameters.path-args >> << parameters.args >>
   - when:
-      condition: 
+      condition:
         or:
           - << parameters.pypi-cache >>
           - << parameters.venv-cache >>

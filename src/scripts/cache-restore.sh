@@ -18,7 +18,7 @@ restore_paths() {
     fi
 }
 
-CACHE_PARENT="/tmp/pycache" 
+CACHE_PARENT="/tmp/pycache"
 
 if [ "${PARAM_VENV_CACHE}" = "1" ]; then
     restore_paths "${CACHE_PARENT}/venv"

@@ -3,7 +3,7 @@ source "$AUTO_DETECT_ENV_SCRIPT"
 
 if [ ! -f "/tmp/lockfile" ]; then
     eval PARAM_APP_DIR="${PARAM_APP_DIR}"
-
+    
     case ${DETECT_PKG_MNGR:-${PARAM_PKG_MNGR}} in
         pip | pip-dist)
             LOCK_FILE="${PARAM_APP_DIR}/${PARAM_DEPENDENCY_FILE:-requirements.txt}"
@@ -19,11 +19,11 @@ if [ ! -f "/tmp/lockfile" ]; then
     if [ -z "${LOCK_FILE}" ]; then
         echo "WARNING: Could not determine lockfile path for ${DETECT_PKG_MNGR:-PARAM_PKG_MNGR}"
     else
-      if [ -f "${LOCK_FILE}" ]; then
-        echo "INFO: Linking ${LOCK_FILE} to /tmp/lockfile"
-        ln -s "${LOCK_FILE}" "/tmp/lockfile"
-      else
-        echo "WARNING: Could not find lockfile at ${LOCK_FILE}"
-      fi
+        if [ -f "${LOCK_FILE}" ]; then
+            echo "INFO: Linking ${LOCK_FILE} to /tmp/lockfile"
+            ln -s "${LOCK_FILE}" "/tmp/lockfile"
+        else
+            echo "WARNING: Could not find lockfile at ${LOCK_FILE}"
+        fi
     fi
 fi
