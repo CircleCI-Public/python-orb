@@ -1,7 +1,8 @@
 # shellcheck source=detect-env.sh
 source "$AUTO_DETECT_ENV_SCRIPT"
+LOCKFILE_PATH="/tmp/pycache/lockfile"
 
-if [ ! -f "/tmp/lockfile" ]; then
+if [ ! -f "${LOCKFILE_PATH}" ]; then
     eval PARAM_APP_DIR="${PARAM_APP_DIR}"
     
     case ${DETECT_PKG_MNGR:-${PARAM_PKG_MNGR}} in
@@ -20,8 +21,8 @@ if [ ! -f "/tmp/lockfile" ]; then
         echo "WARNING: Could not determine lockfile path for ${DETECT_PKG_MNGR:-PARAM_PKG_MNGR}"
     else
         if [ -f "${LOCK_FILE}" ]; then
-            echo "INFO: Linking ${LOCK_FILE} to /tmp/lockfile"
-            ln -s "${LOCK_FILE}" "/tmp/lockfile"
+            echo "INFO: Linking ${LOCK_FILE} to ${LOCKFILE_PATH}"
+            ln -s "${LOCK_FILE}" "${LOCKFILE_PATH}"
         else
             echo "WARNING: Could not find lockfile at ${LOCK_FILE}"
         fi
