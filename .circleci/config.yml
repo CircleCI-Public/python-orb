@@ -16,7 +16,7 @@ parameters:
     default: "dev:alpha"
   cache-version:
     type: string
-    default: v9
+    default: v10
 
 jobs:
   pip-install-test:
