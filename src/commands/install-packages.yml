@@ -114,30 +114,6 @@ steps:
               PARAM_PYPI_CACHE: << parameters.pypi-cache >>
               PARAM_VENV_CACHE: << parameters.venv-cache >>
             command: <<include(scripts/cache-restore.sh)>>
-  - when:
-      condition:
-        and:
-          - << parameters.venv-cache >>
-          - or:
-              - equal: [pipenv, << parameters.pkg-manager >>]
-              - equal: [poetry, << parameters.pkg-manager >>]
-              - equal: [auto, << parameters.pkg-manager >>]
-      steps:
-        - run:
-            name: Link lockfile
-            environment:
-              PARAM_PKG_MNGR: << parameters.pkg-manager >>
-              PARAM_APP_DIR: << parameters.app-dir >>
-              PARAM_DEPENDENCY_FILE: << parameters.pip-dependency-file >>
-            command: <<include(scripts/cache-link-lockfile.sh)>>
-        - restore_cache:
-            keys:
-              - -venv-<<parameters.cache-version>>-<<#parameters.include-branch-in-cache-key>>{{ .Branch }}-<</parameters.include-branch-in-cache-key>>{{ checksum "/tmp/lockfile" }}-<<#parameters.include-python-in-cache-key>>{{ checksum "/home/circleci/.pyenv/version" }}-<</parameters.include-python-in-cache-key>>
-        - run:
-            name: Move restored cache
-            environment:
-              PARAM_VENV_CACHE: << parameters.venv-cache >>
-            command: <<include(scripts/cache-restore.sh)>>
   # run install steps
   - steps: <<parameters.pre-install-steps>>
   - when:
