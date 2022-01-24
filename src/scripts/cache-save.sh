@@ -11,7 +11,7 @@ case ${DETECT_PKG_MNGR:-${PARAM_PKG_MNGR}} in
         LOCK_FILE="${PARAM_APP_DIR}/Pipfile.lock"
         PIPENV_VENV_PATH="${WORKON_HOME:-'/home/circleci/.local/share/virtualenvs'}"
 
-        if [ -z "${PIPENV_VENV_IN_PROJECT }" ]; then
+        if [ -z "${PIPENV_VENV_IN_PROJECT}" ]; then
             VENV_PATHS="[ \"${PIPENV_VENV_PATH}\" ]"
         else
             VENV_PATHS="[ \"${PARAM_APP_DIR}/.venvs\" ]"
