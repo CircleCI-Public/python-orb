@@ -19,13 +19,16 @@ case ${DETECT_PKG_MNGR:-${PARAM_PKG_MNGR}} in
     ;;
 esac
 
+CACHE_PARENT="/tmp/pycache"
+mkdir -p "${CACHE_PARENT}"
+
 link_paths() {
     if [ -d "${1}" ]; then
         echo "Cache directory already exists. Skipping..."
         exit 0
     fi
     
-    mkdir -p "${1}"
+    mkdir "${1}"
     
     for encoded in $(echo "${2}" | jq -r '.[] | @base64'); do
         decoded=$(echo "${encoded}" | base64 -d)
@@ -41,18 +44,20 @@ link_paths() {
     done
 }
 
-if [ "${PARAM_VENV_CACHE}" = "1" ]; then
-    link_paths "/tmp/venv_cache" "${VENV_PATHS}"
+if [ "${PARAM_VENV_CACHE}" = "1" ] && [ -n "${VENV_PATHS}" ]; then
+    link_paths "${CACHE_PARENT}/venv" "${VENV_PATHS}"
 fi
 
 if [ "${PARAM_PYPI_CACHE}" = "1" ]; then
-    link_paths "/tmp/pypi_cache" "${CACHE_PATHS}"
+    link_paths "${CACHE_PARENT}/pypi" "${CACHE_PATHS}"
 fi
 
-if [ -f "/tmp/lockfile" ]; then
-    unlink "/tmp/lockfile"
+LOCKFILE_PATH="${CACHE_PARENT}/lockfile"
+
+if [ -f "${LOCKFILE_PATH}" ]; then
+    unlink "${LOCKFILE_PATH}"
 fi
 
 if [ -f "${LOCK_FILE}" ]; then
-    ln "${LOCK_FILE}" "/tmp/lockfile"
+    ln "${LOCK_FILE}" "${LOCKFILE_PATH}"
 fi

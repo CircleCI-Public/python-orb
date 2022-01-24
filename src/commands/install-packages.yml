@@ -89,7 +89,10 @@ steps:
         echo 'export AUTO_DETECT_ENV_SCRIPT="/tmp/detect-env.sh"' >> $BASH_ENV
   # restore caches
   - when:
-      condition: << parameters.pypi-cache >>
+      condition: 
+        or:
+          - << parameters.pypi-cache >>
+          - << parameters.venv-cache >>
       steps:
         - run:
             name: Link lockfile
@@ -98,16 +101,18 @@ steps:
               PARAM_APP_DIR: << parameters.app-dir >>
               PARAM_DEPENDENCY_FILE: << parameters.pip-dependency-file >>
               PARAM_PYPI_CACHE: << parameters.pypi-cache >>
+              PARAM_VENV_CACHE: << parameters.venv-cache >>
             command: <<include(scripts/cache-link-lockfile.sh)>>
             working_directory: << parameters.app-dir >>
         - restore_cache:
             keys:
-              - -pypi-<<parameters.cache-version>>-<<#parameters.include-branch-in-cache-key>>{{ .Branch }}-<</parameters.include-branch-in-cache-key>>{{ checksum "/tmp/lockfile" }}-<<#parameters.include-python-in-cache-key>>{{ checksum "/home/circleci/.pyenv/version" }}-<</parameters.include-python-in-cache-key>>
+              - <<parameters.cache-version>>-pycache-<<#parameters.include-branch-in-cache-key>>{{ .Branch }}-<</parameters.include-branch-in-cache-key>>{{ checksum "/tmp/pycache/lockfile" }}-<<#parameters.include-python-in-cache-key>>{{ checksum "/home/circleci/.pyenv/version" }}-<</parameters.include-python-in-cache-key>>
         - run:
             name: Move restored cache
             working_directory: << parameters.app-dir >>
             environment:
               PARAM_PYPI_CACHE: << parameters.pypi-cache >>
+              PARAM_VENV_CACHE: << parameters.venv-cache >>
             command: <<include(scripts/cache-restore.sh)>>
   - when:
       condition:
@@ -124,7 +129,6 @@ steps:
               PARAM_PKG_MNGR: << parameters.pkg-manager >>
               PARAM_APP_DIR: << parameters.app-dir >>
               PARAM_DEPENDENCY_FILE: << parameters.pip-dependency-file >>
-              PARAM_VENV_CACHE: << parameters.venv-cache >>
             command: <<include(scripts/cache-link-lockfile.sh)>>
         - restore_cache:
             keys:
@@ -195,34 +199,22 @@ steps:
             command: |
               pip install -e << parameters.path-args >> << parameters.args >>
   - when:
-      condition: << parameters.venv-cache >>
+      condition: 
+        or:
+          - << parameters.pypi-cache >>
+          - << parameters.venv-cache >>
       steps:
         - run:
-            name: Link virtual environment to cache directory
+            name: Copy to cache directory
             working_directory: << parameters.app-dir >>
             environment:
               PARAM_PKG_MNGR: << parameters.pkg-manager >>
               PARAM_APP_DIR: << parameters.app-dir >>
               PARAM_DEPENDENCY_FILE: << parameters.pip-dependency-file >>
               PARAM_VENV_CACHE: << parameters.venv-cache >>
-            command: <<include(scripts/cache-save.sh)>>
-        - save_cache:
-            key: -venv-<<parameters.cache-version>>-<<#parameters.include-branch-in-cache-key>>{{ .Branch }}-<</parameters.include-branch-in-cache-key>>{{ checksum "/tmp/lockfile" }}-<<#parameters.include-python-in-cache-key>>{{ checksum "/home/circleci/.pyenv/version" }}-<</parameters.include-python-in-cache-key>>
-            paths:
-              - /tmp/venv_cache
-  - when:
-      condition: << parameters.pypi-cache >>
-      steps:
-        - run:
-            name: Link dependencies to cache directory
-            working_directory: << parameters.app-dir >>
-            environment:
-              PARAM_PKG_MNGR: << parameters.pkg-manager >>
-              PARAM_APP_DIR: << parameters.app-dir >>
-              PARAM_DEPENDENCY_FILE: << parameters.pip-dependency-file >>
               PARAM_PYPI_CACHE: << parameters.pypi-cache >>
             command: <<include(scripts/cache-save.sh)>>
         - save_cache:
-            key: -pypi-<<parameters.cache-version>>-<<#parameters.include-branch-in-cache-key>>{{ .Branch }}-<</parameters.include-branch-in-cache-key>>{{ checksum "/tmp/lockfile" }}-<<#parameters.include-python-in-cache-key>>{{ checksum "/home/circleci/.pyenv/version" }}-<</parameters.include-python-in-cache-key>>
+            key: <<parameters.cache-version>>-pycache-<<#parameters.include-branch-in-cache-key>>{{ .Branch }}-<</parameters.include-branch-in-cache-key>>{{ checksum "/tmp/pycache/lockfile" }}-<<#parameters.include-python-in-cache-key>>{{ checksum "/home/circleci/.pyenv/version" }}-<</parameters.include-python-in-cache-key>>
             paths:
-              - /tmp/pypi_cache
+              - /tmp/pycache
