@@ -18,12 +18,12 @@ restore_paths() {
     fi
 }
 
-CACHE_PARENT="/tmp/pycache"
+CACHE_DIR="/tmp/pycache"
 
 if [ "${PARAM_VENV_CACHE}" = "1" ]; then
-    restore_paths "${CACHE_PARENT}/venv"
+    restore_paths "${CACHE_DIR}/venv"
 fi
 
 if [ "${PARAM_PYPI_CACHE}" = "1" ]; then
-    restore_paths "${CACHE_PARENT}/pypi"
+    restore_paths "${CACHE_DIR}/pypi"
 fi

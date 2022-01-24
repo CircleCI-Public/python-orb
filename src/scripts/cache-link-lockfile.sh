@@ -1,6 +1,10 @@
 # shellcheck source=detect-env.sh
 source "$AUTO_DETECT_ENV_SCRIPT"
-LOCKFILE_PATH="/tmp/pycache/lockfile"
+
+CACHE_DIR="/tmp/pycache"
+LOCKFILE_PATH="${CACHE_DIR}/lockfile"
+
+mkdir -p "${CACHE_DIR}"
 
 if [ ! -f "${LOCKFILE_PATH}" ]; then
     eval PARAM_APP_DIR="${PARAM_APP_DIR}"

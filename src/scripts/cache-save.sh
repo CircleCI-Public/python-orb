@@ -19,8 +19,8 @@ case ${DETECT_PKG_MNGR:-${PARAM_PKG_MNGR}} in
     ;;
 esac
 
-CACHE_PARENT="/tmp/pycache"
-mkdir -p "${CACHE_PARENT}"
+CACHE_DIR="/tmp/pycache"
+mkdir -p "${CACHE_DIR}"
 
 link_paths() {
     if [ -d "${1}" ]; then
@@ -45,14 +45,14 @@ link_paths() {
 }
 
 if [ "${PARAM_VENV_CACHE}" = "1" ] && [ -n "${VENV_PATHS}" ]; then
-    link_paths "${CACHE_PARENT}/venv" "${VENV_PATHS}"
+    link_paths "${CACHE_DIR}/venv" "${VENV_PATHS}"
 fi
 
 if [ "${PARAM_PYPI_CACHE}" = "1" ]; then
-    link_paths "${CACHE_PARENT}/pypi" "${CACHE_PATHS}"
+    link_paths "${CACHE_DIR}/pypi" "${CACHE_PATHS}"
 fi
 
-LOCKFILE_PATH="${CACHE_PARENT}/lockfile"
+LOCKFILE_PATH="${CACHE_DIR}/lockfile"
 
 if [ -f "${LOCKFILE_PATH}" ]; then
     unlink "${LOCKFILE_PATH}"
