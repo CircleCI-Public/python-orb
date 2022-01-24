@@ -9,6 +9,12 @@ restore_paths() {
         for file in "${1}"/*; do
             echo "INFO: Restoring ${file}"
             decoded=$(basename "${file}" | base64 -d)
+            parent_dir=$(dirname ${decoded})
+
+            if [ ! -d "${parent_dir}" ]; then 
+                mkdir -p "${parent_dir}"
+            fi
+
             mv "${file}" "${decoded}"
             ls -la "${decoded}"
         done
