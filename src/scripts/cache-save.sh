@@ -39,8 +39,6 @@ link_paths() {
         else
             echo "Could not find ${decoded}. Skipping..."
         fi
-        
-        ls -la "${1}"
     done
 }
 
