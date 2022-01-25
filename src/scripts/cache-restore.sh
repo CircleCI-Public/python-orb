@@ -28,4 +28,4 @@ if [ "${PARAM_PYPI_CACHE}" = "1" ]; then
     restore_paths "${CACHE_DIR}/pypi"
 fi
 
-ls -la "~/.pyenv/versions/3.8.12/lib/python3.8/site-packages"
+ls -la "/home/circleci/.pyenv/versions/3.8.12/lib/python3.8/site-packages"
