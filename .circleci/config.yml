@@ -18,9 +18,20 @@ parameters:
     type: string
     default: v8
 
+executors:
+  macos:
+    macos:
+      xcode: 13.2.0
+  machine:
+    machine:
+      image: ubuntu-2004:202111-01
+
 jobs:
   pip-install-test:
-    executor: python/default
+    parameters:
+      os:
+        type: executor
+    executor: <<parameters.os>>
     steps:
       - checkout
       - python/install-packages:
@@ -34,7 +45,10 @@ jobs:
             pytest
 
   pip-install-test-no-packages:
-    executor: python/default
+    parameters:
+      os:
+        type: executor
+    executor: <<parameters.os>>
     steps:
       - checkout
       - run:
@@ -44,7 +58,10 @@ jobs:
             pytest
 
   pip-install-test-args:
-    executor: python/default
+    parameters:
+      os:
+        type: executor
+    executor: <<parameters.os>>
     steps:
       - checkout
       - python/install-packages:
@@ -60,14 +77,20 @@ jobs:
             pytest
 
   dist-test:
-    executor: python/default
+    parameters:
+      os:
+        type: executor
+    executor: <<parameters.os>>
     steps:
       - checkout
       - python/dist:
           app-dir: ~/project/sample_pip
 
   pipenv-test:
-    executor: python/default
+    parameters:
+      os:
+        type: executor
+    executor: <<parameters.os>>
     steps:
       - checkout
       - python/install-packages:
@@ -99,7 +122,10 @@ jobs:
           working_directory: ~/project/sample_pipenv
 
   poetry-test:
-    executor: python/default
+    parameters:
+      os:
+        type: executor
+    executor: <<parameters.os>>
     steps:
       - checkout
       - python/install-packages:
@@ -144,11 +170,26 @@ workflows:
   integration-tests_prod-release:
     when: << pipeline.parameters.run-integration-tests >>
     jobs:
-      - pip-install-test
-      - pip-install-test-args
-      - pipenv-test
-      - poetry-test
-      - dist-test
+      - pip-install-test:
+          matrix:
+            parameters:
+              os: [python/default, macos, machine]
+      - pip-install-test-args:
+          matrix:
+            parameters:
+              os: [python/default, macos, machine]
+      - pipenv-test:
+          matrix:
+            parameters:
+              os: [python/default, macos, machine]
+      - poetry-test:
+          matrix:
+            parameters:
+              os: [python/default, macos, machine]
+      - dist-test:
+          matrix:
+            parameters:
+              os: [python/default, macos, machine]
       - python/test:
           name: job-test-poetry
           pkg-manager: poetry
@@ -166,6 +207,8 @@ workflows:
           cache-version: pip-<< pipeline.parameters.cache-version >>
           test-tool: unittest
           app-dir: ~/project/sample_pip
+          post-steps:
+            - run: ls -la "/home/circleci/.pyenv/versions/3.8.12/lib/python3.8/site-packages"
       - python/test:
           name: job-auto-test-poetry
           cache-version: poetry-auto-<< pipeline.parameters.cache-version >>
