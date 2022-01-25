@@ -1,3 +1,15 @@
+recurse() {
+    if [ ! -d "$1" ] || [ ! -e "$2" ]; then
+        mv -u "$1" "$2" || exit
+        return
+    fi
+    for entry in "$1/"* "$1/."[!.]* "$1/.."?*; do
+        if [ -e "$entry" ]; then
+            recurse "$entry" "$2/${entry##"$1/"}"
+        fi
+    done
+}
+
 restore_paths() {
     if [ -d "${1}" ] && [ -n "$(ls -A "${1}" 2>/dev/null)" ]; then
         for file in "${1}"/*; do
@@ -14,7 +26,8 @@ restore_paths() {
             if [[ ! -f "${decoded}" && ! -d "${decoded}" ]]; then
                 mv "${file}" "${decoded}"
             else
-                rsync -av "${file}/" "${decoded}/"
+                echo "Recursively moving ${file} to ${decoded}"
+                resurse "${file}" "${decoded}"
             fi
         done
     fi
