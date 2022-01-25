@@ -14,7 +14,7 @@ restore_paths() {
             if [[ ! -f "${decoded}" && ! -d "${decoded}" ]]; then
                 mv "${file}" "${decoded}"
             else
-                find "${file}" -name '*' -type f -exec mv -f {} "${decoded}" \;
+                rsync -av "${file}/" "${decoded}/"
             fi
         done
     fi
