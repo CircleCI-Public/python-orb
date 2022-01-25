@@ -35,7 +35,7 @@ mkdir -p "${CACHE_DIR}"
 
 link_paths() {
     if [ -d "${1}" ]; then
-        echo "Cache directory already exists. Skipping..."
+        echo "INFO: Cache directory already exists. Skipping..."
         exit 0
     fi
     
@@ -45,10 +45,10 @@ link_paths() {
         decoded=$(echo "${encoded}" | base64 -d)
         
         if [ -f "${decoded}" ] || [ -d "${decoded}" ]; then
-            echo "Copying ${decoded} to ${1}/${encoded}"
+            echo "INFO: Copying ${decoded} to ${1}/${encoded}"
             cp -a "${decoded}" "${1}/${encoded}"
         else
-            echo "Could not find ${decoded}. Skipping..."
+            echo "INFO: Could not find ${decoded}. Skipping..."
         fi
     done
 }
