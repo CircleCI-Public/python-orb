@@ -1,3 +1,4 @@
+# credit: https://github.com/antichris
 recurse() {
     if [ ! -d "$1" ] || [ ! -e "$2" ]; then
         mv -u "$1" "$2" || exit
@@ -13,7 +14,6 @@ recurse() {
 restore_paths() {
     if [ -d "${1}" ] && [ -n "$(ls -A "${1}" 2>/dev/null)" ]; then
         for file in "${1}"/*; do
-            echo "INFO: Restoring ${file}"
             decoded=$(basename "${file}" | base64 -d)
             parent_dir=$(dirname "${decoded}")
             
@@ -22,13 +22,9 @@ restore_paths() {
                 mkdir -p "${parent_dir}"
             fi
             
-            # make sure there isn't anything there already
-            if [[ ! -f "${decoded}" && ! -d "${decoded}" ]]; then
-                mv "${file}" "${decoded}"
-            else
-                echo "Recursively moving ${file} to ${decoded}"
-                recurse "${file}" "${decoded}"
-            fi
+            echo "INFO: Restoring ${file} ${decoded}"
+
+            recurse "${file}" "${decoded}"
         done
     fi
 }
