@@ -111,7 +111,7 @@ steps:
             working_directory: << parameters.app-dir >>
         - restore_cache:
             keys:
-              - <<parameters.cache-version>>-pycache-<<#parameters.include-branch-in-cache-key>>{{ .Branch }}-<</parameters.include-branch-in-cache-key>>{{ checksum "/tmp/cci_pycache/lockfile" }}-<<#parameters.include-python-in-cache-key>>{{ checksum "/home/circleci/.pyenv/version" }}-<</parameters.include-python-in-cache-key>>
+              - <<parameters.cache-version>>-cci_pycache-<<#parameters.include-branch-in-cache-key>>{{ .Branch }}-<</parameters.include-branch-in-cache-key>>{{ checksum "/tmp/cci_pycache/lockfile" }}-<<#parameters.include-python-in-cache-key>>{{ checksum "/home/circleci/.pyenv/version" }}-<</parameters.include-python-in-cache-key>>
         - run:
             name: Move restored cache
             working_directory: << parameters.app-dir >>
@@ -197,6 +197,6 @@ steps:
               PARAM_VENV_PATH: << parameters.venv-path >>
             command: <<include(scripts/cache-save.sh)>>
         - save_cache:
-            key: <<parameters.cache-version>>-pycache-<<#parameters.include-branch-in-cache-key>>{{ .Branch }}-<</parameters.include-branch-in-cache-key>>{{ checksum "/tmp/cci_pycache/lockfile" }}-<<#parameters.include-python-in-cache-key>>{{ checksum "/home/circleci/.pyenv/version" }}-<</parameters.include-python-in-cache-key>>
+            key: <<parameters.cache-version>>-cci_pycache-<<#parameters.include-branch-in-cache-key>>{{ .Branch }}-<</parameters.include-branch-in-cache-key>>{{ checksum "/tmp/cci_pycache/lockfile" }}-<<#parameters.include-python-in-cache-key>>{{ checksum "/home/circleci/.pyenv/version" }}-<</parameters.include-python-in-cache-key>>
             paths:
               - /tmp/cci_pycache
