@@ -16,7 +16,7 @@ parameters:
     default: "dev:alpha"
   cache-version:
     type: string
-    default: v1
+    default: v8
 
 jobs:
   pip-install-test:
@@ -163,7 +163,6 @@ workflows:
       - python/test:
           name: job-test-pip
           pkg-manager: pip
-          venv-cache: false
           cache-version: pip-<< pipeline.parameters.cache-version >>
           test-tool: unittest
           app-dir: ~/project/sample_pip
@@ -187,7 +186,6 @@ workflows:
           pkg-manager: pip
           pip-dependency-file: ""
           test-tool: unittest
-          venv-cache: false
           cache-version: pip-noreqs-<< pipeline.parameters.cache-version >>
           app-dir: ~/project/sample_pip
       - python/test:
