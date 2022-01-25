@@ -13,6 +13,8 @@ restore_paths() {
             # make sure there isn't anything there already
             if [[ ! -f "${decoded}" && ! -d "${decoded}" ]]; then
                 mv "${file}" "${decoded}"
+            else
+                find "${file}" -name '*' -type f -exec mv -f {} "${decoded}" \;
             fi
         done
     fi
