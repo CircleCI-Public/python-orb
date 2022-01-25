@@ -1,4 +1,4 @@
-# credit: https://github.com/antichris
+# credit for recurse function: https://github.com/antichris
 recurse() {
     if [ ! -d "$1" ] || [ ! -e "$2" ]; then
         mv -u "$1" "$2" || exit
@@ -22,7 +22,7 @@ restore_paths() {
                 mkdir -p "${parent_dir}"
             fi
             
-            echo "INFO: Restoring ${file} ${decoded}"
+            echo "INFO: Restoring ${file} to ${decoded}"
 
             recurse "${file}" "${decoded}"
         done
