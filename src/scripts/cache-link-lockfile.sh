@@ -1,7 +1,7 @@
 # shellcheck source=detect-env.sh
 source "$AUTO_DETECT_ENV_SCRIPT"
 
-CACHE_DIR="/tmp/pycache"
+CACHE_DIR="/tmp/cci_pycache"
 LOCKFILE_PATH="${CACHE_DIR}/lockfile"
 
 mkdir -p "${CACHE_DIR}"
