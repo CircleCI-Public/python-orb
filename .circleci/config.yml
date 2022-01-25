@@ -16,22 +16,11 @@ parameters:
     default: "dev:alpha"
   cache-version:
     type: string
-    default: v8
-
-executors:
-  macos:
-    macos:
-      xcode: 13.2.0
-  machine:
-    machine:
-      image: ubuntu-2004:202111-01
+    default: v1
 
 jobs:
   pip-install-test:
-    parameters:
-      os:
-        type: executor
-    executor: <<parameters.os>>
+    executor: python/default
     steps:
       - checkout
       - python/install-packages:
@@ -45,10 +34,7 @@ jobs:
             pytest
 
   pip-install-test-no-packages:
-    parameters:
-      os:
-        type: executor
-    executor: <<parameters.os>>
+    executor: python/default
     steps:
       - checkout
       - run:
@@ -58,10 +44,7 @@ jobs:
             pytest
 
   pip-install-test-args:
-    parameters:
-      os:
-        type: executor
-    executor: <<parameters.os>>
+    executor: python/default
     steps:
       - checkout
       - python/install-packages:
@@ -77,20 +60,14 @@ jobs:
             pytest
 
   dist-test:
-    parameters:
-      os:
-        type: executor
-    executor: <<parameters.os>>
+    executor: python/default
     steps:
       - checkout
       - python/dist:
           app-dir: ~/project/sample_pip
 
   pipenv-test:
-    parameters:
-      os:
-        type: executor
-    executor: <<parameters.os>>
+    executor: python/default
     steps:
       - checkout
       - python/install-packages:
@@ -122,10 +99,7 @@ jobs:
           working_directory: ~/project/sample_pipenv
 
   poetry-test:
-    parameters:
-      os:
-        type: executor
-    executor: <<parameters.os>>
+    executor: python/default
     steps:
       - checkout
       - python/install-packages:
@@ -170,26 +144,11 @@ workflows:
   integration-tests_prod-release:
     when: << pipeline.parameters.run-integration-tests >>
     jobs:
-      - pip-install-test:
-          matrix:
-            parameters:
-              os: [python/default, macos, machine]
-      - pip-install-test-args:
-          matrix:
-            parameters:
-              os: [python/default, macos, machine]
-      - pipenv-test:
-          matrix:
-            parameters:
-              os: [python/default, macos, machine]
-      - poetry-test:
-          matrix:
-            parameters:
-              os: [python/default, macos, machine]
-      - dist-test:
-          matrix:
-            parameters:
-              os: [python/default, macos, machine]
+      - pip-install-test
+      - pip-install-test-args
+      - pipenv-test
+      - poetry-test
+      - dist-test
       - python/test:
           name: job-test-poetry
           pkg-manager: poetry
