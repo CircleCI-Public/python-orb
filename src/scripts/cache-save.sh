@@ -26,7 +26,7 @@ case ${DETECT_PKG_MNGR:-${PARAM_PKG_MNGR}} in
     ;;
 esac
 
-if [ -z "${PARAM_VENV_PATH}" ]; then
+if [ -n "${PARAM_VENV_PATH}" ]; then
     VENV_PATHS="${PARAM_VENV_PATH}"
 fi
 
