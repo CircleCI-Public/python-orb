@@ -45,7 +45,7 @@ link_paths() {
 
     for encoded in $(echo "${2}" | jq -r '.[] | @base64'); do
         decoded=$(echo "${encoded}" | base64 -d)
-        
+        set -x
         if [ -e "${decoded}" ]; then
             echo "INFO: Copying ${decoded} to ${1}/${encoded}"
             cp -a "${decoded}" "${1}/${encoded}"
