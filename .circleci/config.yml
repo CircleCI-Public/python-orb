@@ -93,6 +93,8 @@ jobs:
       - python/install-packages:
           app-dir: ~/project/sample_pipenv
           pkg-manager: "pipenv"
+          pypi-cache: false
+          venv-cache: false
           cache-version: << pipeline.parameters.cache-version >>
       - run:
           command: pipenv run pytest
