@@ -34,6 +34,8 @@ CACHE_DIR="/tmp/cci_pycache"
 mkdir -p "${CACHE_DIR}"
 
 link_paths() {
+    ls -la "/home/circleci/.local/share/virtualenvs"
+    
     if [ -d "${1}" ]; then
         echo "INFO: Cache directory already exists. Skipping..."
         return
@@ -41,8 +43,6 @@ link_paths() {
     
     mkdir "${1}"
 
-    ls -la "/home/circleci/.local/share/virtualenvs"
-    
     for encoded in $(echo "${2}" | jq -r '.[] | @base64'); do
         decoded=$(echo "${encoded}" | base64 -d)
         
