@@ -9,7 +9,7 @@ case ${DETECT_PKG_MNGR:-${PARAM_PKG_MNGR}} in
     ;;
     pipenv) # TODO: use PIPENV_PIPFILE
         LOCK_FILE="${PARAM_APP_DIR}/Pipfile.lock"
-        PIPENV_VENV_PATH="${WORKON_HOME:-'/home/circleci/.local/share/virtualenvs'}"
+        PIPENV_VENV_PATH="${WORKON_HOME:-/home/circleci/.local/share/virtualenvs}"
 
         if [ -z "${PIPENV_VENV_IN_PROJECT}" ]; then
             VENV_PATHS="[ \"${PIPENV_VENV_PATH}\" ]"
@@ -34,8 +34,6 @@ CACHE_DIR="/tmp/cci_pycache"
 mkdir -p "${CACHE_DIR}"
 
 link_paths() {
-    ls -la "/home/circleci/.local/share/virtualenvs"
-    
     if [ -d "${1}" ]; then
         echo "INFO: Cache directory already exists. Skipping..."
         return
@@ -45,7 +43,7 @@ link_paths() {
 
     for encoded in $(echo "${2}" | jq -r '.[] | @base64'); do
         decoded=$(echo "${encoded}" | base64 -d)
-        set -x
+        
         if [ -e "${decoded}" ]; then
             echo "INFO: Copying ${decoded} to ${1}/${encoded}"
             cp -a "${decoded}" "${1}/${encoded}"
