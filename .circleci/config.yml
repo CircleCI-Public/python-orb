@@ -166,13 +166,13 @@ workflows:
           name: job-test-pipenv
           pkg-manager: pipenv
           cache-version: pipenv-<< pipeline.parameters.cache-version >>
-          args: pytest | tee install_output.txt
+          args: pytest -v | tee install_output.txt
           app-dir: ~/project/sample_pipenv
           post-steps:
             - run:
                 name: Verify cache was successful
                 working_directory: ~/project/sample_pipenv
-                command: 'cat install_output.txt | grep "0/0"'
+                command: 'cat install_output.txt | grep "Since it is already installed"'
       - python/test:
           name: job-test-pip
           pkg-manager: pip
@@ -197,14 +197,14 @@ workflows:
                 command: 'cat install_output.txt | grep "No dependencies to install or update"'
       - python/test:
           name: job-auto-test-pipenv
-          args: pytest | tee install_output.txt
-          cache-version: poetry-auto-<< pipeline.parameters.cache-version >>
+          args: pytest -v | tee install_output.txt
+          cache-version: pipenv-auto-<< pipeline.parameters.cache-version >>
           app-dir: ~/project/sample_pipenv
           post-steps:
             - run:
                 name: Verify cache was successful
                 working_directory: ~/project/sample_pipenv
-                command: 'cat install_output.txt | grep "0/0"'
+                command: 'cat install_output.txt | grep "Since it is already installed"'
       - python/test:
           name: job-auto-test-pip
           test-tool: unittest
