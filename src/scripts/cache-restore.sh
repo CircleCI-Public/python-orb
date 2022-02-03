@@ -1,4 +1,3 @@
-# credit for recurse function: https://github.com/antichris
 recurse() {
     if [ ! -d "$1" ] || [ ! -e "$2" ]; then
         mv -u "$1" "$2" || exit

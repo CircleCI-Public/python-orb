@@ -158,7 +158,10 @@ workflows:
           args: "| tee install_output.txt"
           app-dir: ~/project/sample_poetry
           post-steps:
-            - run: 'cat install_output.txt | grep "No dependencies to install or update"'
+            - run:  
+                name: Verify cache was successful
+                working_directory: ~/project/sample_poetry
+                command: 'cat install_output.txt | grep "No dependencies to install or update"'
       - python/test:
           name: job-test-pipenv
           pkg-manager: pipenv
@@ -166,7 +169,10 @@ workflows:
           args: pytest | tee install_output.txt
           app-dir: ~/project/sample_pipenv
           post-steps:
-            - run: 'cat install_output.txt | grep "0/0"'
+            - run:
+                name: Verify cache was successful
+                working_directory: ~/project/sample_pipenv
+                command: 'cat install_output.txt | grep "0/0"'
       - python/test:
           name: job-test-pip
           pkg-manager: pip
@@ -175,30 +181,42 @@ workflows:
           app-dir: ~/project/sample_pip
           args: "| tee install_output.txt"
           post-steps:
-            - run: 'cat install_output.txt | grep "Requirement already satisfied: pytest"'
+            - run:
+                name: Verify cache was successful
+                working_directory: ~/project/sample_pip
+                command: 'cat install_output.txt | grep "Requirement already satisfied: pytest"'
       - python/test:
           name: job-auto-test-poetry
           cache-version: poetry-auto-<< pipeline.parameters.cache-version >>
           args: "| tee install_output.txt"
           app-dir: ~/project/sample_poetry
           post-steps:
-            - run: 'cat install_output.txt | grep "No dependencies to install or update"'
+            - run:  
+                name: Verify cache was successful
+                working_directory: ~/project/sample_poetry
+                command: 'cat install_output.txt | grep "No dependencies to install or update"'
       - python/test:
           name: job-auto-test-pipenv
           args: pytest | tee install_output.txt
           cache-version: poetry-auto-<< pipeline.parameters.cache-version >>
           app-dir: ~/project/sample_pipenv
           post-steps:
-            - run: 'cat install_output.txt | grep "0/0"'
+            - run:  
+                name: Verify cache was successful
+                working_directory: ~/project/sample_pipenv
+                command: 'cat install_output.txt | grep "0/0"'
       - python/test:
           name: job-auto-test-pip
           test-tool: unittest
           venv-cache: false
-          args: "&& echo test"
+          args: "| tee install_output.txt"
           cache-version: pip-auto-<< pipeline.parameters.cache-version >>
           app-dir: ~/project/sample_pip
           post-steps:
-            - run: 'cat install_output.txt | grep "Requirement already satisfied: pytest"'
+            - run:  
+                name: Verify cache was successful
+                working_directory: ~/project/sample_pip
+                command: 'cat install_output.txt | grep "Requirement already satisfied: pytest"'
       - python/test:
           name: job-test-pip-no-reqs
           pkg-manager: pip
