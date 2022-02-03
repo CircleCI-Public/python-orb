@@ -158,7 +158,7 @@ workflows:
           args: "| tee install_output.txt"
           app-dir: ~/project/sample_poetry
           post-steps:
-            - run:  
+            - run:
                 name: Verify cache was successful
                 working_directory: ~/project/sample_poetry
                 command: 'cat install_output.txt | grep "No dependencies to install or update"'
@@ -191,7 +191,7 @@ workflows:
           args: "| tee install_output.txt"
           app-dir: ~/project/sample_poetry
           post-steps:
-            - run:  
+            - run:
                 name: Verify cache was successful
                 working_directory: ~/project/sample_poetry
                 command: 'cat install_output.txt | grep "No dependencies to install or update"'
@@ -201,7 +201,7 @@ workflows:
           cache-version: poetry-auto-<< pipeline.parameters.cache-version >>
           app-dir: ~/project/sample_pipenv
           post-steps:
-            - run:  
+            - run:
                 name: Verify cache was successful
                 working_directory: ~/project/sample_pipenv
                 command: 'cat install_output.txt | grep "0/0"'
@@ -213,7 +213,7 @@ workflows:
           cache-version: pip-auto-<< pipeline.parameters.cache-version >>
           app-dir: ~/project/sample_pip
           post-steps:
-            - run:  
+            - run:
                 name: Verify cache was successful
                 working_directory: ~/project/sample_pip
                 command: 'cat install_output.txt | grep "Requirement already satisfied: pytest"'
