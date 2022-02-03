@@ -194,7 +194,7 @@ workflows:
           name: job-auto-test-pip
           test-tool: unittest
           venv-cache: false
-          args: "| tee install_output.txt"
+          args: "&& echo test"
           cache-version: pip-auto-<< pipeline.parameters.cache-version >>
           app-dir: ~/project/sample_pip
           post-steps:
