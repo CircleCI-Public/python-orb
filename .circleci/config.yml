@@ -172,7 +172,7 @@ workflows:
             - run:
                 name: Verify cache was successful
                 working_directory: ~/project/sample_pipenv
-                command: 'cat install_output.txt | grep "Since it is already installed"'
+                command: 'cat install_output.txt | grep "Using source directory"'
       - python/test:
           name: job-test-pip
           pkg-manager: pip
@@ -204,7 +204,7 @@ workflows:
             - run:
                 name: Verify cache was successful
                 working_directory: ~/project/sample_pipenv
-                command: 'cat install_output.txt | grep "Since it is already installed"'
+                command: 'cat install_output.txt | grep "Using source directory"'
       - python/test:
           name: job-auto-test-pip
           test-tool: unittest
