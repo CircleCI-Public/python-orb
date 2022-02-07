@@ -207,7 +207,7 @@ workflows:
             - run:
                 name: Run install via script command to capture progress output
                 working_directory: ~/project/sample_pipenv
-                command: 'script -c "pipenv install" install_output.txt'
+                command: 'pipenv install && script -c "pipenv install" install_output.txt'
           post-steps:
             - run:
                 name: Verify cache was successful
