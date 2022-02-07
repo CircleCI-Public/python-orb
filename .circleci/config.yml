@@ -16,7 +16,7 @@ parameters:
     default: "dev:alpha"
   cache-version:
     type: string
-    default: v9
+    default: v20
 
 jobs:
   pip-install-test:
@@ -166,13 +166,12 @@ workflows:
           name: job-test-pipenv
           pkg-manager: pipenv
           cache-version: pipenv-<< pipeline.parameters.cache-version >>
-          args: pytest -v
           app-dir: ~/project/sample_pipenv
           pre-install-steps:
             - run:
                 name: Run install via script command to capture progress output
                 working_directory: ~/project/sample_pipenv
-                command: 'script -c "pipenv install pytest" install_output.txt'
+                command: 'script -c "pipenv install" install_output.txt'
           post-steps:
             - run:
                 name: Verify cache was successful
@@ -202,14 +201,13 @@ workflows:
                 command: 'cat install_output.txt | grep "No dependencies to install or update"'
       - python/test:
           name: job-auto-test-pipenv
-          args: pytest
           cache-version: pipenv-auto-<< pipeline.parameters.cache-version >>
           app-dir: ~/project/sample_pipenv
           pre-install-steps:
             - run:
                 name: Run install via script command to capture progress output
                 working_directory: ~/project/sample_pipenv
-                command: 'script -c "pipenv install pytest" install_output.txt'
+                command: 'script -c "pipenv install" install_output.txt'
           post-steps:
             - run:
                 name: Verify cache was successful
