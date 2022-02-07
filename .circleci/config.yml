@@ -16,7 +16,7 @@ parameters:
     default: "dev:alpha"
   cache-version:
     type: string
-    default: v8
+    default: v9
 
 jobs:
   pip-install-test:
@@ -177,7 +177,7 @@ workflows:
             - run:
                 name: Verify cache was successful
                 working_directory: ~/project/sample_pipenv
-                command: 'cat install_output.txt | grep "Using source directory"'
+                command: 'cat install_output.txt | grep "0/0"'
       - python/test:
           name: job-test-pip
           pkg-manager: pip
@@ -214,7 +214,7 @@ workflows:
             - run:
                 name: Verify cache was successful
                 working_directory: ~/project/sample_pipenv
-                command: "cat install_output.txt"
+                command: 'grep install_output.txt "0/0"'
       - python/test:
           name: job-auto-test-pip
           test-tool: unittest
