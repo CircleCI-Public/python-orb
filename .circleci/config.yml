@@ -214,7 +214,7 @@ workflows:
             - run:
                 name: Verify cache was successful
                 working_directory: ~/project/sample_pipenv
-                command: 'cat install_output.txt'
+                command: "cat install_output.txt"
       - python/test:
           name: job-auto-test-pip
           test-tool: unittest
