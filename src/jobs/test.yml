@@ -80,6 +80,11 @@ parameters:
     default: true
     description: >
       If true, a step will be ran to ensure the configured test tool is installed.
+  pre-install-steps:
+    type: steps
+    default: []
+    description: >
+      Steps needed between restoring the cache and the install step.
 
 executor:
   name: default
@@ -94,6 +99,7 @@ steps:
       cache-version: <<parameters.cache-version>>
       pypi-cache: <<parameters.pypi-cache>>
       venv-cache: <<parameters.venv-cache>>
+      pre-install-steps: <<parameters.pre-install-steps>>
       include-branch-in-cache-key: <<parameters.include-branch-in-cache-key>>
       args: <<parameters.args>>
       pip-dependency-file: <<parameters.pip-dependency-file>>
