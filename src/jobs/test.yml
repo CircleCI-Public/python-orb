@@ -12,8 +12,8 @@ parameters:
       For a full list of releases, see the following: https://hub.docker.com/r/cimg/python
   pkg-manager:
     type: enum
-    enum: ["pip", "pipenv", "poetry", "pip-dist"]
-    default: "pip"
+    enum: [auto, pip, pipenv, poetry, pip-dist]
+    default: "auto"
     description: Select the package manager to use. Default is pip
   pip-dependency-file:
     type: string
@@ -23,6 +23,14 @@ parameters:
     type: string
     default: "~/project"
     description: Path to the directory containing your python project. Not needed if dependency file lives in the root.
+  setup-file-path:
+    type: string
+    default: ""
+    description: Path to the setup.py file.
+  module-src-dir:
+    type: string
+    default: "src"
+    description: Path relative to app-dir which contains module source.
   args:
     type: string
     default: ""
@@ -34,7 +42,7 @@ parameters:
   test-tool:
     type: enum
     enum: ["pytest", "unittest"]
-    default: "unittest"  # default since its not an external requirement
+    default: "pytest"
     description: The tool to run the tests with.
   test-tool-args:
     type: string
@@ -62,6 +70,21 @@ parameters:
     default: true
     description: >
       If true, this cache bucket will checksum the pyenv python version with the cache-key
+  fail-if-missing-tool:
+    type: boolean
+    default: false
+    description: >
+      If true, this job will fail if the test tool was not found. If false, it will automatically install to recover.
+  ensure-test-tool:
+    type: boolean
+    default: true
+    description: >
+      If true, a step will be ran to ensure the configured test tool is installed.
+  pre-install-steps:
+    type: steps
+    default: []
+    description: >
+      Steps needed between restoring the cache and the install step.
 
 executor:
   name: default
@@ -76,13 +99,48 @@ steps:
       cache-version: <<parameters.cache-version>>
       pypi-cache: <<parameters.pypi-cache>>
       venv-cache: <<parameters.venv-cache>>
+      pre-install-steps: <<parameters.pre-install-steps>>
       include-branch-in-cache-key: <<parameters.include-branch-in-cache-key>>
       args: <<parameters.args>>
       pip-dependency-file: <<parameters.pip-dependency-file>>
       include-python-in-cache-key: <<parameters.include-python-in-cache-key>>
   - when:
+      condition: <<parameters.ensure-test-tool>>
+      steps:
+        - run:
+            working_directory: <<parameters.app-dir>>
+            name: Ensuring test tool is installed
+            command: <<include(scripts/ensure-test-tool.sh)>>
+            environment:
+              PARAM_PKG_MNGR: <<parameters.pkg-manager>>
+              PARAM_SETUP_FILE_PATH: <<parameters.setup-file-path>>>
+              PARAM_TEST_TOOL: <<parameters.test-tool>>
+              PARAM_FAIL_IF_MISSING_TOOL: <<parameters.fail-if-missing-tool>>>
+  - when:
       condition:
-        equal: ["unittest", << parameters.test-tool >>]
+        equal: [auto, << parameters.pkg-manager >>]
+      steps:
+        - run:
+            name: Create test-report directory
+            working_directory: <<parameters.app-dir>>
+            command: mkdir test-report
+        - run:
+            name: Run tests with auto-detected packages run
+            working_directory: <<parameters.app-dir>>
+            environment:
+              PYTHONPATH: << parameters.app-dir >>/<< parameters.module-src-dir >>
+              PARAM_PKG_MNGR: <<parameters.pkg-manager>>
+              PARAM_TEST_TOOL_ARGS: <<parameters.test-tool-args>>
+              PARAM_TEST_TOOL: <<parameters.test-tool>>
+            command: <<include(scripts/auto-test-command.sh)>>
+        - store_test_results:
+            path: <<#parameters.app-dir>><<parameters.app-dir>>/<</parameters.app-dir>>test-report
+  - when:
+      condition:
+        and:
+          - equal: ["unittest", << parameters.test-tool >>]
+          - not:
+              equal: [auto, << parameters.pkg-manager >>]
       steps:
         - when:
             condition:
@@ -102,14 +160,15 @@ steps:
               - run:
                   working_directory: <<parameters.app-dir>>
                   name: Run tests with global python env
-                  # the unittest module only looks for things in the path
-                  # add the project to the path
-                  command: |
-                    export PYTHONPATH=$PWD:$PYTHONPATH
-                    python -m unittest << parameters.test-tool-args >>
+                  environment:
+                    PYTHONPATH: << parameters.app-dir >>/<< parameters.module-src-dir >>
+                  command: python -m unittest << parameters.test-tool-args >>
   - when:
       condition:
-        equal: ["pytest", << parameters.test-tool >>]
+        and:
+          - equal: ["pytest", << parameters.test-tool >>]
+          - not:
+              equal: [auto, << parameters.pkg-manager >>]
       steps:
         - run:
             name: Create test-report directory
@@ -134,6 +193,8 @@ steps:
               - run:
                   name: Run tests with global python env
                   working_directory: <<parameters.app-dir>>
+                  environment:
+                    PYTHONPATH: << parameters.app-dir >>/<< parameters.module-src-dir >>
                   command: pytest --junit-xml=test-report/report.xml << parameters.test-tool-args >>
         - store_test_results:
             path: <<#parameters.app-dir>><<parameters.app-dir>>/<</parameters.app-dir>>test-report

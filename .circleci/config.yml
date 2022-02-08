@@ -2,7 +2,7 @@ version: 2.1
 
 orbs:
   python: circleci/python@<<pipeline.parameters.dev-orb-version>>
-  orb-tools: circleci/orb-tools@9.1
+  orb-tools: circleci/orb-tools@10.0
 
 # Pipeline parameters
 parameters:
@@ -14,6 +14,9 @@ parameters:
   dev-orb-version:
     type: string
     default: "dev:alpha"
+  cache-version:
+    type: string
+    default: v20
 
 jobs:
   pip-install-test:
@@ -22,7 +25,18 @@ jobs:
       - checkout
       - python/install-packages:
           pkg-manager: pip
+          cache-version: << pipeline.parameters.cache-version >>
           app-dir: ~/project/sample_pip
+      - run:
+          name: "Test"
+          working_directory: ~/project/sample_pip
+          command: |
+            pytest
+
+  pip-install-test-no-packages:
+    executor: python/default
+    steps:
+      - checkout
       - run:
           name: "Test"
           working_directory: ~/project/sample_pip
@@ -36,6 +50,7 @@ jobs:
       - python/install-packages:
           pkg-manager: pip
           app-dir: ~/project/sample_pip
+          cache-version: << pipeline.parameters.cache-version >>
           args: pytest
           pip-dependency-file: ""
       - run:
@@ -51,14 +66,14 @@ jobs:
       - python/dist:
           app-dir: ~/project/sample_pip
 
-
   pipenv-test:
     executor: python/default
     steps:
       - checkout
       - python/install-packages:
           app-dir: ~/project/sample_pipenv
-          cache-version: v2
+          pkg-manager: "pipenv"
+          cache-version: << pipeline.parameters.cache-version >>
       - run:
           working_directory: ~/project/sample_pipenv
           command: |
@@ -77,7 +92,10 @@ jobs:
           name: Overwrite the lockfile with the one that should load the cache.
       - python/install-packages:
           app-dir: ~/project/sample_pipenv
-          cache-version: v2
+          pkg-manager: "pipenv"
+          pypi-cache: false
+          venv-cache: false
+          cache-version: << pipeline.parameters.cache-version >>
       - run:
           command: pipenv run pytest
           working_directory: ~/project/sample_pipenv
@@ -88,6 +106,7 @@ jobs:
       - checkout
       - python/install-packages:
           app-dir: ~/project/sample_poetry
+          cache-version: << pipeline.parameters.cache-version >>
           pkg-manager: poetry
       - run:
           working_directory: ~/project/sample_poetry
@@ -135,29 +154,91 @@ workflows:
       - python/test:
           name: job-test-poetry
           pkg-manager: poetry
-          test-tool: pytest
+          cache-version: poetry-<< pipeline.parameters.cache-version >>
+          args: "| tee install_output.txt"
           app-dir: ~/project/sample_poetry
+          post-steps:
+            - run:
+                name: Verify cache was successful
+                working_directory: ~/project/sample_poetry
+                command: 'cat install_output.txt | grep "No dependencies to install or update"'
       - python/test:
           name: job-test-pipenv
           pkg-manager: pipenv
-          args: pytest
-          test-tool: pytest
+          cache-version: pipenv-<< pipeline.parameters.cache-version >>
           app-dir: ~/project/sample_pipenv
+          pre-install-steps:
+            - run:
+                name: Run install via script command to capture progress output
+                working_directory: ~/project/sample_pipenv
+                command: 'script -c "pipenv install" install_output.txt'
+          post-steps:
+            - run:
+                name: Verify cache was successful
+                working_directory: ~/project/sample_pipenv
+                command: 'cat install_output.txt | grep "0/0"'
       - python/test:
           name: job-test-pip
           pkg-manager: pip
+          cache-version: pip-<< pipeline.parameters.cache-version >>
+          test-tool: unittest
           app-dir: ~/project/sample_pip
+          args: "| tee install_output.txt"
+          post-steps:
+            - run:
+                name: Verify cache was successful
+                working_directory: ~/project/sample_pip
+                command: 'cat install_output.txt | grep "Requirement already satisfied: pytest"'
+      - python/test:
+          name: job-auto-test-poetry
+          cache-version: poetry-auto-<< pipeline.parameters.cache-version >>
+          args: "| tee install_output.txt"
+          app-dir: ~/project/sample_poetry
+          post-steps:
+            - run:
+                name: Verify cache was successful
+                working_directory: ~/project/sample_poetry
+                command: 'cat install_output.txt | grep "No dependencies to install or update"'
+      - python/test:
+          name: job-auto-test-pipenv
+          cache-version: pipenv-auto-<< pipeline.parameters.cache-version >>
+          app-dir: ~/project/sample_pipenv
+          pre-install-steps:
+            - run:
+                name: Run install via script command to capture progress output
+                working_directory: ~/project/sample_pipenv
+                command: 'script -c "pipenv install" install_output.txt'
+          post-steps:
+            - run:
+                name: Verify cache was successful
+                working_directory: ~/project/sample_pipenv
+                command: 'cat install_output.txt | grep "0/0"'
+      - python/test:
+          name: job-auto-test-pip
+          test-tool: unittest
+          venv-cache: false
+          args: "| tee install_output.txt"
+          cache-version: pip-auto-<< pipeline.parameters.cache-version >>
+          app-dir: ~/project/sample_pip
+          post-steps:
+            - run:
+                name: Verify cache was successful
+                working_directory: ~/project/sample_pip
+                command: 'cat install_output.txt | grep "Requirement already satisfied: pytest"'
       - python/test:
           name: job-test-pip-no-reqs
           pkg-manager: pip
           pip-dependency-file: ""
+          test-tool: unittest
+          cache-version: pip-noreqs-<< pipeline.parameters.cache-version >>
           app-dir: ~/project/sample_pip
       - python/test:
           version: 3.8.2
           name: job-test-pip-dist
           pkg-manager: pip-dist
+          cache-version: pip-dist-<< pipeline.parameters.cache-version >>
           app-dir: ~/project/sample_pip
-          pip-dependency-file: setup.py
+          # pip-dependency-file: setup.py
           post-steps:
             - run:
                 name: Attempt to set the other python version - this should fail, but if the cache is broken, this will succeed.
@@ -190,6 +271,9 @@ workflows:
             - job-test-poetry
             - job-test-pipenv
             - job-test-pip
+            - job-auto-test-poetry
+            - job-auto-test-pipenv
+            - job-auto-test-pip
             - dist-test
           filters:
             branches:

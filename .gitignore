@@ -1,4 +1,7 @@
 src/orb.yml
+orb.yml
+
+sample_pip/*/__pycache__
 
 # dev tools
 .idea

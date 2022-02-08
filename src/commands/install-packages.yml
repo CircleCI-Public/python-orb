@@ -7,8 +7,8 @@ description: >
 parameters:
   pkg-manager:
     type: enum
-    enum: [poetry, pipenv, pip, pip-dist]
-    default: pipenv
+    enum: [auto, poetry, pipenv, pip, pip-dist]
+    default: auto
     description: Which package management tool to use, pipenv, pip or poetry with dependency file. Use `pip-dist` to install with project setup.py.
   path-args:
     type: string
@@ -33,6 +33,10 @@ parameters:
     type: string
     default: "."
     description: Path to the directory containing your python project. Not needed if dependency file lives in the root.
+  no_output_timeout:
+    type: string
+    default: "10m"
+    description: Elapsed time the command can run without output. Passed to install command.
   venv-cache:
     type: boolean
     default: true
@@ -41,6 +45,10 @@ parameters:
     type: boolean
     default: true
     description: Keep all versions of pypi and site-package caches for faster rebuilding overall.
+  venv-path:
+    type: string
+    default: ""
+    description: Override venv path. As json array - ex '[ "path", "path2" ]'
   cache-version:
     type: string
     default: v1
@@ -62,50 +70,72 @@ parameters:
       If true, this cache bucket will checksum the pyenv python version with the cache-key.
 
 steps:
+  - run:
+      name: "Export automatic environment detection script"
+      command: | # detect-env.sh
+        echo 'if [ "${PARAM_PKG_MNGR}" = "auto" ]; then
+                  if [ -f "requirements.txt" ]; then
+                      if [ -f "${PARAM_SETUP_FILE_PATH:-setup.py}" ]; then
+                          export DETECT_PKG_MNGR="pip-dist"
+                      else
+                          export DETECT_PKG_MNGR="pip"
+                      fi
+                      elif [ -f "Pipfile" ]; then
+                      export DETECT_PKG_MNGR="pipenv"
+                      export PYTHON_ENV_TOOL="pipenv"
+                      elif [ -f "pyproject.toml" ]; then
+                      export DETECT_PKG_MNGR="poetry"
+                      export PYTHON_ENV_TOOL="poetry"
+                  fi
+                  echo "INFO: Detected Package Manager ${DETECT_PKG_MNGR}"
+              fi' > /tmp/detect-env.sh
+        chmod +x /tmp/detect-env.sh
+        echo 'export AUTO_DETECT_ENV_SCRIPT="/tmp/detect-env.sh"' >> $BASH_ENV
+  # restore caches
   - when:
-      condition: << parameters.pypi-cache >>
+      condition:
+        or:
+          - << parameters.pypi-cache >>
+          - << parameters.venv-cache >>
       steps:
-        - when:
-            condition:
-              equal: [pipenv, << parameters.pkg-manager >>]
-            steps:
-              - restore_cache:
-                  keys:
-                    - -pypi-<<parameters.cache-version>>-<<#parameters.include-branch-in-cache-key>>{{ .Branch }}-<</parameters.include-branch-in-cache-key>>{{ checksum "<< parameters.app-dir >>/Pipfile.lock" }}-<<#parameters.include-python-in-cache-key>>{{ checksum "/home/circleci/.pyenv/version" }}-<</parameters.include-python-in-cache-key>>
-        - when:
-            condition:
-              equal: [poetry, << parameters.pkg-manager >>]
-            steps:
-              - restore_cache:
-                  keys:
-                    - -pypi-<<parameters.cache-version>>-<<#parameters.include-branch-in-cache-key>>{{ .Branch }}-<</parameters.include-branch-in-cache-key>>{{ checksum "<< parameters.app-dir >>/poetry.lock" }}-<<#parameters.include-python-in-cache-key>>{{ checksum "/home/circleci/.pyenv/version" }}-<</parameters.include-python-in-cache-key>>
-        - when:
-            condition:
-              or:
-                - equal: [pip, << parameters.pkg-manager >>]
-                - equal: [pip-dist, << parameters.pkg-manager >>]
-            steps:
-              - restore_cache:
-                  keys:
-                    - -pypi-<<parameters.cache-version>>-<<#parameters.include-branch-in-cache-key>>{{ .Branch }}-<</parameters.include-branch-in-cache-key>>{{ checksum "<< parameters.app-dir >>/<<parameters.pip-dependency-file>>" }}-<<#parameters.include-python-in-cache-key>>{{ checksum "/home/circleci/.pyenv/version" }}-<</parameters.include-python-in-cache-key>>
-  - when:
-      condition: << parameters.venv-cache >>
-      steps:
-        - when:
-            condition:
-              equal: [pipenv, << parameters.pkg-manager >>]
-            steps:
-              - restore_cache:
-                  keys:
-                    - -venv-<<parameters.cache-version>>-<<#parameters.include-branch-in-cache-key>>{{ .Branch }}-<</parameters.include-branch-in-cache-key>>{{ checksum "<< parameters.app-dir >>/Pipfile.lock" }}-<<#parameters.include-python-in-cache-key>>{{ checksum "/home/circleci/.pyenv/version" }}-<</parameters.include-python-in-cache-key>>
-        - when:
-            condition:
-              equal: [poetry, << parameters.pkg-manager >>]
-            steps:
-              - restore_cache:
-                  keys:
-                    - -venv-<<parameters.cache-version>>-<<#parameters.include-branch-in-cache-key>>{{ .Branch }}-<</parameters.include-branch-in-cache-key>>{{ checksum "<< parameters.app-dir >>/poetry.lock" }}-<<#parameters.include-python-in-cache-key>>{{ checksum "/home/circleci/.pyenv/version" }}-<</parameters.include-python-in-cache-key>>
+        - run:
+            name: Link lockfile
+            environment:
+              PARAM_PKG_MNGR: << parameters.pkg-manager >>
+              PARAM_APP_DIR: << parameters.app-dir >>
+              PARAM_DEPENDENCY_FILE: << parameters.pip-dependency-file >>
+              PARAM_PYPI_CACHE: << parameters.pypi-cache >>
+              PARAM_VENV_CACHE: << parameters.venv-cache >>
+              PARAM_VENV_PATH: << parameters.venv-path >>
+            command: <<include(scripts/cache-link-lockfile.sh)>>
+            working_directory: << parameters.app-dir >>
+        - restore_cache:
+            keys:
+              - <<parameters.cache-version>>-cci_pycache-<<#parameters.include-branch-in-cache-key>>{{ .Branch }}-<</parameters.include-branch-in-cache-key>>{{ checksum "/tmp/cci_pycache/lockfile" }}-<<#parameters.include-python-in-cache-key>>{{ checksum "/home/circleci/.pyenv/version" }}-<</parameters.include-python-in-cache-key>>
+        - run:
+            name: Move restored cache
+            working_directory: << parameters.app-dir >>
+            environment:
+              PARAM_PYPI_CACHE: << parameters.pypi-cache >>
+              PARAM_VENV_CACHE: << parameters.venv-cache >>
+            command: <<include(scripts/cache-restore.sh)>>
+  # run install steps
   - steps: <<parameters.pre-install-steps>>
+  - when:
+      condition:
+        equal: [auto, << parameters.pkg-manager >>]
+      steps:
+        - run:
+            name: "Install dependencies with automatically determined project package manager"
+            working_directory: << parameters.app-dir >>
+            no_output_timeout: << parameters.no_output_timeout >>
+            environment:
+              PARAM_PKG_MNGR: << parameters.pkg-manager >>
+              PARAM_APP_DIR: << parameters.app-dir >>
+              PARAM_DEPENDENCY_FILE: << parameters.pip-dependency-file >>
+              PARAM_PATH_ARGS: << parameters.path-args >>
+              PARAM_ADDITIONAL_ARGS: << parameters.args >>
+            command: <<include(scripts/auto-install-command.sh)>>
   - when:
       condition:
         equal: [pipenv, << parameters.pkg-manager >>]
@@ -130,10 +160,10 @@ steps:
         and:
           - equal: [pip, << parameters.pkg-manager >>]
           - or:
-            # true if no arguments
-            - <<parameters.args>>
-            # true if dep file
-            - <<parameters.pip-dependency-file>>
+              # true if no arguments
+              - <<parameters.args>>
+              # true if dep file
+              - <<parameters.pip-dependency-file>>
       steps:
         - run:
             name: "Install dependencies with pip using project <<parameters.pip-dependency-file>>"
@@ -150,56 +180,23 @@ steps:
             command: |
               pip install -e << parameters.path-args >> << parameters.args >>
   - when:
-      condition: << parameters.venv-cache >>
+      condition:
+        or:
+          - << parameters.pypi-cache >>
+          - << parameters.venv-cache >>
       steps:
-        - when:
-            condition:
-              equal: [pipenv, << parameters.pkg-manager >>]
-            steps:
-              - save_cache:
-                  key: -venv-<<parameters.cache-version>>-<<#parameters.include-branch-in-cache-key>>{{ .Branch }}-<</parameters.include-branch-in-cache-key>>{{ checksum "<< parameters.app-dir >>/Pipfile.lock" }}-<<#parameters.include-python-in-cache-key>>{{ checksum "/home/circleci/.pyenv/version" }}-<</parameters.include-python-in-cache-key>>
-                  paths:
-                    - /home/circleci/.local/share/virtualenvs
-        - when:
-            condition:
-              equal: [poetry, << parameters.pkg-manager >>]
-            steps:
-              - save_cache:
-                  key: -venv-<<parameters.cache-version>>-<<#parameters.include-branch-in-cache-key>>{{ .Branch }}-<</parameters.include-branch-in-cache-key>>{{ checksum "<< parameters.app-dir >>/poetry.lock" }}-<<#parameters.include-python-in-cache-key>>{{ checksum "/home/circleci/.pyenv/version" }}-<</parameters.include-python-in-cache-key>>
-                  paths:
-                    - /home/circleci/.cache/pypoetry/virtualenvs
-  - when:
-      condition: << parameters.pypi-cache >>
-      steps:
-        - when:
-            condition:
-              equal: [pipenv, << parameters.pkg-manager >>]
-            steps:
-              - save_cache:
-                  key: -pypi-<<parameters.cache-version>>-<<#parameters.include-branch-in-cache-key>>{{ .Branch }}-<</parameters.include-branch-in-cache-key>>{{ checksum "<< parameters.app-dir >>/Pipfile.lock" }}-<<#parameters.include-python-in-cache-key>>{{ checksum "/home/circleci/.pyenv/version" }}-<</parameters.include-python-in-cache-key>>
-                  paths:
-                    # pipenv caches a pypi mirror and the site-pacakges
-                    - "/home/circleci/.cache/pip"
-                    - "/home/circleci/.cache/pipenv"
-        - when:
-            condition:
-              equal: [poetry, << parameters.pkg-manager >>]
-            steps:
-              - save_cache:
-                  key: -pypi-<<parameters.cache-version>>-<<#parameters.include-branch-in-cache-key>>{{ .Branch }}-<</parameters.include-branch-in-cache-key>>{{ checksum "<< parameters.app-dir >>/poetry.lock" }}-<<#parameters.include-python-in-cache-key>>{{ checksum "/home/circleci/.pyenv/version" }}-<</parameters.include-python-in-cache-key>>
-                  paths:
-                    # poetry only maintains a pypi mirror
-                    - /home/circleci/.cache/pip
-        - when:
-            condition:
-              or:
-                - equal: [pip, << parameters.pkg-manager >>]
-                - equal: [pip-dist, << parameters.pkg-manager >>]
-            steps:
-              - save_cache:
-                  key: -pypi-<<parameters.cache-version>>-<<#parameters.include-branch-in-cache-key>>{{ .Branch }}-<</parameters.include-branch-in-cache-key>>{{ checksum "<< parameters.app-dir >>/<<parameters.pip-dependency-file>>" }}-<<#parameters.include-python-in-cache-key>>{{ checksum "/home/circleci/.pyenv/version" }}-<</parameters.include-python-in-cache-key>>
-                  paths:
-                    # depending on how pip is used, store the pypi mirror, pyenv 'global' the site-packages, and user site-pacakges
-                    - /home/circleci/.cache/pip
-                    - /home/circleci/.pyenv/versions/
-                    - /home/circleci/.local/lib/
+        - run:
+            name: Copy to cache directory
+            working_directory: << parameters.app-dir >>
+            environment:
+              PARAM_PKG_MNGR: << parameters.pkg-manager >>
+              PARAM_APP_DIR: << parameters.app-dir >>
+              PARAM_DEPENDENCY_FILE: << parameters.pip-dependency-file >>
+              PARAM_VENV_CACHE: << parameters.venv-cache >>
+              PARAM_PYPI_CACHE: << parameters.pypi-cache >>
+              PARAM_VENV_PATH: << parameters.venv-path >>
+            command: <<include(scripts/cache-save.sh)>>
+        - save_cache:
+            key: <<parameters.cache-version>>-cci_pycache-<<#parameters.include-branch-in-cache-key>>{{ .Branch }}-<</parameters.include-branch-in-cache-key>>{{ checksum "/tmp/cci_pycache/lockfile" }}-<<#parameters.include-python-in-cache-key>>{{ checksum "/home/circleci/.pyenv/version" }}-<</parameters.include-python-in-cache-key>>
+            paths:
+              - /tmp/cci_pycache
