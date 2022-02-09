@@ -63,9 +63,7 @@ fi
 
 LOCKFILE_PATH="${CACHE_DIR}/lockfile"
 
-if [ -L "${LOCKFILE_PATH}" ]; then
-    unlink "${LOCKFILE_PATH}"
-fi
+rm -vf "${LOCKFILE_PATH}"
 
 if [ -f "${LOCK_FILE}" ]; then
     ln "${LOCK_FILE}" "${LOCKFILE_PATH}"
