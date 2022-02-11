@@ -67,9 +67,9 @@ if [ -f "${LOCKFILE_PATH}" ]; then
     unlink "${LOCKFILE_PATH}"
 fi
 
-readlink -f -v "${LOCK_FILE}"
 if [ -e "${LOCK_FILE}" ]; then
-    
+    FULL_LOCK_FILE=$(readlink -f "${LOCK_FILE}")
+
     echo "INFO: Linking ${FULL_LOCK_FILE} to ${LOCKFILE_PATH}"
     ln -s "${FULL_LOCK_FILE}" "${LOCKFILE_PATH}"
 fi
