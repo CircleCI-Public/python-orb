@@ -70,6 +70,7 @@ echo "${LOCK_FILE}"
 cd ~
 pwd
 ls -la ~
+ls -la "~/project/"
 cd "~/project/sample_pip/"
 readlink -f -v "./requirements.txt"
 readlink -f -v "${LOCK_FILE}"
