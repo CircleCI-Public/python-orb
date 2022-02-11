@@ -70,6 +70,8 @@ echo "${LOCK_FILE}"
 cd ~
 pwd
 ls -la ~
+cd "~/project/sample_pip/"
+readlink -f -v "./requirements.txt"
 readlink -f -v "${LOCK_FILE}"
 ls -la "$(dirname ${LOCK_FILE})"
 if [ -e "${LOCK_FILE}" ]; then
