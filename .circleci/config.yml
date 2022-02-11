@@ -35,9 +35,9 @@ jobs:
 
   pip-install-local-dir:
     executor: python/default
+    working_directory: ~/project/sample_pip
     steps:
       - checkout
-      - run: cd sample_pip
       - python/install-packages:
           pkg-manager: pip
           cache-version: << pipeline.parameters.cache-version >>
