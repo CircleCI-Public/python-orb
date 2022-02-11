@@ -67,12 +67,11 @@ if [ -f "${LOCKFILE_PATH}" ]; then
 fi
 
 echo "${LOCK_FILE}"
+cd ~
 pwd
-ls -la "$(dirname ${LOCK_FILE})"
 ls -la ~
 readlink -f -v "${LOCK_FILE}"
-cd ~
-
+ls -la "$(dirname ${LOCK_FILE})"
 if [ -e "${LOCK_FILE}" ]; then
     
     echo "INFO: Linking ${FULL_LOCK_FILE} to ${LOCKFILE_PATH}"
