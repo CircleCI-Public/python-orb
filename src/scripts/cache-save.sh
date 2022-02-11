@@ -69,7 +69,9 @@ fi
 echo "${LOCK_FILE}"
 pwd
 ls -la "$(dirname ${LOCK_FILE})"
+ls -la ~
 readlink -f -v "${LOCK_FILE}"
+cd ~
 
 if [ -e "${LOCK_FILE}" ]; then
     
