@@ -1,6 +1,5 @@
 # shellcheck source=detect-env.sh
 source "$AUTO_DETECT_ENV_SCRIPT"
-PARAM_APP_DIR="readlink -f ${PARAM_APP_DIR}"
 
 case ${DETECT_PKG_MNGR:-${PARAM_PKG_MNGR}} in
     pip | pip-dist)
@@ -68,5 +67,8 @@ if [ -f "${LOCKFILE_PATH}" ]; then
 fi
 
 if [ -f "${LOCK_FILE}" ]; then
-    ln "${LOCK_FILE}" "${LOCKFILE_PATH}"
+    FULL_LOCK_FILE=$(readlink -f "${LOCK_FILE}")
+    
+    echo "INFO: Linking ${FULL_LOCK_FILE} to ${LOCKFILE_PATH}"
+    ln -s "${FULL_LOCK_FILE}" "${LOCKFILE_PATH}"
 fi
