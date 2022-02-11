@@ -38,11 +38,10 @@ jobs:
     working_directory: ~/project/sample_pip
     steps:
       - checkout
+      - run: pwd
       - python/install-packages:
           pkg-manager: pip
           cache-version: << pipeline.parameters.cache-version >>
-          pre-install-steps: 
-            run: pwd
       - run:
           name: "Test"
           command: |
