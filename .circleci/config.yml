@@ -33,15 +33,14 @@ jobs:
           command: |
             pytest
 
-  pip-install-local-dir:
+  pip-install-rel-dir:
     executor: python/default
-    working_directory: ~/project/sample_pip
     steps:
       - checkout
-      - run: pwd
       - python/install-packages:
           pkg-manager: pip
           cache-version: << pipeline.parameters.cache-version >>
+          working_directory: ./sample_pip
       - run:
           name: "Test"
           command: |
@@ -165,7 +164,7 @@ workflows:
       - pipenv-test
       - poetry-test
       - dist-test
-      - pip-install-local-dir
+      - pip-install-rel-dir
       - python/test:
           name: job-test-poetry
           pkg-manager: poetry
@@ -283,7 +282,7 @@ workflows:
             - pip-install-test-args
             - pipenv-test
             - poetry-test
-            - pip-install-local-dir
+            - pip-install-rel-dir
             - job-test-poetry
             - job-test-pipenv
             - job-test-pip
