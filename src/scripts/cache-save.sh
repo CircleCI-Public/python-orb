@@ -1,5 +1,6 @@
 # shellcheck source=detect-env.sh
 source "$AUTO_DETECT_ENV_SCRIPT"
+eval PARAM_APP_DIR="${PARAM_APP_DIR}"
 
 case ${DETECT_PKG_MNGR:-${PARAM_PKG_MNGR}} in
     pip | pip-dist)
@@ -66,17 +67,7 @@ if [ -f "${LOCKFILE_PATH}" ]; then
     unlink "${LOCKFILE_PATH}"
 fi
 
-echo "${LOCK_FILE}"
-cd ~
-pwd
-ls -la ~
-cd "~/project"
-ls -la
-ls -la "~/project"
-cd "~/project/sample_pip/"
-readlink -f -v "./requirements.txt"
 readlink -f -v "${LOCK_FILE}"
-ls -la "$(dirname ${LOCK_FILE})"
 if [ -e "${LOCK_FILE}" ]; then
     
     echo "INFO: Linking ${FULL_LOCK_FILE} to ${LOCKFILE_PATH}"
