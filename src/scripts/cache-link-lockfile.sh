@@ -27,6 +27,7 @@ if [ ! -f "${LOCKFILE_PATH}" ]; then
         pwd
         FULL_LOCK_FILE=$(readlink -f -v "${LOCK_FILE}")
         echo ${FULL_LOCK_FILE}
+        ls -la $(dirname ${FULL_LOCK_FILE})
 
         if [ -f "${FULL_LOCK_FILE}" ]; then
             
