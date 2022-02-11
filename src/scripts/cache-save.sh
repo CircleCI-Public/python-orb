@@ -67,6 +67,7 @@ if [ -f "${LOCKFILE_PATH}" ]; then
 fi
 
 echo "${LOCK_FILE}"
+pwd
 ls -la "$(dirname ${LOCK_FILE})"
 readlink -f -v "${LOCK_FILE}"
 
