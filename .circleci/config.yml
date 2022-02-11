@@ -37,6 +37,7 @@ jobs:
     executor: python/default
     steps:
       - checkout
+      - run: ls -la
       - python/install-packages:
           pkg-manager: pip
           cache-version: << pipeline.parameters.cache-version >>
