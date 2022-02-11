@@ -44,6 +44,7 @@ jobs:
           app-dir: ./sample_pip
       - run:
           name: "Test"
+          working_directory: ~/project/sample_pip
           command: |
             pytest
 
