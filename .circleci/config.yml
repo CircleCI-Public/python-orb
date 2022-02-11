@@ -40,7 +40,7 @@ jobs:
       - python/install-packages:
           pkg-manager: pip
           cache-version: << pipeline.parameters.cache-version >>
-          working_directory: ./sample_pip
+          app-dir: ./sample_pip
       - run:
           name: "Test"
           command: |
