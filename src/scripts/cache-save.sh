@@ -67,7 +67,7 @@ if [ -f "${LOCKFILE_PATH}" ]; then
 fi
 
 echo "${LOCK_FILE}"
-readlink -f "${LOCK_FILE}"
+readlink -f -v "${LOCK_FILE}"
 
 if [ -e "${LOCK_FILE}" ]; then
     
