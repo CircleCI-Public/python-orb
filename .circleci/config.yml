@@ -40,7 +40,7 @@ jobs:
       - run: ls -la sample_pip
       - run: readlink -f "."
       - run: readlink -f "./sample_pip"
-      - run: readlink -f "./sample_pip/requirements.txt"
+      - run: readlink -f ./sample_pip/requirements.txt
       - run: readlink -f ~/project/sample_pip/requirements.txt
       - python/install-packages:
           pkg-manager: pip

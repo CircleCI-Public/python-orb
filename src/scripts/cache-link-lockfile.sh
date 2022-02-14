@@ -25,6 +25,7 @@ if [ ! -f "${LOCKFILE_PATH}" ]; then
         echo "WARNING: Could not determine lockfile path for ${DETECT_PKG_MNGR:-PARAM_PKG_MNGR}"
     else
         set -x
+        pwd
         echo "${LOCK_FILE}"
         FULL_LOCK_FILE=$(readlink -f -v "${LOCK_FILE}")
         echo "${FULL_LOCK_FILE}"
