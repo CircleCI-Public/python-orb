@@ -10,7 +10,7 @@ case ${DETECT_PKG_MNGR:-${PARAM_PKG_MNGR}} in
     pipenv) # TODO: use PIPENV_PIPFILE
         LOCK_FILE="${PARAM_APP_DIR}/Pipfile.lock"
         PIPENV_VENV_PATH="${WORKON_HOME:-/home/circleci/.local/share/virtualenvs}"
-
+        
         if [ -z "${PIPENV_VENV_IN_PROJECT}" ]; then
             VENV_PATHS="[ \"${PIPENV_VENV_PATH}\" ]"
         else
@@ -40,7 +40,7 @@ link_paths() {
     fi
     
     mkdir "${1}"
-
+    
     for encoded in $(echo "${2}" | jq -r '.[] | @base64'); do
         decoded=$(echo "${encoded}" | base64 -d)
         
@@ -67,10 +67,9 @@ if [ -f "${LOCKFILE_PATH}" ]; then
     unlink "${LOCKFILE_PATH}"
 fi
 
-if [ -e "${LOCK_FILE}" ]; then  
-    echo "${LOCK_FILE}"
+if [ -e "${LOCK_FILE}" ]; then
     FULL_LOCK_FILE=$(readlink -f "${LOCK_FILE}")
-
+    
     echo "INFO: Linking ${FULL_LOCK_FILE} to ${LOCKFILE_PATH}"
     ln -s "${FULL_LOCK_FILE}" "${LOCKFILE_PATH}"
 fi
