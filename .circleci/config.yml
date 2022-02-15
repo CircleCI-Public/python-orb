@@ -16,7 +16,7 @@ parameters:
     default: "dev:alpha"
   cache-version:
     type: string
-    default: v20
+    default: v2
 
 jobs:
   pip-install-test:
@@ -27,6 +27,20 @@ jobs:
           pkg-manager: pip
           cache-version: << pipeline.parameters.cache-version >>
           app-dir: ~/project/sample_pip
+      - run:
+          name: "Test"
+          working_directory: ~/project/sample_pip
+          command: |
+            pytest
+
+  pip-install-rel-dir:
+    executor: python/default
+    steps:
+      - checkout
+      - python/install-packages:
+          pkg-manager: pip
+          cache-version: << pipeline.parameters.cache-version >>
+          app-dir: "./sample_pip"
       - run:
           name: "Test"
           working_directory: ~/project/sample_pip
@@ -151,6 +165,7 @@ workflows:
       - pipenv-test
       - poetry-test
       - dist-test
+      - pip-install-rel-dir
       - python/test:
           name: job-test-poetry
           pkg-manager: poetry
@@ -268,6 +283,7 @@ workflows:
             - pip-install-test-args
             - pipenv-test
             - poetry-test
+            - pip-install-rel-dir
             - job-test-poetry
             - job-test-pipenv
             - job-test-pip

@@ -1,26 +1,25 @@
 # shellcheck source=detect-env.sh
 source "$AUTO_DETECT_ENV_SCRIPT"
-eval PARAM_APP_DIR="${PARAM_APP_DIR}"
 
 case ${DETECT_PKG_MNGR:-${PARAM_PKG_MNGR}} in
     pip | pip-dist)
-        LOCK_FILE="${PARAM_APP_DIR}/${PARAM_DEPENDENCY_FILE:-requirements.txt}"
+        LOCK_FILE="${PARAM_DEPENDENCY_FILE:-requirements.txt}"
         CACHE_PATHS='[ "/home/circleci/.cache/pip", "/home/circleci/.pyenv/versions", "/home/circleci/.local/lib" ]'
     ;;
     pipenv) # TODO: use PIPENV_PIPFILE
-        LOCK_FILE="${PARAM_APP_DIR}/Pipfile.lock"
+        LOCK_FILE="Pipfile.lock"
         PIPENV_VENV_PATH="${WORKON_HOME:-/home/circleci/.local/share/virtualenvs}"
-
+        
         if [ -z "${PIPENV_VENV_IN_PROJECT}" ]; then
             VENV_PATHS="[ \"${PIPENV_VENV_PATH}\" ]"
         else
-            VENV_PATHS="[ \"${PARAM_APP_DIR}/.venvs\" ]"
+            VENV_PATHS="[ \"${CIRCLE_WORKING_DIRECTORY}/.venvs\" ]"
         fi
         
         CACHE_PATHS='[ "/home/circleci/.cache/pip", "/home/circleci/.cache/pipenv" ]'
     ;;
     poetry)
-        LOCK_FILE="${PARAM_APP_DIR}/poetry.lock"
+        LOCK_FILE="poetry.lock"
         VENV_PATHS='[ "/home/circleci/.cache/pypoetry/virtualenvs" ]'
         CACHE_PATHS='[ "/home/circleci/.cache/pip" ]'
     ;;
@@ -40,7 +39,7 @@ link_paths() {
     fi
     
     mkdir "${1}"
-
+    
     for encoded in $(echo "${2}" | jq -r '.[] | @base64'); do
         decoded=$(echo "${encoded}" | base64 -d)
         
@@ -63,10 +62,13 @@ fi
 
 LOCKFILE_PATH="${CACHE_DIR}/lockfile"
 
-if [ -f "${LOCKFILE_PATH}" ]; then
+if [ -L "${LOCKFILE_PATH}" ]; then
     unlink "${LOCKFILE_PATH}"
 fi
 
-if [ -f "${LOCK_FILE}" ]; then
-    ln "${LOCK_FILE}" "${LOCKFILE_PATH}"
+if [ -e "${LOCK_FILE}" ]; then
+    FULL_LOCK_FILE=$(readlink -f "${LOCK_FILE}")
+    
+    echo "INFO: Linking ${FULL_LOCK_FILE} to ${LOCKFILE_PATH}"
+    ln -s "${FULL_LOCK_FILE}" "${LOCKFILE_PATH}"
 fi
