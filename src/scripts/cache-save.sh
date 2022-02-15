@@ -1,6 +1,5 @@
 # shellcheck source=detect-env.sh
 source "$AUTO_DETECT_ENV_SCRIPT"
-eval PARAM_APP_DIR="${PARAM_APP_DIR}"
 
 case ${DETECT_PKG_MNGR:-${PARAM_PKG_MNGR}} in
     pip | pip-dist)
@@ -14,7 +13,7 @@ case ${DETECT_PKG_MNGR:-${PARAM_PKG_MNGR}} in
         if [ -z "${PIPENV_VENV_IN_PROJECT}" ]; then
             VENV_PATHS="[ \"${PIPENV_VENV_PATH}\" ]"
         else
-            VENV_PATHS="[ \"${PARAM_APP_DIR}/.venvs\" ]"
+            VENV_PATHS="[ \"${CIRCLE_WORKING_DIRECTORY}/.venvs\" ]"
         fi
         
         CACHE_PATHS='[ "/home/circleci/.cache/pip", "/home/circleci/.cache/pipenv" ]'

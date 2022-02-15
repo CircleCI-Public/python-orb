@@ -102,7 +102,6 @@ steps:
             name: Link lockfile
             environment:
               PARAM_PKG_MNGR: << parameters.pkg-manager >>
-              PARAM_APP_DIR: << parameters.app-dir >>
               PARAM_DEPENDENCY_FILE: << parameters.pip-dependency-file >>
               PARAM_PYPI_CACHE: << parameters.pypi-cache >>
               PARAM_VENV_CACHE: << parameters.venv-cache >>
@@ -131,7 +130,6 @@ steps:
             no_output_timeout: << parameters.no_output_timeout >>
             environment:
               PARAM_PKG_MNGR: << parameters.pkg-manager >>
-              PARAM_APP_DIR: << parameters.app-dir >>
               PARAM_DEPENDENCY_FILE: << parameters.pip-dependency-file >>
               PARAM_PATH_ARGS: << parameters.path-args >>
               PARAM_ADDITIONAL_ARGS: << parameters.args >>
@@ -190,7 +188,6 @@ steps:
             working_directory: << parameters.app-dir >>
             environment:
               PARAM_PKG_MNGR: << parameters.pkg-manager >>
-              PARAM_APP_DIR: << parameters.app-dir >>
               PARAM_DEPENDENCY_FILE: << parameters.pip-dependency-file >>
               PARAM_VENV_CACHE: << parameters.venv-cache >>
               PARAM_PYPI_CACHE: << parameters.pypi-cache >>
