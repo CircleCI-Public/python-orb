@@ -26,7 +26,7 @@ if [ ! -f "${LOCKFILE_PATH}" ]; then
 
         if [ -f "${LOCK_FILE}" ]; then
             echo "INFO: Linking ${FULL_LOCK_FILE} to ${LOCKFILE_PATH}"
-            ln -s "${FULL_LOCK_FILE}" "${LOCKFILE_PATH}"
+            cp "${FULL_LOCK_FILE}" "${LOCKFILE_PATH}"
         else
             echo "WARNING: Could not find lockfile at ${LOCK_FILE}"
         fi
