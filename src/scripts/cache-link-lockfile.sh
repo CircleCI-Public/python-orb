@@ -25,7 +25,7 @@ if [ ! -f "${LOCKFILE_PATH}" ]; then
         FULL_LOCK_FILE=$(readlink -f -v "${LOCK_FILE}")
 
         if [ -f "${LOCK_FILE}" ]; then
-            echo "INFO: Linking ${FULL_LOCK_FILE} to ${LOCKFILE_PATH}"
+            echo "INFO: Copying ${FULL_LOCK_FILE} to ${LOCKFILE_PATH}"
             cp "${FULL_LOCK_FILE}" "${LOCKFILE_PATH}"
         else
             echo "WARNING: Could not find lockfile at ${LOCK_FILE}"

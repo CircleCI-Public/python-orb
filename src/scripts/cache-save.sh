@@ -69,6 +69,6 @@ fi
 if [ -e "${LOCK_FILE}" ]; then
     FULL_LOCK_FILE=$(readlink -f "${LOCK_FILE}")
     
-    echo "INFO: Linking ${FULL_LOCK_FILE} to ${LOCKFILE_PATH}"
+    echo "INFO: Copying ${FULL_LOCK_FILE} to ${LOCKFILE_PATH}"
     cp "${FULL_LOCK_FILE}" "${LOCKFILE_PATH}"
 fi
