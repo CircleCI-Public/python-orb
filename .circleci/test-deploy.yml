@@ -5,6 +5,10 @@ orbs:
 filters: &filters
   tags:
     only: /.*/
+parameters:
+  cache-version:
+    type: string
+    default: v3
 jobs:
   pip-install-test:
     executor: python/default
