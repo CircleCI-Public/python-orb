@@ -6,7 +6,7 @@ parameters:
     default: "."
     description: Path to the directory containing your python project. Not needed if 'setup.py' lives in root project dir
 steps:
-  - run: 
+  - run:
       name: Install wheel
       command: pip install wheel
   - run:
