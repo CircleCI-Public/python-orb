@@ -8,6 +8,11 @@ filters: &filters
   tags:
     only: /.*/
 
+parameters:
+  cache-version:
+    type: string
+    default: v3
+
 workflows:
   lint-pack:
     jobs:
@@ -23,6 +28,7 @@ workflows:
       - orb-tools/publish:
           orb-name: circleci/python
           vcs-type: << pipeline.project.type >>
+          github-token: GHI_TOKEN
           requires:
             [orb-tools/lint, orb-tools/review, orb-tools/pack, shellcheck/check]
           # Use a context to hold your publishing token.
