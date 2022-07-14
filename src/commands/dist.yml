@@ -20,7 +20,7 @@ parameters:
   no-isolation:
     type: boolean
     default: false
-    description: Do not isolation the build in a virtual environment.
+    description: Do not isolate the build in a virtual environment.
   skip-dependency-check:
     type: boolean
     default: false
