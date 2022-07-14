@@ -1,18 +1,42 @@
-description: "Build a distribution package using distutils and setup.py"
+description: "Build a distribution package using PEP517"
 
 parameters:
   app-dir:
     type: string
     default: "."
     description: Path to the directory containing your python project. Not needed if 'setup.py' lives in root project dir
+  sdist-only:
+    type: boolean
+    default: false
+    description: Only build a source distribution. (Default behavior builds both sdist and wheel.)
+  wheel-only:
+    type: boolean
+    default: false
+    description: Only build a wheel, directly from the source. (Default behavior builds an sdist and a wheel from the sdist.)
+  out-dir:
+    type: string
+    default: "./dist"
+    description: Path where to write the output files
+  no-isolation:
+    type: boolean
+    default: false
+    description: Do not isolation the build in a virtual environment.
+  skip-dependency-check:
+    type: boolean
+    default: false
+    description: Do not check that build dependencies are installed.
+
 steps:
   - run:
-      name: Install wheel
-      command: pip install wheel
+      name: Install pypa build
+      command: pip install build
   - run:
       working_directory: << parameters.app-dir >>
       name: "Build distribution package"
-      command: |
-        python setup.py sdist
-        python setup.py bdist_wheel
-        ls -l dist
+      command: << include(scripts/pypa-build.sh) >>
+      environment:
+        PARAM_NO_ISOLATION: << parameters.no-isolation >>
+        PARAM_OUTDIR: << parameters.out-dir >>
+        PARAM_SDIST: << parameters.sdist-only >>
+        PARAM_SKIP_DEPENDENCY_CHECK: << parameters.skip-dependency-check >>
+        PARAM_WHEEL: << parameters.wheel-only >>
