@@ -92,7 +92,7 @@ steps:
             working_directory: << parameters.app-dir >>
         - run:
             name: Save python version
-            command: python --version | cut -d' ' -f2 > /tmp/python-version
+            command: python --version | cut -d ' ' -f2 > /tmp/python-version
         - restore_cache:
             keys:
               - <<parameters.cache-version>>-cci_pycache-<<#parameters.include-branch-in-cache-key>>{{ .Branch }}-<</parameters.include-branch-in-cache-key>>{{ checksum "/tmp/cci_pycache/lockfile" }}-<<#parameters.include-python-in-cache-key>>{{ checksum "/tmp/python-version" }}-<</parameters.include-python-in-cache-key>>
