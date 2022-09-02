@@ -22,7 +22,7 @@ if [ ! -f "${LOCKFILE_PATH}" ]; then
     if [ -z "${LOCK_FILE}" ]; then
         echo "WARNING: Could not determine lockfile path for ${DETECT_PKG_MNGR:-PARAM_PKG_MNGR}"
     else
-        FULL_LOCK_FILE=$(readlink -f -v "${LOCK_FILE}")
+        FULL_LOCK_FILE=$(readlink -f "${LOCK_FILE}")
 
         if [ -f "${LOCK_FILE}" ]; then
             echo "INFO: Copying ${FULL_LOCK_FILE} to ${LOCKFILE_PATH}"
