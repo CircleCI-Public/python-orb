@@ -130,10 +130,13 @@ workflows:
           name: "pip-install-macos"
           filters: *filters
           executor: macos
-          pre-install-steps:
+          pre-steps:
             - run:
                 name: Alias python3
-                command: echo "alias python=python3" >> $BASH_ENV && source $BASH_ENV
+                command: |
+                  echo "alias python=python3" >> $BASH_ENV
+                  which -v python
+                  which -v python3
       - pip-install-test:
           filters: *filters
       - pip-install-test-args:
