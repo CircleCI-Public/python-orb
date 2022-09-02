@@ -133,7 +133,7 @@ workflows:
           pre-steps:
             - run:
                 name: Alias python3
-                command: echo "alias python=python3" >> $BASH_ENV
+                command: echo "alias python=python3" >> $BASH_ENV && source $BASH_ENV
       - pip-install-test:
           filters: *filters
       - pip-install-test-args:
