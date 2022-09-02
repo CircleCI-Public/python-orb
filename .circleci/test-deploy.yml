@@ -10,10 +10,11 @@ parameters:
     type: string
     default: v3
 
-macos:
+executors:
   macos:
-    xcode: 14.0.0
-  resource_class: medium
+    macos:
+      xcode: 14.0.0
+    resource_class: medium
 
 jobs:
   pip-install-test:
