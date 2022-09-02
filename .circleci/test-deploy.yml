@@ -135,6 +135,7 @@ workflows:
                 name: Alias python3
                 command: |
                   echo "alias python=python3" >> $BASH_ENV
+                  echo 'alias python="python3"' >> ~/.zshrc
                   which -v python
                   which -v python3
       - pip-install-test:
