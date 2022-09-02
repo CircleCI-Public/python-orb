@@ -130,6 +130,10 @@ workflows:
           name: "pip-install-macos"
           filters: *filters
           executor: macos
+          pre-steps:
+            - run:
+                name: Install Python
+                command: brew install python@3.9
       - pip-install-test:
           filters: *filters
       - pip-install-test-args:
