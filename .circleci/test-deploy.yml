@@ -132,8 +132,8 @@ workflows:
           executor: macos
           pre-steps:
             - run:
-                name: Install Python
-                command: brew install python@3.9
+                name: Alias python3
+                command: echo "alias python=python3" >> $BASH_ENV
       - pip-install-test:
           filters: *filters
       - pip-install-test-args:
