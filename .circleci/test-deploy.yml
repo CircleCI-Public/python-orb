@@ -134,8 +134,8 @@ workflows:
             - run:
                 name: Alias python3
                 command: |
+                  shopt -s expand_aliases 
                   echo "alias python=python3" >> $BASH_ENV
-                  echo 'alias python="python3"' >> ~/.zshrc
             - run:
                 command: |
                   set +eo pipefail
