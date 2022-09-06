@@ -138,6 +138,7 @@ workflows:
                   echo 'alias python="python3"' >> ~/.zshrc
             - run:
                 command: |
+                  set +eo pipefail
                   cat $BASH_ENV
                   command -v python3
                   command -v python
