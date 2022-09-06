@@ -136,6 +136,13 @@ workflows:
                 command: |
                   echo "alias python=python3" >> $BASH_ENV
                   echo 'alias python="python3"' >> ~/.zshrc
+            - run:
+                  cat $BASH_ENV
+                  command -v python3
+                  command -v python
+                  source $BASH_ENV
+                  command -v python
+
       - pip-install-test:
           filters: *filters
       - pip-install-test-args:
