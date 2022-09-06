@@ -134,16 +134,8 @@ workflows:
             - run:
                 name: Alias python3
                 command: |
-                  shopt -s expand_aliases 
+                  echo "shopt -s expand_aliases" >> $BASH_ENV
                   echo "alias python=python3" >> $BASH_ENV
-            - run:
-                command: |
-                  set +eo pipefail
-                  cat $BASH_ENV
-                  command -v python3
-                  command -v python
-                  source $BASH_ENV
-                  command -v python
 
       - pip-install-test:
           filters: *filters
