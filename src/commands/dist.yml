@@ -7,6 +7,9 @@ parameters:
     description: Path to the directory containing your python project. Not needed if 'setup.py' lives in root project dir
 steps:
   - run:
+      name: Alias Python
+      command: <<include(scripts/alias-python.sh)>>
+  - run:
       name: Install wheel
       command: pip install wheel
   - run:

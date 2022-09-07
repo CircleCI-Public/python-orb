@@ -9,9 +9,20 @@ parameters:
   cache-version:
     type: string
     default: v3
+
+executors:
+  macos:
+    macos:
+      xcode: 14.0.0
+    resource_class: medium
+
 jobs:
   pip-install-test:
-    executor: python/default
+    parameters:
+      executor:
+        type: executor
+        default: python/default
+    executor: << parameters.executor >>
     steps:
       - checkout
       - python/install-packages:
@@ -115,6 +126,10 @@ workflows:
   test-deploy:
     jobs:
       # Make sure to include "filters: *filters" in every test job you want to run as part of your deployment.
+      - pip-install-test:
+          name: "pip-install-macos"
+          filters: *filters
+          executor: macos
       - pip-install-test:
           filters: *filters
       - pip-install-test-args:
@@ -242,6 +257,7 @@ workflows:
           requires:
             - orb-tools/pack
             - pip-install-test
+            - pip-install-macos
             - pip-install-test-args
             - pipenv-test
             - poetry-test

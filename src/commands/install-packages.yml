@@ -73,6 +73,9 @@ steps:
   - run:
       name: "Export automatic environment detection script"
       command: << include(scripts/export-detect-env.sh) >>
+  - run:
+      name: Alias Python
+      command: <<include(scripts/alias-python.sh)>>
   # restore caches
   - when:
       condition:
