@@ -6,7 +6,7 @@ if [ ! "${BASH_ENV_PYTHON_ALIASED}" ]; then
   alias python=python3
   alias pip=pip3
 
-  if [ "${EXPAND_ALIASES}" == "off" ];
+  if [ "${EXPAND_ALIASES}" == "off" ]; then
     shopt -u expand_aliases
   fi
 fi
