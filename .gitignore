@@ -5,3 +5,4 @@ sample_pip/*/__pycache__
 
 # dev tools
 .idea
+**/.DS_Store
