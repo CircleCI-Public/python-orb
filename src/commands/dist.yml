@@ -28,6 +28,9 @@ parameters:
 
 steps:
   - run:
+      name: Alias Python
+      command: <<include(scripts/alias-python.sh)>>
+  - run:
       name: Install pypa build
       command: pip install build
   - run:
