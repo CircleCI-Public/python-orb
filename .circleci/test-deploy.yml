@@ -73,16 +73,16 @@ jobs:
             pytest
   dist-test:
     executor: python/default
+    parameters:
+      build-tool:
+        type: enum
+        enum: ["wheel", "build"]
+        default: "wheel"
+        description: Build command to run.
     steps:
       - checkout
       - python/dist:
-          app-dir: ~/project/sample_pip
-  dist-test:
-    executor: python/default
-    steps:
-      - checkout
-      - python/dist:
-          build-tool: build
+          build-tool: << parameters.build-tool >>
           app-dir: ~/project/sample_pip
   pipenv-test:
     executor: python/default
@@ -146,6 +146,11 @@ workflows:
       - poetry-test:
           filters: *filters
       - dist-test:
+          name: "dist-test-wheel"
+          filters: *filters
+      - dist-test:
+          name: "dist-test-build"
+          build-tool: "build"
           filters: *filters
       - pip-install-rel-dir:
           filters: *filters
@@ -275,7 +280,8 @@ workflows:
             - job-auto-test-poetry
             - job-auto-test-pipenv
             - job-auto-test-pip
-            - dist-test
+            - dist-test-wheel
+            - dist-test-build
           context: orb-publisher
           filters:
             branches:
