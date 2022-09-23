@@ -1,45 +1,67 @@
-description: "Build a distribution package using PEP517"
+description: "Build a distribution package"
 
 parameters:
+  build-tool:
+    type: enum
+    enum: ["wheel", "build"]
+    default: "wheel"
+    description: Choose the build command to run. Options include PEP427 wheel (default) and PEP517 build.
   app-dir:
     type: string
     default: "."
-    description: Path to the directory containing your python project. Not needed if 'setup.py' lives in root project dir
-  sdist-only:
-    type: boolean
-    default: false
-    description: Only build a source distribution. (Default behavior builds both sdist and wheel.)
-  wheel-only:
-    type: boolean
-    default: false
-    description: Only build a wheel, directly from the source. (Default behavior builds an sdist and a wheel from the sdist.)
+    description: Path to the directory containing your python project. Not needed if 'setup.py' lives in root project dir.
   out-dir:
     type: string
     default: "./dist"
-    description: Path where to write the output files
+    description: Path where to write the output files.
+  sdist-separate:
+    type: boolean
+    default: false
+    description: Opt out of default behavior and build sdist independently from wheel. Exclusive to build-tool option "build" only.
+  wheel-seperate:
+    type: boolean
+    default: false
+    description: Build a wheel directly from the source. Default behavior builds an sdist, then builds a wheel from that sdist. Exclusive to build-tool option "build" only.
   no-isolation:
     type: boolean
     default: false
-    description: Do not isolate the build in a virtual environment.
+    description: Do not isolate the build in a virtual environment. Exclusive to build-tool option "build" only.
   skip-dependency-check:
     type: boolean
     default: false
-    description: Do not check that build dependencies are installed.
+    description: Do not check that build dependencies are installed. Exclusive to build-tool option "build" only.
 
 steps:
   - run:
       name: Alias Python
       command: <<include(scripts/alias-python.sh)>>
-  - run:
-      name: Install pypa build
-      command: pip install build
-  - run:
-      working_directory: << parameters.app-dir >>
-      name: "Build distribution package"
-      command: << include(scripts/pypa-build.sh) >>
-      environment:
-        PARAM_NO_ISOLATION: << parameters.no-isolation >>
-        PARAM_OUTDIR: << parameters.out-dir >>
-        PARAM_SDIST: << parameters.sdist-only >>
-        PARAM_SKIP_DEPENDENCY_CHECK: << parameters.skip-dependency-check >>
-        PARAM_WHEEL: << parameters.wheel-only >>
+  - when:
+      condition:
+        equal: [<< parameters.build-tool >>, "build"]
+      steps:
+        - run:
+            name: Install pypa build
+            command: pip install build
+        - run:
+            working_directory: << parameters.app-dir >>
+            name: "Build distribution package"
+            command: << include(scripts/pypa-build.sh) >>
+            environment:
+              PARAM_NO_ISOLATION: << parameters.no-isolation >>
+              PARAM_OUTDIR: << parameters.out-dir >>
+              PARAM_SDIST: << parameters.sdist-only >>
+              PARAM_SKIP_DEPENDENCY_CHECK: << parameters.skip-dependency-check >>
+              PARAM_WHEEL: << parameters.wheel-only >>
+  - when:
+      condition:
+        equal: [<< parameters.build-tool >>, "wheel"]
+      steps:
+        - run:
+            name: Install wheel
+            command: pip install wheel
+        - run:
+            working_directory: << parameters.app-dir >>
+            name: "Build distribution package"
+            command: << include(scripts/pypa-wheel.sh) >>
+            environment:
+              PARAM_OUTDIR: << parameters.out-dir >>

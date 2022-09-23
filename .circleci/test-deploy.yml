@@ -77,6 +77,13 @@ jobs:
       - checkout
       - python/dist:
           app-dir: ~/project/sample_pip
+  dist-test:
+    executor: python/default
+    steps:
+      - checkout
+      - python/dist:
+          build-tool: build
+          app-dir: ~/project/sample_pip
   pipenv-test:
     executor: python/default
     steps:
