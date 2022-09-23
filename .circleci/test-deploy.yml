@@ -172,16 +172,6 @@ workflows:
           pkg-manager: pipenv
           cache-version: pipenv-<< pipeline.parameters.cache-version >>
           app-dir: ~/project/sample_pipenv
-          pre-install-steps:
-            - run:
-                name: Run install via script command to capture progress output
-                working_directory: ~/project/sample_pipenv
-                command: 'script -c "pipenv install" install_output.txt'
-          post-steps:
-            - run:
-                name: Verify cache was successful
-                working_directory: ~/project/sample_pipenv
-                command: 'cat install_output.txt | grep "0/0"'
       - python/test:
           filters: *filters
           name: job-test-pip
@@ -211,16 +201,6 @@ workflows:
           name: job-auto-test-pipenv
           cache-version: pipenv-auto-<< pipeline.parameters.cache-version >>
           app-dir: ~/project/sample_pipenv
-          pre-install-steps:
-            - run:
-                name: Run install via script command to capture progress output
-                working_directory: ~/project/sample_pipenv
-                command: 'script -c "pipenv install" install_output.txt'
-          post-steps:
-            - run:
-                name: Verify cache was successful
-                working_directory: ~/project/sample_pipenv
-                command: 'cat install_output.txt | grep "0/0"'
       - python/test:
           filters: *filters
           name: job-auto-test-pip
