@@ -8,7 +8,7 @@ filters: &filters
 parameters:
   cache-version:
     type: string
-    default: v3
+    default: v4
 
 executors:
   macos:
@@ -73,9 +73,27 @@ jobs:
             pytest
   dist-test:
     executor: python/default
+    parameters:
+      build-tool:
+        type: enum
+        enum: ["wheel", "build"]
+        default: "wheel"
+        description: Build command to run.
     steps:
       - checkout
       - python/dist:
+          build-tool: << parameters.build-tool >>
+          app-dir: ~/project/sample_pip
+  dist-test-build-opts:
+    executor: python/default
+    steps:
+      - checkout
+      - python/dist:
+          build-tool: build
+          wheel-separate: true
+          sdist-separate: true
+          no-isolation: true
+          skip-dependency-check: true
           app-dir: ~/project/sample_pip
   pipenv-test:
     executor: python/default
@@ -139,6 +157,14 @@ workflows:
       - poetry-test:
           filters: *filters
       - dist-test:
+          name: "dist-test-wheel"
+          filters: *filters
+      - dist-test:
+          name: "dist-test-build"
+          build-tool: "build"
+          filters: *filters
+      - dist-test-build-opts:
+          name: "dist-test-build-opts"
           filters: *filters
       - pip-install-rel-dir:
           filters: *filters
@@ -160,16 +186,6 @@ workflows:
           pkg-manager: pipenv
           cache-version: pipenv-<< pipeline.parameters.cache-version >>
           app-dir: ~/project/sample_pipenv
-          pre-install-steps:
-            - run:
-                name: Run install via script command to capture progress output
-                working_directory: ~/project/sample_pipenv
-                command: 'script -c "pipenv install" install_output.txt'
-          post-steps:
-            - run:
-                name: Verify cache was successful
-                working_directory: ~/project/sample_pipenv
-                command: 'cat install_output.txt | grep "0/0"'
       - python/test:
           filters: *filters
           name: job-test-pip
@@ -199,16 +215,6 @@ workflows:
           name: job-auto-test-pipenv
           cache-version: pipenv-auto-<< pipeline.parameters.cache-version >>
           app-dir: ~/project/sample_pipenv
-          pre-install-steps:
-            - run:
-                name: Run install via script command to capture progress output
-                working_directory: ~/project/sample_pipenv
-                command: 'script -c "pipenv install" install_output.txt'
-          post-steps:
-            - run:
-                name: Verify cache was successful
-                working_directory: ~/project/sample_pipenv
-                command: 'cat install_output.txt | grep "0/0"'
       - python/test:
           filters: *filters
           name: job-auto-test-pip
@@ -268,7 +274,9 @@ workflows:
             - job-auto-test-poetry
             - job-auto-test-pipenv
             - job-auto-test-pip
-            - dist-test
+            - dist-test-wheel
+            - dist-test-build
+            - dist-test-build-opts
           context: orb-publisher
           filters:
             branches:

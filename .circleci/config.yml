@@ -8,11 +8,6 @@ filters: &filters
   tags:
     only: /.*/
 
-parameters:
-  cache-version:
-    type: string
-    default: v3
-
 workflows:
   lint-pack:
     jobs:
