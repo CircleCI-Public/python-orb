@@ -89,7 +89,7 @@ jobs:
     steps:
       - checkout
       - python/dist:
-          build-tool: wheel
+          build-tool: build
           wheel-separate: true
           sdist-separate: true
           no-isolation: true
