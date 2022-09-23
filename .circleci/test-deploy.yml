@@ -164,7 +164,7 @@ workflows:
           build-tool: "build"
           filters: *filters
       - dist-test-build-opts:
-          name: "dist-test-wheel-opts"
+          name: "dist-test-build-opts"
           filters: *filters
       - pip-install-rel-dir:
           filters: *filters
@@ -276,6 +276,7 @@ workflows:
             - job-auto-test-pip
             - dist-test-wheel
             - dist-test-build
+            - dist-test-build-opts
           context: orb-publisher
           filters:
             branches:
