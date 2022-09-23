@@ -163,6 +163,9 @@ workflows:
           name: "dist-test-build"
           build-tool: "build"
           filters: *filters
+      - dist-test-build-opts:
+          name: "dist-test-wheel-opts"
+          filters: *filters
       - pip-install-rel-dir:
           filters: *filters
       - python/test:
