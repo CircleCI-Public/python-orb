@@ -1,5 +1,3 @@
-#!/usr/bin/env bash
-
 main() {
   local -a build_args
   build_args=(

@@ -18,7 +18,7 @@ parameters:
     type: boolean
     default: false
     description: Opt out of default behavior and build sdist independently from wheel. Exclusive to build-tool option "build" only.
-  wheel-seperate:
+  wheel-separate:
     type: boolean
     default: false
     description: Build a wheel directly from the source. Default behavior builds an sdist, then builds a wheel from that sdist. Exclusive to build-tool option "build" only.
@@ -49,9 +49,9 @@ steps:
             environment:
               PARAM_NO_ISOLATION: << parameters.no-isolation >>
               PARAM_OUTDIR: << parameters.out-dir >>
-              PARAM_SDIST: << parameters.sdist-only >>
+              PARAM_SDIST: << parameters.sdist-separate >>
+              PARAM_WHEEL: << parameters.wheel-separate >>
               PARAM_SKIP_DEPENDENCY_CHECK: << parameters.skip-dependency-check >>
-              PARAM_WHEEL: << parameters.wheel-only >>
   - when:
       condition:
         equal: [<< parameters.build-tool >>, "wheel"]
