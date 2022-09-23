@@ -84,6 +84,17 @@ jobs:
       - python/dist:
           build-tool: << parameters.build-tool >>
           app-dir: ~/project/sample_pip
+  dist-test-build-opts:
+    executor: python/default
+    steps:
+      - checkout
+      - python/dist:
+          build-tool: wheel
+          wheel-separate: true
+          sdist-separate: true
+          no-isolation: true
+          skip-dependency-check: true
+          app-dir: ~/project/sample_pip
   pipenv-test:
     executor: python/default
     steps:

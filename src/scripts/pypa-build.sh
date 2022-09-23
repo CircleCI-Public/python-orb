@@ -1,5 +1,7 @@
 main() {
   local -a build_args
+  
+  set -x
   build_args=(
     --outdir "$PARAM_OUTDIR"
   )
@@ -7,6 +9,8 @@ main() {
   [[ $PARAM_WHEEL ]] && build_args+=( --wheel )
   [[ $PARAM_SKIP_DEPENDENCY_CHECK ]] && build_args+=( --skip-dependency-check )
   [[ $PARAM_NO_ISOLATION ]] && build_args+=( --no-isolation )
+  set +x
+
   python -m build "${build_args[@]}" .
   ls -l "$PARAM_OUTDIR"
 }
