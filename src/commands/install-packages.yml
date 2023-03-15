@@ -9,7 +9,7 @@ parameters:
     type: enum
     enum: [auto, poetry, pipenv, pip, pip-dist]
     default: auto
-    description: Which package management tool to use, pipenv, pip or poetry with dependency file. Use `pip-dist` to install with project setup.py.
+    description: Which package management tool to use, pipenv, pip or poetry with dependency file. Use `pip-dist` to install with project setup.py or PEP621 (pyproject.toml).
   path-args:
     type: string
     default: "."
@@ -27,7 +27,7 @@ parameters:
     default: requirements.txt
     description: |
       Name of the requirements file that needs to be installed with pip. Prepended with `app-dir`. If using pipenv or poetry, this is ignored.
-      If using `pip-dist`, use this to use the cache checksum against the `setup.py` if desired.
+      If using `pip-dist`, use this to use the cache checksum against the `setup.py` or `pyproject.toml` if desired.
       If `pip-dependency-file` is set to an empty string, no dependency file is used in the `pip install` command.
   app-dir:
     type: string
@@ -161,7 +161,7 @@ steps:
         equal: [pip-dist, << parameters.pkg-manager >>]
       steps:
         - run:
-            name: "Install dependencies with pip using project setup.py"
+            name: "Install dependencies with pip using project setup.py or pyproject.toml"
             working_directory: <<parameters.app-dir>>
             command: |
               pip install -e << parameters.path-args >> << parameters.args >>
