@@ -13,8 +13,7 @@ parameters:
 executors:
   macos:
     macos:
-      xcode: 14.0.0
-    resource_class: medium
+      xcode: 16.1
 
 jobs:
   pip-install-test:
