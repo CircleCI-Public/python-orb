@@ -1,0 +1,11 @@
+# Example toml for integration testing - this is not used by the orb in anyway
+[tool.setuptools]
+authors=["Test"]
+name="test"
+description="none"
+version = "0.0.1"
+
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
