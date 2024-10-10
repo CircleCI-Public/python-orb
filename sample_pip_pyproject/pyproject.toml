@@ -1,6 +1,8 @@
 # Example toml for integration testing - this is not used by the orb in anyway
 [project]
-authors=["Test"]
+authors=[
+    {name="TEST", email="test@test.com"}
+]
 name="test"
 description="none"
 version = "0.0.1"
