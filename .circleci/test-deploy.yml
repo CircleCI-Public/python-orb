@@ -173,6 +173,7 @@ workflows:
           pkg-manager: poetry
           cache-version: poetry-<< pipeline.parameters.cache-version >>
           args: "| tee install_output.txt"
+          include-branch-in-cache-key: false
           app-dir: ~/project/sample_poetry
           post-steps:
             - run:
@@ -183,12 +184,14 @@ workflows:
           filters: *filters
           name: job-test-pipenv
           pkg-manager: pipenv
+          include-branch-in-cache-key: false
           cache-version: pipenv-<< pipeline.parameters.cache-version >>
           app-dir: ~/project/sample_pipenv
       - python/test:
           filters: *filters
           name: job-test-pip
           pkg-manager: pip
+          include-branch-in-cache-key: false
           cache-version: pip-<< pipeline.parameters.cache-version >>
           test-tool: unittest
           app-dir: ~/project/sample_pip
@@ -203,6 +206,7 @@ workflows:
           name: job-auto-test-poetry
           cache-version: poetry-auto-<< pipeline.parameters.cache-version >>
           args: "| tee install_output.txt"
+          include-branch-in-cache-key: false
           app-dir: ~/project/sample_poetry
           post-steps:
             - run:
@@ -214,11 +218,13 @@ workflows:
           name: job-auto-test-pipenv
           cache-version: pipenv-auto-<< pipeline.parameters.cache-version >>
           app-dir: ~/project/sample_pipenv
+          include-branch-in-cache-key: false
       - python/test:
           filters: *filters
           name: job-auto-test-pip
           test-tool: unittest
           venv-cache: false
+          include-branch-in-cache-key: false
           args: "| tee install_output.txt"
           cache-version: pip-auto-<< pipeline.parameters.cache-version >>
           app-dir: ~/project/sample_pip
@@ -232,6 +238,7 @@ workflows:
           name: job-test-pip-no-reqs
           pkg-manager: pip
           pip-dependency-file: ""
+          include-branch-in-cache-key: false
           test-tool: unittest
           cache-version: pip-noreqs-<< pipeline.parameters.cache-version >>
           app-dir: ~/project/sample_pip
@@ -240,6 +247,7 @@ workflows:
           version: 3.8.2
           name: job-test-pip-dist
           pkg-manager: pip-dist
+          include-branch-in-cache-key: false
           cache-version: pip-dist-<< pipeline.parameters.cache-version >>
           app-dir: ~/project/sample_pip
           # pip-dependency-file: setup.py
@@ -257,6 +265,7 @@ workflows:
           version: 3.11.4
           name: job-test-pip-dist-pyproject
           pkg-manager: pip-dist
+          include-branch-in-cache-key: false
           cache-version: pip-dist-pyproject-<< pipeline.parameters.cache-version >>
           app-dir: ~/project/sample_pip_pyproject
       - orb-tools/pack:
