@@ -252,6 +252,13 @@ workflows:
                 name: If another python version is loaded - its broken - this verifies that it's broken
                 when: on_fail
                 command: python --version
+      - python/test:
+          filters: *filters
+          version: 3.11.4
+          name: job-test-pip-dist-pyproject
+          pkg-manager: pip-dist
+          cache-version: pip-dist-pyproject-<< pipeline.parameters.cache-version >>
+          app-dir: ~/project/sample_pip_pyproject
       - orb-tools/pack:
           filters: *filters
       - orb-tools/publish:
@@ -270,6 +277,8 @@ workflows:
             - job-test-poetry
             - job-test-pipenv
             - job-test-pip
+            - job-test-pip-dist
+            - job-test-pip-dist-pyproject
             - job-auto-test-poetry
             - job-auto-test-pipenv
             - job-auto-test-pip
