@@ -1,0 +1,14 @@
+description: "Install the specified version of python"
+
+parameters:
+  version:
+    type: string
+    default: 3.11.10
+    description: Python version to install
+
+steps:
+  - run:
+      name: Install Python
+      command: <<include(scripts/install-python.sh)>>
+      environment:
+        PARAM_VERSION: << parameters.version >>

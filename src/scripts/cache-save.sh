@@ -62,10 +62,6 @@ fi
 
 LOCKFILE_PATH="${CACHE_DIR}/lockfile"
 
-if [ -e "${LOCKFILE_PATH}" ]; then
-    rm -f "${LOCKFILE_PATH}"
-fi
-
 if [ -e "${LOCK_FILE}" ]; then
     FULL_LOCK_FILE=$(readlink -f "${LOCK_FILE}")
     

@@ -14,8 +14,30 @@ executors:
   macos:
     macos:
       xcode: 16.1
-
+  machine:
+    machine:
+      image: ubuntu-2004:current
+  machine-arm:
+    resource_class: arm.medium
+    machine:
+      image: ubuntu-2004:current
+  docker-latest:
+    docker:
+      - image: cimg/base:stable
 jobs:
+  install-python:
+    parameters:
+      executor:
+        type: executor
+        default: machine
+      version:
+        type: string
+        default: 3.11.10
+    executor: <<parameters.executor>>
+    steps:
+      - python/install:
+          version: <<parameters.version>>
+
   pip-install-test:
     parameters:
       executor:
@@ -143,6 +165,16 @@ workflows:
   test-deploy:
     jobs:
       # Make sure to include "filters: *filters" in every test job you want to run as part of your deployment.
+      - pip-install-test-no-packages:
+          filters: *filters
+      - install-python:
+          filters: *filters
+          name: install-python-<<matrix.version>>-<<matrix.executor>>
+          matrix:
+            alias: install-python
+            parameters:
+              executor: ["machine", "machine-arm","macos", "docker-latest"]
+              version: ["3.11", "3.8", "3.12", "3.11.5", "3.9.4"]
       - pip-install-test:
           name: "pip-install-macos"
           filters: *filters
@@ -294,6 +326,7 @@ workflows:
             - dist-test-wheel
             - dist-test-build
             - dist-test-build-opts
+            - install-python
           context: orb-publisher
           filters:
             branches:
