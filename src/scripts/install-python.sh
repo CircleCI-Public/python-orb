@@ -8,13 +8,13 @@ read -r MAJOR MINOR PATCH <<< "$PARAM_VERSION"
 Install_Pyenv() {
 
   {
-    echo "export PATH=$HOME/.pyenv/bin:$PATH"
     echo "export PYENV_ROOT=$HOME/.pyenv"
+    echo "export PATH=$PYENV_ROOT/bin:$PATH"
     echo "export PYTHON_VERSION=$PARAM_VERSION"
     echo "export PIPENV_DEFAULT_PYTHON_VERSION=$PARAM_VERSION"
   } >> "$BASH_ENV"
-  . "${BASH_ENV}"
   curl https://pyenv.run | bash
+  . "${BASH_ENV}"
 }
 
 Install_Python() {
@@ -35,13 +35,13 @@ else
 fi
 
 if [ -z "$MAJOR" ] || [ -z "$MINOR" ]; then
-  echo "The version provide: $PARAM_VERSION is not valid"
+  echo "The version provided: $PARAM_VERSION is not valid"
   exit 1
 fi
 
-if ! command -v "python$MAJOR.$MINOR" >/dev/null 2>&1; then
+if ! python --version | grep "Python $PARAM_VERSION" >/dev/null 2>&1; then
   Install_Python
 else
-  echo "Python$MAJOR.$MINOR is already installed"
+  echo "Python$PARAM_VERSION is already installed"
   exit 0
 fi
