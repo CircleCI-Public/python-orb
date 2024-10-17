@@ -7,7 +7,7 @@ Install_Python() {
   wget "https://www.python.org/ftp/python/$PARAM_VERSION/Python-$PARAM_VERSION.tgz"
   tar -xf Python-$PARAM_VERSION.tgz
   rm -f Python-$PARAM_VERSION.tgz
-  cd Python-$PARAM_VERSION
+  cd Python-$PARAM_VERSION || exit 1
   ./configure --enable-optimizations
   make
   $SUDO make altinstall
@@ -18,7 +18,9 @@ Install_Python() {
   ln -s "/usr/local/bin/pip$MAJOR.$MINOR" "/usr/bin/pip$MAJOR.$MINOR"
 
   shopt -s expand_aliases
+  # shellcheck disable=SC2139
   alias python="python$MAJOR.$MINOR"
+  # shellcheck disable=SC2139
   alias pip="pip$MAJOR.$MINOR"
   echo "export BASH_ENV_PYTHON_ALIASED=true" >> "$BASH_ENV"
 }
