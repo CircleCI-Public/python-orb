@@ -27,6 +27,9 @@ executors:
   docker-latest:
     docker:
       - image: cimg/base:stable
+  ruby:
+    docker:
+      - image: circleci/ruby:2.7.2
 jobs:
   install-python:
     parameters:
@@ -165,7 +168,7 @@ workflows:
           matrix:
             alias: install-python
             parameters:
-              executor: ["machine", "machine-arm","macos", "docker-latest", "python"]
+              executor: ["machine", "machine-arm","macos", "ruby", "python"]
               version: ["3.11", "3.8", "3.12", "3.11.5", "3.9.4"]
           post-steps:
             - run:
