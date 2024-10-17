@@ -13,8 +13,8 @@ Install_Pyenv() {
     echo "export PYTHON_VERSION=$PARAM_VERSION"
     echo "export PIPENV_DEFAULT_PYTHON_VERSION=$PARAM_VERSION"
   } >> "$BASH_ENV"
-  curl https://pyenv.run | bash
   . "${BASH_ENV}"
+  curl https://pyenv.run | bash
 }
 
 Install_Python() {
