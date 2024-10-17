@@ -3,7 +3,7 @@ description: |
 usage:
   version: 2.1
   orbs:
-    python: circleci/python@1.0.0
+    python: circleci/python@3.0.0
   workflows:
     main:
       jobs:
