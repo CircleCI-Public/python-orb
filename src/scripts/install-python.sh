@@ -1,14 +1,17 @@
 #!/bin/bash
+# shellcheck disable=SC2034  # Unused variables left for readability
+# shellcheck disable=SC1090
 PARAM_VERSION="$(echo "${PARAM_VERSION}" | circleci env subst)"
 IFS='.'
-# shellcheck disable=SC2034  # Unused variables left for readability
 read -r MAJOR MINOR PATCH <<< "$PARAM_VERSION"
 
 Install_Pyenv() {
-  curl https://pyenv.run | bash
   echo "export PATH=$HOME/.pyenv/bin:$PATH" >> "$BASH_ENV"
-  #shellcheck disable=SC1090
+  echo "export PYENV_ROOT=$HOME/.pyenv" >> "$BASH_ENV"
+  echo "export PYTHON_VERSION=$PARAM_VERSION" >> "$BASH_ENV"
+  echo "export PIPENV_DEFAULT_PYTHON_VERSION=$PARAM_VERSION" >> "$BASH_ENV"
   . "${BASH_ENV}"
+  curl https://pyenv.run | bash
 }
 
 Install_Python() {
