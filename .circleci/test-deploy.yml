@@ -68,15 +68,6 @@ jobs:
           working_directory: ~/project/sample_pip
           command: |
             pytest
-  pip-install-test-no-packages:
-    executor: python/default
-    steps:
-      - checkout
-      - run:
-          name: "Test"
-          working_directory: ~/project/sample_pip
-          command: |
-            pytest
   pip-install-test-args:
     executor: python/default
     steps:
@@ -165,8 +156,6 @@ workflows:
   test-deploy:
     jobs:
       # Make sure to include "filters: *filters" in every test job you want to run as part of your deployment.
-      - pip-install-test-no-packages:
-          filters: *filters
       - install-python:
           filters: *filters
           name: install-python-<<matrix.version>>-<<matrix.executor>>

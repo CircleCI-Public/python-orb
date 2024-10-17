@@ -5,9 +5,9 @@ read -r MAJOR MINOR PATCH <<< "$PARAM_VERSION"
 
 Install_Python() {
   wget "https://www.python.org/ftp/python/$PARAM_VERSION/Python-$PARAM_VERSION.tgz"
-  tar -xf Python-$PARAM_VERSION.tgz
-  rm -f Python-$PARAM_VERSION.tgz
-  cd Python-$PARAM_VERSION || exit 1
+  tar -xf "Python-$PARAM_VERSION.tgz"
+  rm -f "Python-$PARAM_VERSION.tgz"
+  cd "Python-$PARAM_VERSION" || exit 1
   ./configure --enable-optimizations
   make
   $SUDO make altinstall
