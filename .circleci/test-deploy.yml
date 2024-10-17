@@ -276,7 +276,9 @@ workflows:
           app-dir: ~/project/sample_pip
       - python/test:
           filters: *filters
-          version: 3.8.2
+          executor:
+            name: python/default
+            tag: 3.8.2
           name: job-test-pip-dist
           pkg-manager: pip-dist
           include-branch-in-cache-key: false
@@ -294,7 +296,9 @@ workflows:
                 command: python --version
       - python/test:
           filters: *filters
-          version: 3.11.4
+          executor:
+            name: python/default
+            tag: 3.11.4
           name: job-test-pip-dist-pyproject
           pkg-manager: pip-dist
           include-branch-in-cache-key: false
