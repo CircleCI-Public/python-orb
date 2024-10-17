@@ -11,6 +11,9 @@ parameters:
     default: v4
 
 executors:
+  python:
+    docker:
+      - image: cimg/python:3.8
   macos:
     macos:
       xcode: 16.1
@@ -162,8 +165,12 @@ workflows:
           matrix:
             alias: install-python
             parameters:
-              executor: ["machine", "machine-arm","macos", "docker-latest"]
+              executor: ["machine", "machine-arm","macos", "docker-latest", "python"]
               version: ["3.11", "3.8", "3.12", "3.11.5", "3.9.4"]
+          post-steps:
+            - run:
+                name: Verify python version is right
+                command: python --version | grep "Python <<matrix.version>>"
       - pip-install-test:
           name: "pip-install-macos"
           filters: *filters
