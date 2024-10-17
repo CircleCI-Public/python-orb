@@ -6,10 +6,13 @@ IFS='.'
 read -r MAJOR MINOR PATCH <<< "$PARAM_VERSION"
 
 Install_Pyenv() {
-  echo "export PATH=$HOME/.pyenv/bin:$PATH" >> "$BASH_ENV"
-  echo "export PYENV_ROOT=$HOME/.pyenv" >> "$BASH_ENV"
-  echo "export PYTHON_VERSION=$PARAM_VERSION" >> "$BASH_ENV"
-  echo "export PIPENV_DEFAULT_PYTHON_VERSION=$PARAM_VERSION" >> "$BASH_ENV"
+
+  {
+    echo "export PATH=$HOME/.pyenv/bin:$PATH"
+    echo "export PYENV_ROOT=$HOME/.pyenv"
+    echo "export PYTHON_VERSION=$PARAM_VERSION"
+    echo "export PIPENV_DEFAULT_PYTHON_VERSION=$PARAM_VERSION"
+  } >> "$BASH_ENV"
   . "${BASH_ENV}"
   curl https://pyenv.run | bash
 }
