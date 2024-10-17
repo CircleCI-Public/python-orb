@@ -7,7 +7,7 @@ read -r MAJOR MINOR PATCH <<< "$PARAM_VERSION"
 Install_Pyenv() {
   curl https://pyenv.run | bash
   echo "export PATH=$HOME/.pyenv/bin:$PATH" >> "$BASH_ENV"
-  touch "${BASH_ENV}"
+  #shellcheck disable=SC1090
   . "${BASH_ENV}"
 }
 
