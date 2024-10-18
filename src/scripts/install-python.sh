@@ -9,11 +9,11 @@ Install_Pyenv() {
 
   {
     echo "export PYENV_ROOT=$HOME/.pyenv"
-    echo "export PATH=$PYENV_ROOT/bin:$PATH"
+    echo "export PATH=$HOME/.pyenv/shims:$HOME/.pyenv/bin:$PATH"
     echo "export PYTHON_VERSION=$PARAM_VERSION"
     echo "export PIPENV_DEFAULT_PYTHON_VERSION=$PARAM_VERSION"
   } >> "$BASH_ENV"
-  . "${BASH_ENV}"
+  . "$BASH_ENV"
   curl https://pyenv.run | bash
 }
 

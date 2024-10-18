@@ -29,7 +29,7 @@ executors:
       - image: cimg/base:stable
   ruby:
     docker:
-      - image: circleci/ruby:2.7.2
+      - image: ubuntu:22.04
 jobs:
   install-python:
     parameters:
