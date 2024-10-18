@@ -22,8 +22,8 @@ Install_Python() {
   else
     echo "Pyenv is already installed"
   fi
-  "$HOME/.pyenv/bin/pyenv" install "$PARAM_VERSION"
-  "$HOME/.pyenv/bin/pyenv" global "$PARAM_VERSION"
+  pyenv install "$PARAM_VERSION"
+  pyenv global "$PARAM_VERSION"
   echo "BASH_ENV_PYTHON_ALIASED=true" >> "$BASH_ENV"
 }
 
