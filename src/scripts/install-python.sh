@@ -5,8 +5,37 @@ PARAM_VERSION="$(echo "${PARAM_VERSION}" | circleci env subst)"
 IFS='.'
 read -r MAJOR MINOR PATCH <<< "$PARAM_VERSION"
 
-Install_Pyenv() {
+detect_os() { 
+  detected_platform="$(uname -s | tr '[:upper:]' '[:lower:]')"
 
+  case "$detected_platform" in
+    linux*)
+        if grep "Alpine" /etc/issue >/dev/null 2>&1; then
+            printf '%s\n' "Detected OS: Alpine Linux."
+            SYS_ENV_PLATFORM=linux_alpine
+        else
+            printf '%s\n' "Detected OS: Linux."
+            SYS_ENV_PLATFORM=linux
+        fi  
+      ;;
+    darwin*)
+      printf '%s\n' "Detected OS: macOS."
+      SYS_ENV_PLATFORM=macos
+      ;;
+    msys*|cygwin*)
+      printf '%s\n' "Detected OS: Windows."
+      SYS_ENV_PLATFORM=windows
+      ;;
+    *)
+      printf '%s\n' "Unsupported OS: \"$detected_platform\"."
+      exit 1
+      ;;
+  esac
+
+  export SYS_ENV_PLATFORM
+}
+
+Install_Pyenv() {
   {
     echo "export PYENV_ROOT=$HOME/.pyenv"
     echo "export PATH=$HOME/.pyenv/shims:$HOME/.pyenv/bin:$PATH"
@@ -16,15 +45,15 @@ Install_Pyenv() {
   . "$BASH_ENV"
   curl https://pyenv.run | bash
 }
-
+PATH=/root/.pyenv/shims:/root/.pyenv/bin:/root/.pyenv/shims:/root/.pyenv/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 Install_Python() {
   if ! command -v "pyenv" >/dev/null 2>&1; then
     Install_Pyenv
   else
     echo "Pyenv is already installed"
   fi
-  pyenv install "$PARAM_VERSION"
-  pyenv global "$PARAM_VERSION"
+  "$PYENV_ROOT/bin/pyenv" install "$PARAM_VERSION"
+  "$PYENV_ROOT/bin/pyenv" global "$PARAM_VERSION"
   echo "BASH_ENV_PYTHON_ALIASED=true" >> "$BASH_ENV"
 }
 
