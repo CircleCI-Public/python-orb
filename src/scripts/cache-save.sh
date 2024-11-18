@@ -23,6 +23,11 @@ case ${DETECT_PKG_MNGR:-${PARAM_PKG_MNGR}} in
         VENV_PATHS='[ "/home/circleci/.cache/pypoetry/virtualenvs" ]'
         CACHE_PATHS='[ "/home/circleci/.cache/pip" ]'
     ;;
+    uv)
+        LOCK_FILE="uv.lock"
+        VENV_PATHS="[ \"${CIRCLE_WORKING_DIRECTORY}/.venv\" ]"
+        CACHE_PATHS='[ "/home/circleci/.cache/uv" ]'
+    ;;
 esac
 
 if [ -n "${PARAM_VENV_PATH}" ]; then

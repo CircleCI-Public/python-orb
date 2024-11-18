@@ -11,13 +11,13 @@ parameters:
       The name of executor to use.
   pkg-manager:
     type: enum
-    enum: [auto, pip, pipenv, poetry, pip-dist]
+    enum: [auto, pip, pipenv, poetry, pip-dist, uv]
     default: "auto"
     description: Select the package manager to use. Default is pip
   pip-dependency-file:
     type: string
     default: requirements.txt
-    description: Name of the requirements file that needs to be installed with pip. Prepended with `app-dir`. If using pipenv or poetry, this is ignored.
+    description: Name of the requirements file that needs to be installed with pip. Prepended with `app-dir`. If using pipenv, poetry or uv, this is ignored.
   app-dir:
     type: string
     default: "~/project"
@@ -33,7 +33,7 @@ parameters:
   args:
     type: string
     default: ""
-    description: Arguments to pass to install command for pipenv and poetry. Override '-r requirements.txt' for pip.
+    description: Arguments to pass to install command for pipenv, poetry or uv. Override '-r requirements.txt' for pip.
   setup:
     type: steps
     description: Provide any optional steps you would like to run prior to install the python project.
@@ -144,6 +144,7 @@ steps:
               or:
                 - equal: [poetry, << parameters.pkg-manager >>]
                 - equal: [pipenv, << parameters.pkg-manager >>]
+                - equal: [uv, << parameters.pkg-manager >>]
             steps:
               - run:
                   name: Run tests with <<parameters.pkg-manager>> run
@@ -176,6 +177,7 @@ steps:
               or:
                 - equal: [poetry, << parameters.pkg-manager >>]
                 - equal: [pipenv, << parameters.pkg-manager >>]
+                - equal: [uv, << parameters.pkg-manager >>]
             steps:
               - run:
                   name: Run tests with <<parameters.pkg-manager>> run
