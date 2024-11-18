@@ -42,10 +42,14 @@ if [ "${PARAM_TEST_TOOL}" != "unittest" ]; then
     
     # If the test package is not detected, install using PYTHON_INSTALL_TOOL
     if [ -z "$DETECT_TEST_TOOL" ]; then
-        # TODO: handle uv case
         echo "INFO: Test package ${PARAM_TEST_TOOL} was not found. Installing..."
-        eval "${PYTHON_ENV_TOOL:-pip} install ${PYTHON_INSTALL_ARGS} ${PARAM_TEST_TOOL}"
-        INSTALL_RESULT=$?
+        if [ "$PYTHON_ENV_TOOL" = "uv" ]; then
+            eval "uv add ${PYTHON_INSTALL_ARGS} ${PARAM_TEST_TOOL}"
+            INSTALL_RESULT=$?
+        else
+            eval "${PYTHON_ENV_TOOL:-pip} install ${PYTHON_INSTALL_ARGS} ${PARAM_TEST_TOOL}"
+            INSTALL_RESULT=$?
+        fi
     else
         echo "INFO: Detected test package: $DETECT_TEST_TOOL"
     fi
