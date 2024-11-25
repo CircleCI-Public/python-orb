@@ -14,6 +14,7 @@ commands:
   python-install-pipenv-packages:
     steps:
       - python/install-packages:
+          app-dir: sample_pipenv
           pkg-manager: pipenv
           include-branch-in-cache-key: false
           args: --dev
