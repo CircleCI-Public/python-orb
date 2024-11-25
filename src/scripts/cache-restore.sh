@@ -28,7 +28,7 @@ restore_paths() {
     fi
 }
 
-CACHE_DIR="/tmp/cci_pycache"
+CACHE_DIR=".cci_pycache"
 
 if [ "${PARAM_VENV_CACHE}" = "1" ]; then
     restore_paths "${CACHE_DIR}/venv"
