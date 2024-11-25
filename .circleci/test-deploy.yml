@@ -2,55 +2,305 @@ version: 2.1
 orbs:
   python: circleci/python@dev:<<pipeline.git.revision>>
   orb-tools: circleci/orb-tools@11.1
-  windows: circleci/windows@5
+filters: &filters
+  tags:
+    only: /.*/
+parameters:
+  cache-version:
+    type: string
+    default: v4
 
 executors:
-  linux:
-    docker:
-      - image: cimg/python:3.12
-    resource_class: small
-
-commands:
-  python-install-pipenv-packages:
-    steps:
-      - python/install-packages:
-          app-dir: sample_pipenv
-          pkg-manager: pipenv
-          include-branch-in-cache-key: false
-          args: --dev
-  install-python-on-windows:
-    steps:
-      - run:
-          name: Install Python 3.12
-          command: |
-            set -euxo pipefail
-            choco feature enable -n allowGlobalConfirmation
-            # skip python install if we already have something that's good enough
-            if ! python --version | grep -q 'Python 3\.12'; then
-              choco upgrade python312 --package-parameters="/NoLockdown"
-            fi
-            pip install pipenv
+  macos:
+    macos:
+      xcode: 16.1
 
 jobs:
-  python-cache-dependencies:
+  pip-install-test:
     parameters:
       executor:
         type: executor
+        default: python/default
     executor: << parameters.executor >>
     steps:
       - checkout
-      - python-install-pipenv-packages
-
+      - python/install-packages:
+          pkg-manager: pip
+          cache-version: << pipeline.parameters.cache-version >>
+          app-dir: ~/project/sample_pip
+      - run:
+          name: "Test"
+          working_directory: ~/project/sample_pip
+          command: |
+            pytest
+  pip-install-rel-dir:
+    executor: python/default
+    steps:
+      - checkout
+      - python/install-packages:
+          pkg-manager: pip
+          cache-version: << pipeline.parameters.cache-version >>
+          app-dir: "./sample_pip"
+      - run:
+          name: "Test"
+          working_directory: ~/project/sample_pip
+          command: |
+            pytest
+  pip-install-test-no-packages:
+    executor: python/default
+    steps:
+      - checkout
+      - run:
+          name: "Test"
+          working_directory: ~/project/sample_pip
+          command: |
+            pytest
+  pip-install-test-args:
+    executor: python/default
+    steps:
+      - checkout
+      - python/install-packages:
+          pkg-manager: pip
+          app-dir: ~/project/sample_pip
+          cache-version: << pipeline.parameters.cache-version >>
+          args: pytest
+          pip-dependency-file: ""
+      - run:
+          name: "Test"
+          working_directory: ~/project/sample_pip
+          command: |
+            pytest
+  dist-test:
+    executor: python/default
+    parameters:
+      build-tool:
+        type: enum
+        enum: ["wheel", "build"]
+        default: "wheel"
+        description: Build command to run.
+    steps:
+      - checkout
+      - python/dist:
+          build-tool: << parameters.build-tool >>
+          app-dir: ~/project/sample_pip
+  dist-test-build-opts:
+    executor: python/default
+    steps:
+      - checkout
+      - python/dist:
+          build-tool: build
+          wheel-separate: true
+          sdist-separate: true
+          no-isolation: true
+          skip-dependency-check: true
+          app-dir: ~/project/sample_pip
+  pipenv-test:
+    executor: python/default
+    steps:
+      - checkout
+      - python/install-packages:
+          app-dir: ~/project/sample_pipenv
+          pkg-manager: "pipenv"
+          cache-version: << pipeline.parameters.cache-version >>
+      - run:
+          working_directory: ~/project/sample_pipenv
+          command: |
+            cp Pipfile.lock Pipfile.lock.tmp
+            cp Pipfile Pipfile.tmp
+            pipenv run pytest --version
+          name: Ensure pipenv is working and copy lock file for cache testing
+      - run:
+          command: pipenv install pytest==4.6.1
+          working_directory: ~/project/sample_pipenv
+      - run:
+          working_directory: ~/project/sample_pipenv
+          command: |
+            cp Pipfile.lock.tmp Pipfile.lock
+            cp Pipfile.tmp Pipfile
+          name: Overwrite the lockfile with the one that should load the cache.
+      - python/install-packages:
+          app-dir: ~/project/sample_pipenv
+          pkg-manager: "pipenv"
+          pypi-cache: false
+          venv-cache: false
+          cache-version: << pipeline.parameters.cache-version >>
+      - run:
+          command: pipenv run pytest
+          working_directory: ~/project/sample_pipenv
+  poetry-test:
+    executor: python/default
+    steps:
+      - checkout
+      - python/install-packages:
+          app-dir: ~/project/sample_poetry
+          cache-version: << pipeline.parameters.cache-version >>
+          pkg-manager: poetry
+      - run:
+          working_directory: ~/project/sample_poetry
+          command: |-
+            poetry run pytest
 workflows:
-  build-and-test:
+  test-deploy:
     jobs:
-      - python-cache-dependencies:
-          name: server cache dependencies linux
-          executor: linux
-      - python-cache-dependencies:
-          name: server cache dependencies windows
+      # Make sure to include "filters: *filters" in every test job you want to run as part of your deployment.
+      - pip-install-test:
+          name: "pip-install-macos"
+          filters: *filters
+          executor: macos
+      - pip-install-test:
+          filters: *filters
+      - pip-install-test-args:
+          filters: *filters
+      - pipenv-test:
+          filters: *filters
+      - poetry-test:
+          filters: *filters
+      - dist-test:
+          name: "dist-test-wheel"
+          filters: *filters
+      - dist-test:
+          name: "dist-test-build"
+          build-tool: "build"
+          filters: *filters
+      - dist-test-build-opts:
+          name: "dist-test-build-opts"
+          filters: *filters
+      - pip-install-rel-dir:
+          filters: *filters
+      - python/test:
+          filters: *filters
+          name: job-test-poetry
+          pkg-manager: poetry
+          cache-version: poetry-<< pipeline.parameters.cache-version >>
+          args: "| tee install_output.txt"
+          include-branch-in-cache-key: false
+          app-dir: ~/project/sample_poetry
+          post-steps:
+            - run:
+                name: Verify cache was successful
+                working_directory: ~/project/sample_poetry
+                command: 'cat install_output.txt | grep "No dependencies to install or update"'
+      - python/test:
+          filters: *filters
+          name: job-test-pipenv
+          pkg-manager: pipenv
+          include-branch-in-cache-key: false
+          cache-version: pipenv-<< pipeline.parameters.cache-version >>
+          app-dir: ~/project/sample_pipenv
+      - python/test:
+          filters: *filters
+          name: job-test-pip
+          pkg-manager: pip
+          include-branch-in-cache-key: false
+          cache-version: pip-<< pipeline.parameters.cache-version >>
+          test-tool: unittest
+          app-dir: ~/project/sample_pip
+          args: "| tee install_output.txt"
+          post-steps:
+            - run:
+                name: Verify cache was successful
+                working_directory: ~/project/sample_pip
+                command: 'cat install_output.txt | grep "Requirement already satisfied: pytest"'
+      - python/test:
+          filters: *filters
+          name: job-auto-test-poetry
+          cache-version: poetry-auto-<< pipeline.parameters.cache-version >>
+          args: "| tee install_output.txt"
+          include-branch-in-cache-key: false
+          app-dir: ~/project/sample_poetry
+          post-steps:
+            - run:
+                name: Verify cache was successful
+                working_directory: ~/project/sample_poetry
+                command: 'cat install_output.txt | grep "No dependencies to install or update"'
+      - python/test:
+          filters: *filters
+          name: job-auto-test-pipenv
+          cache-version: pipenv-auto-<< pipeline.parameters.cache-version >>
+          app-dir: ~/project/sample_pipenv
+          include-branch-in-cache-key: false
+      - python/test:
+          filters: *filters
+          name: job-auto-test-pip
+          test-tool: unittest
+          venv-cache: false
+          include-branch-in-cache-key: false
+          args: "| tee install_output.txt"
+          cache-version: pip-auto-<< pipeline.parameters.cache-version >>
+          app-dir: ~/project/sample_pip
+          post-steps:
+            - run:
+                name: Verify cache was successful
+                working_directory: ~/project/sample_pip
+                command: 'cat install_output.txt | grep "Requirement already satisfied: pytest"'
+      - python/test:
+          filters: *filters
+          name: job-test-pip-no-reqs
+          pkg-manager: pip
+          pip-dependency-file: ""
+          include-branch-in-cache-key: false
+          test-tool: unittest
+          cache-version: pip-noreqs-<< pipeline.parameters.cache-version >>
+          app-dir: ~/project/sample_pip
+      - python/test:
+          filters: *filters
           executor:
-            name: windows/default
-            shell: bash.exe
-          pre-steps:
-            - install-python-on-windows
+            name: python/default
+            tag: 3.8.2
+          name: job-test-pip-dist
+          pkg-manager: pip-dist
+          include-branch-in-cache-key: false
+          cache-version: pip-dist-<< pipeline.parameters.cache-version >>
+          app-dir: ~/project/sample_pip
+          # pip-dependency-file: setup.py
+          post-steps:
+            - run:
+                name: Attempt to set the other python version - this should fail, but if the cache is broken, this will succeed.
+                command: |
+                  ! pyenv local 3.8.6
+            - run:
+                name: If another python version is loaded - its broken - this verifies that it's broken
+                when: on_fail
+                command: python --version
+      - python/test:
+          filters: *filters
+          executor:
+            name: python/default
+            tag: 3.11.4
+          name: job-test-pip-dist-pyproject
+          pkg-manager: pip-dist
+          include-branch-in-cache-key: false
+          cache-version: pip-dist-pyproject-<< pipeline.parameters.cache-version >>
+          app-dir: ~/project/sample_pip_pyproject
+      - orb-tools/pack:
+          filters: *filters
+      - orb-tools/publish:
+          orb-name: circleci/python
+          github-token: GHI_TOKEN
+          vcs-type: << pipeline.project.type >>
+          pub-type: production
+          requires:
+            - orb-tools/pack
+            - pip-install-test
+            - pip-install-macos
+            - pip-install-test-args
+            - pipenv-test
+            - poetry-test
+            - pip-install-rel-dir
+            - job-test-poetry
+            - job-test-pipenv
+            - job-test-pip
+            - job-test-pip-dist
+            - job-test-pip-dist-pyproject
+            - job-auto-test-poetry
+            - job-auto-test-pipenv
+            - job-auto-test-pip
+            - dist-test-wheel
+            - dist-test-build
+            - dist-test-build-opts
+          context: orb-publisher
+          filters:
+            branches:
+              ignore: /.*/
+            tags:
+              only: /^v[0-9]+\.[0-9]+\.[0-9]+$/
