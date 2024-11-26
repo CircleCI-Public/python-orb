@@ -150,7 +150,7 @@ jobs:
       - run:
           working_directory: ~/project/sample_uv
           command: |-
-            poetry run pytest
+            uvx run pytest
 workflows:
   test-deploy:
     jobs:
