@@ -17,6 +17,10 @@ case ${DETECT_PKG_MNGR:-${PARAM_PKG_MNGR}} in
         REQUIREMENTS_PATH="pyproject.toml"
         PYTHON_ENV_TOOL="poetry"
     ;;
+    uv)
+        REQUIREMENTS_PATH="uv.lock"
+        PYTHON_ENV_TOOL="uv"
+    ;;
 esac
 
 if [ -f ${REQUIREMENTS_PATH} ]; then
@@ -39,8 +43,13 @@ if [ "${PARAM_TEST_TOOL}" != "unittest" ]; then
     # If the test package is not detected, install using PYTHON_INSTALL_TOOL
     if [ -z "$DETECT_TEST_TOOL" ]; then
         echo "INFO: Test package ${PARAM_TEST_TOOL} was not found. Installing..."
-        eval "${PYTHON_ENV_TOOL:-pip} install ${PYTHON_INSTALL_ARGS} ${PARAM_TEST_TOOL}"
-        INSTALL_RESULT=$?
+        if [ "$PYTHON_ENV_TOOL" = "uv" ]; then
+            eval "uv add ${PYTHON_INSTALL_ARGS} ${PARAM_TEST_TOOL}"
+            INSTALL_RESULT=$?
+        else
+            eval "${PYTHON_ENV_TOOL:-pip} install ${PYTHON_INSTALL_ARGS} ${PARAM_TEST_TOOL}"
+            INSTALL_RESULT=$?
+        fi
     else
         echo "INFO: Detected test package: $DETECT_TEST_TOOL"
     fi

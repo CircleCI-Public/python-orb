@@ -17,6 +17,9 @@ if [ ! -f "${LOCKFILE_PATH}" ]; then
         poetry)
             LOCK_FILE="poetry.lock"
         ;;
+        uv)
+            LOCK_FILE="uv.lock"
+        ;;
     esac
     
     if [ -z "${LOCK_FILE}" ]; then
