@@ -29,7 +29,7 @@ if [ -n "${PARAM_VENV_PATH}" ]; then
     VENV_PATHS="${PARAM_VENV_PATH}"
 fi
 
-CACHE_DIR=".cci_pycache"
+CACHE_DIR="$PARAM_CACHE_FOLDER_PREFIX.cci_pycache"
 mkdir -p "${CACHE_DIR}"
 
 link_paths() {

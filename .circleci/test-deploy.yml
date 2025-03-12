@@ -14,6 +14,18 @@ executors:
   macos:
     macos:
       xcode: 16.1
+  windows:
+    machine:
+      image: windows-server-2022-gui:current
+    resource_class: windows.medium
+  ubuntu:
+    machine:
+      image: ubuntu-2204:2024.11.1
+    resource_class: medium
+  arm:
+    machine:
+      image: ubuntu-2204:2024.11.1
+    resource_class: arm.medium
 
 jobs:
   pip-install-test:
@@ -272,6 +284,31 @@ workflows:
           include-branch-in-cache-key: false
           cache-version: pip-dist-pyproject-<< pipeline.parameters.cache-version >>
           app-dir: ~/project/sample_pip_pyproject
+      - python/test:
+          filters: *filters
+          name: "Test-<<matrix.executor>>-<<matrix.cache-folder-prefix>>"
+          include-branch-in-cache-key: false
+          cache-version: << pipeline.parameters.cache-version >>
+          app-dir: ~/project/sample_pip
+          pkg-manager: pip-dist
+          matrxi:
+            alias: test-cache-folders
+            parameters:
+              executor: [macos, ubuntu, arm]
+              test-cache-folders: [/tmp/, ""]
+      - python/test:
+          filters: *filters
+          pre-steps:
+            - run: mkdir /c/temp
+          name: "Test-windows-<<matrix.cache-folder-prefix>>"
+          include-branch-in-cache-key: false
+          cache-version: << pipeline.parameters.cache-version >>
+          app-dir: ~/project/sample_pip
+          pkg-manager: pip-dist
+          matrxi:
+            alias: test-cache-folders
+            parameters:
+              test-cache-folders: [/tmp/, "/c/temp/"]
       - orb-tools/pack:
           filters: *filters
       - orb-tools/publish:
@@ -281,6 +318,7 @@ workflows:
           pub-type: production
           requires:
             - orb-tools/pack
+            - test-cache-folders
             - pip-install-test
             - pip-install-macos
             - pip-install-test-args
