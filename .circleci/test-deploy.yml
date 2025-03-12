@@ -304,6 +304,7 @@ workflows:
           include-branch-in-cache-key: false
           cache-version: << pipeline.parameters.cache-version >>
           app-dir: ~/project/sample_pip
+          executor: windows
           pkg-manager: pip-dist
           matrix:
             alias: test-cache-folders-windows
