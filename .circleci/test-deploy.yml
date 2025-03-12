@@ -306,7 +306,7 @@ workflows:
           app-dir: ~/project/sample_pip
           pkg-manager: pip-dist
           matrix:
-            alias: test-cache-folders
+            alias: test-cache-folders-windows
             parameters:
               cache-folder-prefix: [/tmp/, "/c/temp/"]
       - orb-tools/pack:
@@ -319,6 +319,7 @@ workflows:
           requires:
             - orb-tools/pack
             - test-cache-folders
+            - test-cache-folders-windows
             - pip-install-test
             - pip-install-macos
             - pip-install-test-args
