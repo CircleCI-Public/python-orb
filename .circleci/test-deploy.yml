@@ -291,7 +291,7 @@ workflows:
           cache-version: << pipeline.parameters.cache-version >>
           app-dir: ~/project/sample_pip
           pkg-manager: pip-dist
-          matrxi:
+          matrix:
             alias: test-cache-folders
             parameters:
               executor: [macos, ubuntu, arm]
@@ -305,7 +305,7 @@ workflows:
           cache-version: << pipeline.parameters.cache-version >>
           app-dir: ~/project/sample_pip
           pkg-manager: pip-dist
-          matrxi:
+          matrix:
             alias: test-cache-folders
             parameters:
               test-cache-folders: [/tmp/, "/c/temp/"]
