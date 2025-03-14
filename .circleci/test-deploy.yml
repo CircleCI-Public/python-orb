@@ -334,7 +334,7 @@ workflows:
           filters: *filters
           pre-steps:
             - run: |
-                mkdir /c/temp
+                mkdir C:\temp\
                 ls -la
           name: "Test-windows-<<matrix.cache-folder-prefix>>"
           include-branch-in-cache-key: false
@@ -345,7 +345,7 @@ workflows:
           matrix:
             alias: test-cache-folders-windows
             parameters:
-              cache-folder-prefix: ["/c/temp/"]
+              cache-folder-prefix: [C:\temp\]
       - orb-tools/pack:
           filters: *filters
       - orb-tools/publish:
