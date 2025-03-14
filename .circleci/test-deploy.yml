@@ -333,8 +333,7 @@ workflows:
       - python/test:
           filters: *filters
           pre-steps:
-            - run: |
-                mkdir C:\temp\
+            - run: mkdir C:\\tempo
           name: "Test-windows-<<matrix.cache-folder-prefix>>"
           include-branch-in-cache-key: false
           cache-version: << pipeline.parameters.cache-version >>
@@ -344,7 +343,7 @@ workflows:
           matrix:
             alias: test-cache-folders-windows
             parameters:
-              cache-folder-prefix: [C:\temp\]
+              cache-folder-prefix: [C:\tempo\]
       - orb-tools/pack:
           filters: *filters
       - orb-tools/publish:
