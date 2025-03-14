@@ -335,7 +335,6 @@ workflows:
           pre-steps:
             - run: |
                 mkdir C:\temp\
-                ls -la
           name: "Test-windows-<<matrix.cache-folder-prefix>>"
           include-branch-in-cache-key: false
           cache-version: << pipeline.parameters.cache-version >>
