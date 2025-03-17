@@ -333,7 +333,7 @@ workflows:
       - python/test:
           filters: *filters
           pre-steps:
-            - run: mkdir C:\\tempo
+            - run: mkdir 'C:\tempo'
           name: "Test-windows-<<matrix.cache-folder-prefix>>"
           include-branch-in-cache-key: false
           cache-version: << pipeline.parameters.cache-version >>
