@@ -1,6 +1,6 @@
 # shellcheck source=detect-env.sh
 source "$AUTO_DETECT_ENV_SCRIPT"
-
+set -x 
 case ${DETECT_PKG_MNGR:-${PARAM_PKG_MNGR}} in
     pip | pip-dist)
         LOCK_FILE="${PARAM_DEPENDENCY_FILE:-requirements.txt}"
@@ -72,3 +72,4 @@ if [ -e "${LOCK_FILE}" ]; then
     echo "INFO: Copying ${FULL_LOCK_FILE} to ${LOCKFILE_PATH}"
     cp "${FULL_LOCK_FILE}" "${LOCKFILE_PATH}"
 fi
+set +x
