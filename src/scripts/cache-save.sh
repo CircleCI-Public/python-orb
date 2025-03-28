@@ -41,7 +41,7 @@ link_paths() {
     mkdir "${1}"
     
     for encoded in $(echo "${2}" | jq -r '.[] | @base64'); do
-        decoded=$(echo "${encoded}" | base64 -d)
+        decoded=$(echo "${encoded}" | tr -d '\r' |  base64 -d)
         
         if [ -e "${decoded}" ]; then
             echo "INFO: Copying ${decoded} to ${1}/${encoded}"
