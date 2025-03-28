@@ -332,8 +332,8 @@ workflows:
               cache-folder-prefix: [/tmp/, "/tmp/cache"]
       - python/test:
           filters: *filters
-          pre-steps:
-            - run: mkdir 'C:\tempo'
+          # pre-steps:
+          #   - run: mkdir 'C:\tempo'
           name: "Test-windows-<<matrix.cache-folder-prefix>>"
           include-branch-in-cache-key: false
           cache-version: << pipeline.parameters.cache-version >>
@@ -343,7 +343,7 @@ workflows:
           matrix:
             alias: test-cache-folders-windows
             parameters:
-              cache-folder-prefix: ['/tempo/']
+              cache-folder-prefix: ['../tempo']
       - orb-tools/pack:
           filters: *filters
       - orb-tools/publish:
