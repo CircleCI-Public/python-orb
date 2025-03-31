@@ -1,7 +1,13 @@
 # shellcheck source=detect-env.sh
 source "$AUTO_DETECT_ENV_SCRIPT"
 PARAM_CACHE_FOLDER_PREFIX="$(echo "$PARAM_CACHE_FOLDER_PREFIX" | circleci env subst)"
-CACHE_DIR="$PARAM_CACHE_FOLDER_PREFIX.cci_pycache"
+
+if [[ "$PARA_APP_DIR" == "." || "$PARAM_CACHE_FOLDER_PREFIX" ~= "^\/.*" ]]; then
+    CACHE_DIR="$PARAM_CACHE_FOLDER_PREFIX.cci_pycache"
+else
+    CACHE_DIR="$HOME/project/$PARAM_CACHE_FOLDER_PREFIX.cci_pycache"
+fi
+
 LOCKFILE_PATH="${CACHE_DIR}/lockfile"
 
 mkdir -p "${CACHE_DIR}"

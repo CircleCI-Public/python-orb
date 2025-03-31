@@ -99,6 +99,7 @@ steps:
               PARAM_VENV_CACHE: << parameters.venv-cache >>
               PARAM_VENV_PATH: << parameters.venv-path >>
               PARAM_CACHE_FOLDER_PREFIX: <<parameters.cache-folder-prefix>>
+              PARAM_APP_DIR: <<parameters.app-dir>>
             command: <<include(scripts/cache-link-lockfile.sh)>>
             working_directory: << parameters.app-dir >>
         - run:
