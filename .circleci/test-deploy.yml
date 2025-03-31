@@ -329,7 +329,7 @@ workflows:
             alias: test-cache-folders
             parameters:
               executor: [macos, ubuntu, arm]
-              cache-folder-prefix: [/tmp/, "/tmp/cache/"]
+              cache-folder-prefix: ["/tmp/cache/"]
       - python/test:
           filters: *filters
           # pre-steps:
