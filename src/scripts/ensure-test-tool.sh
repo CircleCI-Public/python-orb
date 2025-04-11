@@ -1,5 +1,4 @@
 # shellcheck source=detect-env.sh
-set -x
 source "$AUTO_DETECT_ENV_SCRIPT"
 
 case ${DETECT_PKG_MNGR:-${PARAM_PKG_MNGR}} in
@@ -32,32 +31,20 @@ fi
 
 # Automatically install test package. unittest is preinstalled and not required.
 if [ "${PARAM_TEST_TOOL}" != "unittest" ]; then
-    DETECT_TEST_TOOL=$(eval "${PYTHON_ENV_TOOL:+$PYTHON_ENV_TOOL run} pip --disable-pip-version-check list" |
-    awk 'NR > 2 && NF > 0 { print $1 }' | grep "^${PARAM_TEST_TOOL}$")
-    
-    NOT_DETECTED=$?
-    
-    if (( NOT_DETECTED > 0 )) && [ "${PARAM_FAIL_IF_MISSING_TOOL}" = true ]; then
-        exit $NOT_DETECTED
-    fi
-    
-    # If the test package is not detected, install using PYTHON_INSTALL_TOOL
-    if [ -z "$DETECT_TEST_TOOL" ]; then
+    if ! "${PYTHON_ENV_TOOL:+$PYTHON_ENV_TOOL run}" pip --disable-pip-version-check list | awk 'NR > 2 && NF > 0 { print $1 }' | grep -q "^${PARAM_TEST_TOOL}$"; then
+        if [ "${PARAM_FAIL_IF_MISSING_TOOL}" = true ]; then
+            echo "ERROR: Test package ${PARAM_TEST_TOOL} was not found"
+            exit 1
+        fi
+
+        # If the test package is not detected, install using PYTHON_INSTALL_TOOL
         echo "INFO: Test package ${PARAM_TEST_TOOL} was not found. Installing..."
         if [ "$PYTHON_ENV_TOOL" = "uv" ]; then
             eval "uv add ${PYTHON_INSTALL_ARGS} ${PARAM_TEST_TOOL}"
-            INSTALL_RESULT=$?
         else
             eval "${PYTHON_ENV_TOOL:-pip} install ${PYTHON_INSTALL_ARGS} ${PARAM_TEST_TOOL}"
-            INSTALL_RESULT=$?
         fi
     else
         echo "INFO: Detected test package: $DETECT_TEST_TOOL"
     fi
-    
-    # Exit with test package install result, or exit 0 if param fail is set to false
-    if (( NOT_DETECTED > 0 )) && [ "${PARAM_FAIL_IF_MISSING_TOOL}" = false ]; then
-        exit ${INSTALL_RESULT:-0}
-    fi
 fi
-set +x
