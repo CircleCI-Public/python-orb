@@ -1,4 +1,5 @@
 # shellcheck source=detect-env.sh
+set -x
 source "$AUTO_DETECT_ENV_SCRIPT"
 
 case ${DETECT_PKG_MNGR:-${PARAM_PKG_MNGR}} in
@@ -59,3 +60,4 @@ if [ "${PARAM_TEST_TOOL}" != "unittest" ]; then
         exit ${INSTALL_RESULT:-0}
     fi
 fi
+set +x

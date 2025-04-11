@@ -135,6 +135,7 @@ jobs:
           app-dir: ~/project/sample_poetry
           cache-version: << pipeline.parameters.cache-version >>
           pkg-manager: poetry
+          args: --no-root
       - run:
           working_directory: ~/project/sample_poetry
           command: |-
@@ -150,7 +151,7 @@ jobs:
       - run:
           working_directory: ~/project/sample_uv
           command: |-
-            uvx run pytest
+            uv run pytest
 workflows:
   test-deploy:
     jobs:
