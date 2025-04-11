@@ -4,7 +4,9 @@ requires = ["setuptools"]
 build-backend = "setuptools.build_meta"
 
 [project]
-authors = ["Test"]
+authors = [
+    {name="TEST", email="test@test.com"}
+]
 name = "test"
 description = "none"
 version = "0.0.1"

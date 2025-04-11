@@ -186,7 +186,7 @@ workflows:
           name: job-test-poetry
           pkg-manager: poetry
           cache-version: poetry-<< pipeline.parameters.cache-version >>
-          args: "| tee install_output.txt"
+          args: "--no-root | tee install_output.txt"
           include-branch-in-cache-key: false
           app-dir: ~/project/sample_poetry
           post-steps:
@@ -232,7 +232,7 @@ workflows:
           filters: *filters
           name: job-auto-test-poetry
           cache-version: poetry-auto-<< pipeline.parameters.cache-version >>
-          args: "| tee install_output.txt"
+          args: "--no-root | tee install_output.txt"
           include-branch-in-cache-key: false
           app-dir: ~/project/sample_poetry
           post-steps:
