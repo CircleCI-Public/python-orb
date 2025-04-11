@@ -200,7 +200,7 @@ workflows:
           name: job-test-uv
           pkg-manager: uv
           cache-version: uv-<< pipeline.parameters.cache-version >>
-          args: " -v | tee install_output.txt"
+          args: " -v 2> install_output.txt"
           include-branch-in-cache-key: false
           app-dir: ~/project/sample_uv
           post-steps:
@@ -245,7 +245,7 @@ workflows:
           filters: *filters
           name: job-auto-test-uv
           cache-version: uv-auto-<< pipeline.parameters.cache-version >>
-          args: "-v | tee install_output.txt"
+          args: "-v 2> install_output.txt"
           include-branch-in-cache-key: false
           app-dir: ~/project/sample_uv
           post-steps:
