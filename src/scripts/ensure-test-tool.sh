@@ -31,7 +31,7 @@ fi
 
 # Automatically install test package. unittest is preinstalled and not required.
 if [ "${PARAM_TEST_TOOL}" != "unittest" ]; then
-    if ! $("${PYTHON_ENV_TOOL:+$PYTHON_ENV_TOOL run}" pip --disable-pip-version-check list | awk 'NR > 2 && NF > 0 { print $1 }' | grep -q "^${PARAM_TEST_TOOL}$"); then
+    if ! eval "${PYTHON_ENV_TOOL:+$PYTHON_ENV_TOOL run} pip --disable-pip-version-check list" | awk 'NR > 2 && NF > 0 { print $1 }' | grep -q "^${PARAM_TEST_TOOL}$"; then
         if [ "${PARAM_FAIL_IF_MISSING_TOOL}" = true ]; then
             echo "ERROR: Test package ${PARAM_TEST_TOOL} was not found"
             exit 1
