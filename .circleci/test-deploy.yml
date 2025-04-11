@@ -285,7 +285,7 @@ workflows:
           filters: *filters
           executor:
             name: python/default
-            tag: 3.8.2
+            tag: 3.9.22
           name: job-test-pip-dist
           pkg-manager: pip-dist
           include-branch-in-cache-key: false
@@ -305,7 +305,7 @@ workflows:
           filters: *filters
           executor:
             name: python/default
-            tag: 3.11.4
+            tag: 3.11.12
           name: job-test-pip-dist-pyproject
           pkg-manager: pip-dist
           include-branch-in-cache-key: false
