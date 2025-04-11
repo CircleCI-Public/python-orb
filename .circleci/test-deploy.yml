@@ -200,14 +200,14 @@ workflows:
           name: job-test-uv
           pkg-manager: uv
           cache-version: uv-<< pipeline.parameters.cache-version >>
-          args: "| tee install_output.txt"
+          args: " -v | tee install_output.txt"
           include-branch-in-cache-key: false
           app-dir: ~/project/sample_uv
           post-steps:
             - run:
                 name: Verify cache was successful
                 working_directory: ~/project/sample_uv
-                command: 'cat install_output.txt | grep "No dependencies to install or update"'
+                command: 'cat install_output.txt | grep "Requirement already installed: pytest"'
       - python/test:
           filters: *filters
           name: job-test-pipenv
@@ -245,14 +245,14 @@ workflows:
           filters: *filters
           name: job-auto-test-uv
           cache-version: uv-auto-<< pipeline.parameters.cache-version >>
-          args: "| tee install_output.txt"
+          args: "-v | tee install_output.txt"
           include-branch-in-cache-key: false
           app-dir: ~/project/sample_uv
           post-steps:
             - run:
                 name: Verify cache was successful
                 working_directory: ~/project/sample_uv
-                command: 'cat install_output.txt | grep "No dependencies to install or update"'
+                command: 'cat install_output.txt | grep "Requirement already installed: pytest"'
       - python/test:
           filters: *filters
           name: job-auto-test-pipenv
