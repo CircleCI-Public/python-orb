@@ -207,7 +207,7 @@ workflows:
             - run:
                 name: Verify cache was successful
                 working_directory: ~/project/sample_uv
-                command: 'cat install_output.txt | grep "Requirement already installed: pytest"'
+                command: 'cat install_output.txt | grep "Requirement already cached: pytest"'
       - python/test:
           filters: *filters
           name: job-test-pipenv
@@ -252,7 +252,7 @@ workflows:
             - run:
                 name: Verify cache was successful
                 working_directory: ~/project/sample_uv
-                command: 'cat install_output.txt | grep "Requirement already installed: pytest"'
+                command: 'cat install_output.txt | grep "Requirement already cached: pytest"'
       - python/test:
           filters: *filters
           name: job-auto-test-pipenv
