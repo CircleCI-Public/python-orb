@@ -7,7 +7,7 @@ description: >
 parameters:
   pkg-manager:
     type: enum
-    enum: [auto, poetry, pipenv, pip, pip-dist]
+    enum: [auto, poetry, pipenv, pip, pip-dist, uv]
     default: auto
     description: Which package management tool to use, pipenv, pip or poetry with dependency file. Use `pip-dist` to install with project setup.py or PEP621 (pyproject.toml).
   path-args:
@@ -143,6 +143,16 @@ steps:
             working_directory: << parameters.app-dir >>
             command: |
               poetry install --no-ansi << parameters.args >>
+  - when:
+      condition:
+        equal: [uv, << parameters.pkg-manager >>]
+      steps:
+        - run:
+            name: "Install dependencies with uv using project pyproject.toml and uv.lock"
+            no_output_timeout: << parameters.no_output_timeout >>
+            working_directory: << parameters.app-dir >>
+            command: |
+              uv sync << parameters.args >>
   - when:
       condition:
         # if pip == pkgmanager and args != "" or pip-dependency-file != ""

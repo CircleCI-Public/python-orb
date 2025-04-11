@@ -1,0 +1,19 @@
+# Example toml for integration testing - this is not used by the orb in anyway
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+authors = [
+    {name="TEST", email="test@test.com"}
+]
+name = "test"
+description = "none"
+version = "0.0.1"
+requires-python = ">=3.9"
+dependencies = []
+
+[dependency-groups]
+dev = [
+  "pytest"
+]

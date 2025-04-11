@@ -135,10 +135,23 @@ jobs:
           app-dir: ~/project/sample_poetry
           cache-version: << pipeline.parameters.cache-version >>
           pkg-manager: poetry
+          args: --no-root
       - run:
           working_directory: ~/project/sample_poetry
           command: |-
             poetry run pytest
+  uv-test:
+    executor: python/default
+    steps:
+      - checkout
+      - python/install-packages:
+          app-dir: ~/project/sample_uv
+          cache-version: << pipeline.parameters.cache-version >>
+          pkg-manager: uv
+      - run:
+          working_directory: ~/project/sample_uv
+          command: |-
+            uv run pytest
 workflows:
   test-deploy:
     jobs:
@@ -154,6 +167,8 @@ workflows:
       - pipenv-test:
           filters: *filters
       - poetry-test:
+          filters: *filters
+      - uv-test:
           filters: *filters
       - dist-test:
           name: "dist-test-wheel"
@@ -172,7 +187,7 @@ workflows:
           name: job-test-poetry
           pkg-manager: poetry
           cache-version: poetry-<< pipeline.parameters.cache-version >>
-          args: "| tee install_output.txt"
+          args: "--no-root | tee install_output.txt"
           include-branch-in-cache-key: false
           app-dir: ~/project/sample_poetry
           post-steps:
@@ -180,6 +195,19 @@ workflows:
                 name: Verify cache was successful
                 working_directory: ~/project/sample_poetry
                 command: 'cat install_output.txt | grep "No dependencies to install or update"'
+      - python/test:
+          filters: *filters
+          name: job-test-uv
+          pkg-manager: uv
+          cache-version: uv-<< pipeline.parameters.cache-version >>
+          args: " -v 2> install_output.txt"
+          include-branch-in-cache-key: false
+          app-dir: ~/project/sample_uv
+          post-steps:
+            - run:
+                name: Verify cache was successful
+                working_directory: ~/project/sample_uv
+                command: 'cat install_output.txt | grep "already cached: pytest"'
       - python/test:
           filters: *filters
           name: job-test-pipenv
@@ -205,7 +233,7 @@ workflows:
           filters: *filters
           name: job-auto-test-poetry
           cache-version: poetry-auto-<< pipeline.parameters.cache-version >>
-          args: "| tee install_output.txt"
+          args: "--no-root | tee install_output.txt"
           include-branch-in-cache-key: false
           app-dir: ~/project/sample_poetry
           post-steps:
@@ -213,6 +241,18 @@ workflows:
                 name: Verify cache was successful
                 working_directory: ~/project/sample_poetry
                 command: 'cat install_output.txt | grep "No dependencies to install or update"'
+      - python/test:
+          filters: *filters
+          name: job-auto-test-uv
+          cache-version: uv-auto-<< pipeline.parameters.cache-version >>
+          args: "-v 2> install_output.txt"
+          include-branch-in-cache-key: false
+          app-dir: ~/project/sample_uv
+          post-steps:
+            - run:
+                name: Verify cache was successful
+                working_directory: ~/project/sample_uv
+                command: 'cat install_output.txt | grep "already cached: pytest"'
       - python/test:
           filters: *filters
           name: job-auto-test-pipenv
@@ -246,7 +286,7 @@ workflows:
           filters: *filters
           executor:
             name: python/default
-            tag: 3.8.2
+            tag: 3.9.22
           name: job-test-pip-dist
           pkg-manager: pip-dist
           include-branch-in-cache-key: false
@@ -266,7 +306,7 @@ workflows:
           filters: *filters
           executor:
             name: python/default
-            tag: 3.11.4
+            tag: 3.11.12
           name: job-test-pip-dist-pyproject
           pkg-manager: pip-dist
           include-branch-in-cache-key: false
@@ -286,13 +326,16 @@ workflows:
             - pip-install-test-args
             - pipenv-test
             - poetry-test
+            - uv-test
             - pip-install-rel-dir
             - job-test-poetry
+            - job-test-uv
             - job-test-pipenv
             - job-test-pip
             - job-test-pip-dist
             - job-test-pip-dist-pyproject
             - job-auto-test-poetry
+            - job-auto-test-uv
             - job-auto-test-pipenv
             - job-auto-test-pip
             - dist-test-wheel
