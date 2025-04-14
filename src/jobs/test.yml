@@ -84,6 +84,13 @@ parameters:
     default: []
     description: >
       Steps needed between restoring the cache and the install step.
+  cache-folder-prefix:
+    type: string
+    default: ""
+    description: |
+      A directory where you would like to save the cache files. Defaults to empty, saving the cache to project folder.
+      If you don't want the cache in your project directory, specify the absolute path of an existing directory here.
+      Add an / at the end of the directoy, for example: /tmp/
 
 executor: <<parameters.executor>>
 
@@ -101,6 +108,7 @@ steps:
       args: <<parameters.args>>
       pip-dependency-file: <<parameters.pip-dependency-file>>
       include-python-in-cache-key: <<parameters.include-python-in-cache-key>>
+      cache-folder-prefix: <<parameters.cache-folder-prefix>>
   - when:
       condition: <<parameters.ensure-test-tool>>
       steps:

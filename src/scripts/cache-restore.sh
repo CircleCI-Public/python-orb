@@ -27,8 +27,8 @@ restore_paths() {
         done
     fi
 }
-
-CACHE_DIR=".cci_pycache"
+PARAM_CACHE_FOLDER_PREFIX="$(echo "$PARAM_CACHE_FOLDER_PREFIX" | circleci env subst)"
+CACHE_DIR="$PARAM_CACHE_FOLDER_PREFIX.cci_pycache"
 
 if [ "${PARAM_VENV_CACHE}" = "1" ]; then
     restore_paths "${CACHE_DIR}/venv"
