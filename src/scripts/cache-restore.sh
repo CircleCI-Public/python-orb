@@ -1,3 +1,6 @@
+eval "$SCRIPT_UTILS"
+detect_os
+
 recurse() {
     if [ ! -d "$1" ] || [ ! -e "$2" ]; then
         mv -u "$1" "$2" || exit
@@ -28,7 +31,19 @@ restore_paths() {
     fi
 }
 PARAM_CACHE_FOLDER_PREFIX="$(echo "$PARAM_CACHE_FOLDER_PREFIX" | circleci env subst)"
-CACHE_DIR="$PARAM_CACHE_FOLDER_PREFIX.cci_pycache"
+
+if [[ "$PARAM_CACHE_FOLDER_PREFIX" == /* ]]; then
+    if [[ "$PLATFORM" == "windows" ]]; then
+        CACHE_PREFIX="/c$PARAM_CACHE_FOLDER_PREFIX"
+    else
+        CACHE_PREFIX="$PARAM_CACHE_FOLDER_PREFIX"
+    fi
+
+else
+    CACHE_PREFIX="${PWD%/"$PARAM_APP_SRC_DIR"}/$PARAM_CACHE_FOLDER_PREFIX"
+fi
+
+CACHE_DIR="$CACHE_PREFIX.cci_pycache"
 
 if [ "${PARAM_VENV_CACHE}" = "1" ]; then
     restore_paths "${CACHE_DIR}/venv"

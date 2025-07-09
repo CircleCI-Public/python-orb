@@ -13,7 +13,7 @@ parameters:
 executors:
   macos:
     macos:
-      xcode: 16.1
+      xcode: 16.3
   windows:
     machine:
       image: windows-server-2022-gui:current
@@ -328,8 +328,8 @@ workflows:
           matrix:
             alias: test-cache-folders
             parameters:
-              executor: [ubuntu, arm]
-              cache-folder-prefix: ["/tmp/cache/"]
+              executor: [ubuntu, arm, macos]
+              cache-folder-prefix: ["/tmp/cache/", ""]
       - python/test:
           filters: *filters
           # pre-steps:
@@ -343,7 +343,7 @@ workflows:
           matrix:
             alias: test-cache-folders-windows
             parameters:
-              cache-folder-prefix: ['']
+              cache-folder-prefix: ['', '/tmp/cache']
       - orb-tools/pack:
           filters: *filters
       - orb-tools/publish:

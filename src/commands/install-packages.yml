@@ -100,11 +100,20 @@ steps:
               PARAM_VENV_PATH: << parameters.venv-path >>
               PARAM_CACHE_FOLDER_PREFIX: <<parameters.cache-folder-prefix>>
               PARAM_APP_DIR: <<parameters.app-dir>>
+              SCRIPT_UTILS: "<<include(scripts/utils.sh)>>"
             command: <<include(scripts/cache-link-lockfile.sh)>>
             working_directory: << parameters.app-dir >>
         - run:
             name: Save python version
-            command: python --version | cut -d ' ' -f2 > "<<parameters.cache-folder-prefix>>.temp-python-version" && cat "<<parameters.cache-folder-prefix>>.temp-python-version"
+            environment:
+              PARAM_CACHE_FOLDER_PREFIX: <<parameters.cache-folder-prefix>>
+              PARAM_APP_DIR: <<parameters.app-dir>>
+              SCRIPT_UTILS: "<<include(scripts/utils.sh)>>"
+            working_directory: << parameters.app-dir >>
+            command: <<include(scripts/save-python-version.sh)>>
+        # - run:
+        #     name: Save python version
+        #     command: python --version | cut -d ' ' -f2 > "<<parameters.cache-folder-prefix>>.temp-python-version" && cat "<<parameters.cache-folder-prefix>>.temp-python-version"
         - restore_cache:
             keys:
               - <<parameters.cache-version>>-cci_pycache-<<#parameters.include-branch-in-cache-key>>{{ .Branch }}-<</parameters.include-branch-in-cache-key>><<#parameters.include-python-in-cache-key>>{{ checksum "<<parameters.cache-folder-prefix>>.temp-python-version" }}-<</parameters.include-python-in-cache-key>>{{ checksum "<<parameters.cache-folder-prefix>>.cci_pycache/lockfile" }}
@@ -116,6 +125,8 @@ steps:
               PARAM_PYPI_CACHE: << parameters.pypi-cache >>
               PARAM_VENV_CACHE: << parameters.venv-cache >>
               PARAM_CACHE_FOLDER_PREFIX: <<parameters.cache-folder-prefix>>
+              PARAM_APP_SRC_DIR: <<parameters.app-dir>>
+              SCRIPT_UTILS: "<<include(scripts/utils.sh)>>"
             command: <<include(scripts/cache-restore.sh)>>
   # run install steps
   - steps: <<parameters.pre-install-steps>>
@@ -196,6 +207,8 @@ steps:
               PARAM_PYPI_CACHE: << parameters.pypi-cache >>
               PARAM_VENV_PATH: << parameters.venv-path >>
               PARAM_CACHE_FOLDER_PREFIX: <<parameters.cache-folder-prefix>>
+              PARAM_APP_SRC_DIR: <<parameters.app-dir>>
+              SCRIPT_UTILS: "<<include(scripts/utils.sh)>>"
             command: <<include(scripts/cache-save.sh)>>
         - save_cache:
             key: <<parameters.cache-version>>-cci_pycache-<<#parameters.include-branch-in-cache-key>>{{ .Branch }}-<</parameters.include-branch-in-cache-key>><<#parameters.include-python-in-cache-key>>{{ checksum "<<parameters.cache-folder-prefix>>.temp-python-version" }}-<</parameters.include-python-in-cache-key>>{{ checksum "<<parameters.cache-folder-prefix>>.cci_pycache/lockfile" }}
