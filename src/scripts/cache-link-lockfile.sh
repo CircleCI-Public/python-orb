@@ -14,7 +14,7 @@ else
     CACHE_PREFIX="${PWD%/"$PARAM_APP_SRC_DIR"}/$PARAM_CACHE_FOLDER_PREFIX"
 fi
 
-LOCKFILE_PATH="${CACHE_PREFIX}lockfile"
+LOCKFILE_PATH="${CACHE_PREFIX}.cci_pycache/lockfile"
 
 mkdir -p "${CACHE_PREFIX}"
 
