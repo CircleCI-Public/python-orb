@@ -2,7 +2,7 @@ eval "$SCRIPT_UTILS"
 # shellcheck source=detect-env.sh
 source "$AUTO_DETECT_ENV_SCRIPT"
 PARAM_CACHE_FOLDER_PREFIX="$(echo "$PARAM_CACHE_FOLDER_PREFIX" | circleci env subst)"
-
+PARAM_APP_SRC_DIR=$(realpath "$PARAM_APP_SRC_DIR")
 if [[ "$PARAM_CACHE_FOLDER_PREFIX" == /* ]]; then
     if [[ "$PLATFORM" == "windows" ]]; then
         CACHE_PREFIX="/c$PARAM_CACHE_FOLDER_PREFIX"
@@ -11,6 +11,7 @@ if [[ "$PARAM_CACHE_FOLDER_PREFIX" == /* ]]; then
     fi
 
 else
+    # /home/circleci/project/sample
     CACHE_PREFIX="${PWD%/"$PARAM_APP_SRC_DIR"}/$PARAM_CACHE_FOLDER_PREFIX"
 fi
 

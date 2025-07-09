@@ -2,7 +2,7 @@
 eval "$SCRIPT_UTILS"
 detect_os
 source "$AUTO_DETECT_ENV_SCRIPT"
-set -x 
+
 case ${DETECT_PKG_MNGR:-${PARAM_PKG_MNGR}} in
     pip | pip-dist)
         LOCK_FILE="${PARAM_DEPENDENCY_FILE:-requirements.txt}"
@@ -32,7 +32,7 @@ if [ -n "${PARAM_VENV_PATH}" ]; then
     VENV_PATHS="${PARAM_VENV_PATH}"
 fi
 PARAM_CACHE_FOLDER_PREFIX="$(echo "$PARAM_CACHE_FOLDER_PREFIX" | circleci env subst)"
-
+PARAM_APP_SRC_DIR=$(realpath "$PARAM_APP_SRC_DIR")
 if [[ "$PARAM_CACHE_FOLDER_PREFIX" == /* ]]; then
     if [[ "$PLATFORM" == "windows" ]]; then
         CACHE_PREFIX="/c$PARAM_CACHE_FOLDER_PREFIX"
@@ -87,4 +87,3 @@ if [ -e "${LOCK_FILE}" ]; then
     echo "INFO: Copying ${FULL_LOCK_FILE} to ${LOCKFILE_PATH}"
     cp "${FULL_LOCK_FILE}" "${LOCKFILE_PATH}"
 fi
-set +x

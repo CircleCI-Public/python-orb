@@ -323,17 +323,17 @@ workflows:
           app-dir: ~/project/sample_pip
           cache-folder-prefix: /tmp/cache/
           pre-steps:
-            - run: mkdir -p /tmp/cache
+            - run: mkdir -p .tempo_cache
           pkg-manager: pip-dist
           matrix:
             alias: test-cache-folders
             parameters:
               executor: [ubuntu, arm, macos]
-              cache-folder-prefix: ["/tmp/cache/", ""]
+              cache-folder-prefix: ["/tmp/cache/", "", ".tempo_cache/"]
       - python/test:
           filters: *filters
-          # pre-steps:
-          #   - run: mkdir '.tempo_cache'
+          pre-steps:
+            - run: mkdir '.tempo_cache'
           name: "Test-windows-<<matrix.cache-folder-prefix>>"
           include-branch-in-cache-key: false
           cache-version: << pipeline.parameters.cache-version >>
@@ -343,7 +343,7 @@ workflows:
           matrix:
             alias: test-cache-folders-windows
             parameters:
-              cache-folder-prefix: ['', '/tmp/cache']
+              cache-folder-prefix: ['', '/tmp/cache/', ".tempo_cache/"]
       - orb-tools/pack:
           filters: *filters
       - orb-tools/publish:
