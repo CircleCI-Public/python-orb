@@ -16,7 +16,7 @@ fi
 
 LOCKFILE_PATH="${CACHE_PREFIX}/lockfile"
 
-mkdir -p "${CACHE_DIR}"
+mkdir -p "${CACHE_PREFIX}"
 
 if [ ! -f "${LOCKFILE_PATH}" ]; then
     case ${DETECT_PKG_MNGR:-${PARAM_PKG_MNGR}} in
