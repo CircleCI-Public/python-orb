@@ -17,5 +17,5 @@ fi
 
 CACHE_DIR="$CACHE_PREFIX.temp-python-version"
 mkdir -p "${CACHE_PREFIX}"
-
+echo "INFO: Copying python version to ${CACHE_DIR}"
 python --version | cut -d ' ' -f2 > "$CACHE_DIR" && cat "$CACHE_DIR"
