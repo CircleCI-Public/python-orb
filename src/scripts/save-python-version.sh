@@ -16,6 +16,6 @@ else
 fi
 
 CACHE_DIR="$CACHE_PREFIX.temp-python-version"
-
+mkdir -p "${CACHE_PREFIX}"
 
 python --version | cut -d ' ' -f2 > "$CACHE_DIR" && cat "$CACHE_DIR"
