@@ -32,7 +32,9 @@ if [ -n "${PARAM_VENV_PATH}" ]; then
     VENV_PATHS="${PARAM_VENV_PATH}"
 fi
 PARAM_CACHE_FOLDER_PREFIX="$(echo "$PARAM_CACHE_FOLDER_PREFIX" | circleci env subst)"
-PARAM_APP_SRC_DIR=$(realpath "$PARAM_APP_SRC_DIR")
+if [ -n "$PARAM_APP_SRC_DIR" ]; then
+    PARAM_APP_SRC_DIR=$(realpath "$PARAM_APP_SRC_DIR")
+fi
 if [[ "$PARAM_CACHE_FOLDER_PREFIX" == /* ]]; then
     if [[ "$PLATFORM" == "windows" ]]; then
         CACHE_PREFIX="/c$PARAM_CACHE_FOLDER_PREFIX"
