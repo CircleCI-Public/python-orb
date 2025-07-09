@@ -4,13 +4,13 @@ detect_os() {
 
   case "$detected_platform" in
     linux*)
-      PLATFORM=linux
+      export PLATFORM=linux
       ;;
     darwin*)
-      PLATFORM=macos
+      export PLATFORM=macos
       ;;
     msys*|cygwin*)
-      PLATFORM=windows
+      export PLATFORM=windows
       ;;
     *)
       printf '%s\n' "Unsupported OS: \"$detected_platform\"."
