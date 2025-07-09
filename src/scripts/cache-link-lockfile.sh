@@ -16,7 +16,7 @@ fi
 
 LOCKFILE_PATH="${CACHE_PREFIX}.cci_pycache/lockfile"
 
-mkdir -p "${CACHE_PREFIX}"
+mkdir -p "${CACHE_PREFIX}.cci_pycache/"
 
 if [ ! -f "${LOCKFILE_PATH}" ]; then
     case ${DETECT_PKG_MNGR:-${PARAM_PKG_MNGR}} in
