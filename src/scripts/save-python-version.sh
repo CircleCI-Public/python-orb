@@ -1,9 +1,11 @@
 eval "$SCRIPT_UTILS"
 detect_os
-PARAM_CACHE_FOLDER_PREFIX="$(echo "$PARAM_CACHE_FOLDER_PREFIX" | circleci env subst)"
+PARAM_CACHE_FOLDER_PREFIX="$(echo "$PARAM_CACHE_FOLDER_PREFIX"
+    echo "$PARAM_APP_SRC_DIR"
+    echo "$PWD" | circleci env subst)"
 
 set -x
-if [[ "$PARAM_CACHE_FOLDER_PREFIX" == ^/* ]]; then
+if [[ "$PARAM_CACHE_FOLDER_PREFIX" == /* ]]; then
     if [[ "$PLATFORM" == "windows" ]]; then
         CACHE_PREFIX="/c$PARAM_CACHE_FOLDER_PREFIX"
     else
@@ -11,7 +13,11 @@ if [[ "$PARAM_CACHE_FOLDER_PREFIX" == ^/* ]]; then
     fi
 
 else
+    echo "$PARAM_CACHE_FOLDER_PREFIX"
+    echo "$PARAM_APP_SRC_DIR"
+    echo "$PWD"
     CACHE_PREFIX="${PWD%/"$PARAM_APP_SRC_DIR"}/$PARAM_CACHE_FOLDER_PREFIX"
+    echo "$CACHE_PREFIX"
 fi
 
 CACHE_DIR="$CACHE_PREFIX/.temp-python-version"
