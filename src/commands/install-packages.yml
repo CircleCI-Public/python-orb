@@ -70,11 +70,10 @@ parameters:
       If true, this cache bucket will checksum the pyenv python version with the cache-key.
   cache-folder-prefix:
     type: string
-    default: "/tmp/cache/"
+    default: "/tmp/cache"
     description: |
       A directory where you would like to save the cache files. Defaults to empty, saving the cache to project folder.
       If you don't want the cache in your project directory, specify the absolute path of an existing directory here.
-      Add an / at the end of the directoy, for example: /tmp/
 
 steps:
   - run:
@@ -113,8 +112,8 @@ steps:
             command: <<include(scripts/save-python-version.sh)>>
         - restore_cache:
             keys:
-              - <<parameters.cache-version>>-cci_pycache-<<#parameters.include-branch-in-cache-key>>{{ .Branch }}-<</parameters.include-branch-in-cache-key>><<#parameters.include-python-in-cache-key>>{{ checksum "<<parameters.cache-folder-prefix>>.temp-python-version" }}-<</parameters.include-python-in-cache-key>>{{ checksum "<<parameters.cache-folder-prefix>>.cci_pycache/lockfile" }}
-              - <<parameters.cache-version>>-cci_pycache-<<#parameters.include-branch-in-cache-key>>{{ .Branch }}-<</parameters.include-branch-in-cache-key>><<#parameters.include-python-in-cache-key>>{{ checksum "<<parameters.cache-folder-prefix>>.temp-python-version" }}-<</parameters.include-python-in-cache-key>>
+              - <<parameters.cache-version>>-cci_pycache-<<#parameters.include-branch-in-cache-key>>{{ .Branch }}-<</parameters.include-branch-in-cache-key>><<#parameters.include-python-in-cache-key>>{{ checksum "<<parameters.cache-folder-prefix>>/.temp-python-version" }}-<</parameters.include-python-in-cache-key>>{{ checksum "<<parameters.cache-folder-prefix>>/.cci_pycache/lockfile" }}
+              - <<parameters.cache-version>>-cci_pycache-<<#parameters.include-branch-in-cache-key>>{{ .Branch }}-<</parameters.include-branch-in-cache-key>><<#parameters.include-python-in-cache-key>>{{ checksum "<<parameters.cache-folder-prefix>>/.temp-python-version" }}-<</parameters.include-python-in-cache-key>>
         - run:
             name: Move restored cache
             working_directory: << parameters.app-dir >>
@@ -208,6 +207,6 @@ steps:
               SCRIPT_UTILS: "<<include(scripts/utils.sh)>>"
             command: <<include(scripts/cache-save.sh)>>
         - save_cache:
-            key: <<parameters.cache-version>>-cci_pycache-<<#parameters.include-branch-in-cache-key>>{{ .Branch }}-<</parameters.include-branch-in-cache-key>><<#parameters.include-python-in-cache-key>>{{ checksum "<<parameters.cache-folder-prefix>>.temp-python-version" }}-<</parameters.include-python-in-cache-key>>{{ checksum "<<parameters.cache-folder-prefix>>.cci_pycache/lockfile" }}
+            key: <<parameters.cache-version>>-cci_pycache-<<#parameters.include-branch-in-cache-key>>{{ .Branch }}-<</parameters.include-branch-in-cache-key>><<#parameters.include-python-in-cache-key>>{{ checksum "<<parameters.cache-folder-prefix>>/.temp-python-version" }}-<</parameters.include-python-in-cache-key>>{{ checksum "<<parameters.cache-folder-prefix>>/.cci_pycache/lockfile" }}
             paths:
               - <<parameters.cache-folder-prefix>>.cci_pycache

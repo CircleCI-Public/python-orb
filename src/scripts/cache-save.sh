@@ -33,7 +33,7 @@ if [ -n "${PARAM_VENV_PATH}" ]; then
 fi
 PARAM_CACHE_FOLDER_PREFIX="$(echo "$PARAM_CACHE_FOLDER_PREFIX" | circleci env subst)"
 
-if [[ "$PARAM_CACHE_FOLDER_PREFIX" == /* ]]; then
+if [[ "$PARAM_CACHE_FOLDER_PREFIX" == ^/* ]]; then
     if [[ "$PLATFORM" == "windows" ]]; then
         CACHE_PREFIX="/c$PARAM_CACHE_FOLDER_PREFIX"
     else
@@ -44,7 +44,7 @@ else
     CACHE_PREFIX="${PWD%/"$PARAM_APP_SRC_DIR"}/$PARAM_CACHE_FOLDER_PREFIX"
 fi
 
-CACHE_DIR="$CACHE_PREFIX.cci_pycache"
+CACHE_DIR="$CACHE_PREFIX/.cci_pycache"
 mkdir -p "${CACHE_DIR}"
 
 link_paths() {
