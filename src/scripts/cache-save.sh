@@ -48,7 +48,7 @@ else
     echo "$CACHE_PREFIX"
 fi
 
-CACHE_DIR="$CACHE_PREFIX/.cci_pycache"
+CACHE_DIR="${CACHE_PREFIX%/}/.cci_pycache"
 mkdir -p "${CACHE_DIR}"
 
 link_paths() {
