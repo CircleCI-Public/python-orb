@@ -219,4 +219,4 @@ steps:
         - save_cache:
             key: <<parameters.cache-version>>-cci_pycache-<<#parameters.include-branch-in-cache-key>>{{ .Branch }}-<</parameters.include-branch-in-cache-key>><<#parameters.include-python-in-cache-key>>{{ checksum "<<parameters.cache-folder-prefix>>/.temp-python-version" }}-<</parameters.include-python-in-cache-key>>{{ checksum "<<parameters.cache-folder-prefix>>/.cci_pycache/lockfile" }}
             paths:
-              - <<parameters.cache-folder-prefix>>.cci_pycache
+              - <<parameters.cache-folder-prefix>>/.cci_pycache
