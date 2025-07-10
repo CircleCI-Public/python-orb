@@ -41,7 +41,7 @@ jobs:
           pkg-manager: pip
           cache-version: << pipeline.parameters.cache-version >>
           app-dir: sample_pip
-          cache-folder-prefix: /tmp/cachetmp/cache/
+          cache-folder-prefix: /tmp/cachetmp/cache
       - run:
           name: "Test"
           working_directory: sample_pip
@@ -76,7 +76,7 @@ jobs:
       - python/install-packages:
           pkg-manager: pip
           app-dir: sample_pip
-          cache-folder-prefix: /tmp/cache/
+          cache-folder-prefix: /tmp/cache
           cache-version: << pipeline.parameters.cache-version >>
           args: pytest
           pip-dependency-file: ""
@@ -135,7 +135,7 @@ jobs:
           name: Overwrite the lockfile with the one that should load the cache.
       - python/install-packages:
           app-dir: sample_pipenv
-          cache-folder-prefix: /tmp/cache/
+          cache-folder-prefix: /tmp/cache
           pkg-manager: "pipenv"
           pypi-cache: false
           venv-cache: false
@@ -191,7 +191,7 @@ workflows:
           args: "| tee install_output.txt"
           include-branch-in-cache-key: false
           app-dir: sample_poetry
-          cache-folder-prefix: /tmp/cache/
+          cache-folder-prefix: /tmp/cache
           pre-steps:
             - run: mkdir -p /tmp/cache
           post-steps:
@@ -206,7 +206,7 @@ workflows:
           include-branch-in-cache-key: false
           cache-version: pipenv-<< pipeline.parameters.cache-version >>
           app-dir: sample_pipenv
-          cache-folder-prefix: /tmp/cache/
+          cache-folder-prefix: /tmp/cache
           pre-steps:
             - run: mkdir -p /tmp/cache
       - python/test:
@@ -217,7 +217,7 @@ workflows:
           cache-version: pip-<< pipeline.parameters.cache-version >>
           test-tool: unittest
           app-dir: sample_pip
-          cache-folder-prefix: /tmp/cache/
+          cache-folder-prefix: /tmp/cache
           pre-steps:
             - run: mkdir -p /tmp/cache
           args: "| tee install_output.txt"
@@ -235,7 +235,7 @@ workflows:
           app-dir: sample_poetry
           pre-steps:
             - run: mkdir -p /tmp/cache
-          cache-folder-prefix: /tmp/cache/
+          cache-folder-prefix: /tmp/cache
           post-steps:
             - run:
                 name: Verify cache was successful
@@ -246,7 +246,7 @@ workflows:
           name: job-auto-test-pipenv
           cache-version: pipenv-auto-<< pipeline.parameters.cache-version >>
           app-dir: sample_pipenv
-          cache-folder-prefix: /tmp/cache/
+          cache-folder-prefix: /tmp/cache
           pre-steps:
             - run: mkdir -p /tmp/cache
           include-branch-in-cache-key: false
@@ -259,7 +259,7 @@ workflows:
           args: "| tee install_output.txt"
           cache-version: pip-auto-<< pipeline.parameters.cache-version >>
           app-dir: sample_pip
-          cache-folder-prefix: /tmp/cache/
+          cache-folder-prefix: /tmp/cache
           pre-steps:
             - run: mkdir -p /tmp/cache
           post-steps:
@@ -276,7 +276,7 @@ workflows:
           test-tool: unittest
           cache-version: pip-noreqs-<< pipeline.parameters.cache-version >>
           app-dir: sample_pip
-          cache-folder-prefix: /tmp/cache/
+          cache-folder-prefix: /tmp/cache
           pre-steps:
             - run: mkdir -p /tmp/cache
       - python/test:
@@ -289,7 +289,7 @@ workflows:
           include-branch-in-cache-key: false
           cache-version: pip-dist-<< pipeline.parameters.cache-version >>
           app-dir: sample_pip
-          cache-folder-prefix: /tmp/cache/
+          cache-folder-prefix: /tmp/cache
           pre-steps:
             - run: mkdir -p /tmp/cache
           # pip-dependency-file: setup.py
@@ -312,7 +312,7 @@ workflows:
           include-branch-in-cache-key: false
           cache-version: pip-dist-pyproject-<< pipeline.parameters.cache-version >>
           app-dir: sample_pip_pyproject
-          cache-folder-prefix: /tmp/cache/
+          cache-folder-prefix: /tmp/cache
           pre-steps:
             - run: mkdir -p /tmp/cache
       - python/test:
@@ -321,13 +321,22 @@ workflows:
           include-branch-in-cache-key: false
           cache-version: << pipeline.parameters.cache-version >>
           app-dir: sample_pip
-          cache-folder-prefix: /tmp/cache/
+          cache-folder-prefix: /tmp/cache
           pkg-manager: pip-dist
           matrix:
             alias: test-cache-folders
             parameters:
               executor: [ubuntu, arm, macos]
-              cache-folder-prefix: ["/tmp/cache/", "", ".tempo_cache/"]
+              cache-folder-prefix: ["/tmp/cache", "", ".tempo_cache"]
+          post-steps:
+            - run:
+                name: Attempt to set the other python version - this should fail, but if the cache is broken, this will succeed.
+                command: |
+                  ! pyenv local 3.8.6
+            - run:
+                name: If another python version is loaded - its broken - this verifies that it's broken
+                when: on_fail
+                command: python --version
       - python/test:
           filters: *filters
           name: "Test-windows-<<matrix.cache-folder-prefix>>"
@@ -339,7 +348,16 @@ workflows:
           matrix:
             alias: test-cache-folders-windows
             parameters:
-              cache-folder-prefix: ['', '/tmp/cache/', ".tempo_cache/"]
+              cache-folder-prefix: ['', '/tmp/cache', ".tempo_cache"]
+          post-steps:
+            - run:
+                name: Attempt to set the other python version - this should fail, but if the cache is broken, this will succeed.
+                command: |
+                  ! pyenv local 3.8.6
+            - run:
+                name: If another python version is loaded - its broken - this verifies that it's broken
+                when: on_fail
+                command: python --version
       - orb-tools/pack:
           filters: *filters
       - orb-tools/publish:
