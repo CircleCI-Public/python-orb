@@ -30,9 +30,7 @@ restore_paths() {
         done
     fi
 }
-PARAM_CACHE_FOLDER_PREFIX="$(echo "$PARAM_CACHE_FOLDER_PREFIX"
-    echo "$PARAM_APP_SRC_DIR"
-    echo "$PWD" | circleci env subst)"
+PARAM_CACHE_FOLDER_PREFIX="$(echo "$PARAM_CACHE_FOLDER_PREFIX" | circleci env subst)"
 
 if [[ "$PARAM_CACHE_FOLDER_PREFIX" == /* ]]; then
     if [[ "$PLATFORM" == "windows" ]]; then

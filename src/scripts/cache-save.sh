@@ -31,9 +31,7 @@ esac
 if [ -n "${PARAM_VENV_PATH}" ]; then
     VENV_PATHS="${PARAM_VENV_PATH}"
 fi
-PARAM_CACHE_FOLDER_PREFIX="$(echo "$PARAM_CACHE_FOLDER_PREFIX"
-    echo "$PARAM_APP_SRC_DIR"
-    echo "$PWD" | circleci env subst)"
+PARAM_CACHE_FOLDER_PREFIX="$(echo "$PARAM_CACHE_FOLDER_PREFIX" | circleci env subst)"
 
 if [[ "$PARAM_CACHE_FOLDER_PREFIX" == /* ]]; then
     if [[ "$PLATFORM" == "windows" ]]; then

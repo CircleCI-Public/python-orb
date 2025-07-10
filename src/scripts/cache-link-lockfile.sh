@@ -1,9 +1,7 @@
 eval "$SCRIPT_UTILS"
 # shellcheck source=detect-env.sh
 source "$AUTO_DETECT_ENV_SCRIPT"
-PARAM_CACHE_FOLDER_PREFIX="$(echo "$PARAM_CACHE_FOLDER_PREFIX"
-    echo "$PARAM_APP_SRC_DIR"
-    echo "$PWD" | circleci env subst)"
+PARAM_CACHE_FOLDER_PREFIX="$(echo "$PARAM_CACHE_FOLDER_PREFIX" | circleci env subst)"
 detect_os
 set -x
 if [[ "$PARAM_CACHE_FOLDER_PREFIX" == /* ]]; then

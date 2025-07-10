@@ -1,8 +1,6 @@
 eval "$SCRIPT_UTILS"
 detect_os
-PARAM_CACHE_FOLDER_PREFIX="$(echo "$PARAM_CACHE_FOLDER_PREFIX"
-    echo "$PARAM_APP_SRC_DIR"
-    echo "$PWD" | circleci env subst)"
+PARAM_CACHE_FOLDER_PREFIX="$(echo "$PARAM_CACHE_FOLDER_PREFIX" | circleci env subst)"
 
 set -x
 if [[ "$PARAM_CACHE_FOLDER_PREFIX" == /* ]]; then
