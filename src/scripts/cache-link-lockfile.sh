@@ -1,10 +1,25 @@
+eval "$SCRIPT_UTILS"
 # shellcheck source=detect-env.sh
 source "$AUTO_DETECT_ENV_SCRIPT"
+PARAM_CACHE_FOLDER_PREFIX="$(echo "$PARAM_CACHE_FOLDER_PREFIX" | circleci env subst)"
+detect_os
+if [[ "$PARAM_CACHE_FOLDER_PREFIX" == /* ]]; then
+    if [[ "$PLATFORM" == "windows" ]]; then
+        CACHE_PREFIX="/c$PARAM_CACHE_FOLDER_PREFIX"
+    else
+        CACHE_PREFIX="$PARAM_CACHE_FOLDER_PREFIX"
+    fi
 
-CACHE_DIR=".cci_pycache"
-LOCKFILE_PATH="${CACHE_DIR}/lockfile"
+else
+    echo "$PARAM_CACHE_FOLDER_PREFIX"
+    echo "$PARAM_APP_DIR"
+    echo "$PWD"
+    CACHE_PREFIX="${PWD%/"$PARAM_APP_DIR"}/$PARAM_CACHE_FOLDER_PREFIX"
+    echo "$CACHE_PREFIX"
+fi
 
-mkdir -p "${CACHE_DIR}"
+    LOCKFILE_PATH="${CACHE_PREFIX%/}/.cci_pycache/lockfile"
+mkdir -p "${CACHE_PREFIX}/.cci_pycache/"
 
 if [ ! -f "${LOCKFILE_PATH}" ]; then
     case ${DETECT_PKG_MNGR:-${PARAM_PKG_MNGR}} in
