@@ -1,9 +1,7 @@
 eval "$SCRIPT_UTILS"
 detect_os
 PARAM_CACHE_FOLDER_PREFIX="$(echo "$PARAM_CACHE_FOLDER_PREFIX" | circleci env subst)"
-if [[ "$PARAM_APP_SRC_DIR" == ~* ]]; then
-    PARAM_APP_SRC_DIR="$HOME${PARAM_APP_SRC_DIR:1}"
-fi
+
 if [[ "$PARAM_CACHE_FOLDER_PREFIX" == /* ]]; then
     if [[ "$PLATFORM" == "windows" ]]; then
         CACHE_PREFIX="/c$PARAM_CACHE_FOLDER_PREFIX"
