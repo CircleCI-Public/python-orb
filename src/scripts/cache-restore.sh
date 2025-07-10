@@ -40,7 +40,11 @@ if [[ "$PARAM_CACHE_FOLDER_PREFIX" == ^/* ]]; then
     fi
 
 else
+    echo "$PARAM_CACHE_FOLDER_PREFIX"
+    echo "$PARAM_APP_SRC_DIR"
+    echo "$PWD"
     CACHE_PREFIX="${PWD%/"$PARAM_APP_SRC_DIR"}/$PARAM_CACHE_FOLDER_PREFIX"
+    echo "$CACHE_PREFIX"
 fi
 
 CACHE_DIR="$CACHE_PREFIX/.cci_pycache"

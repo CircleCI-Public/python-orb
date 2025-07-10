@@ -4,7 +4,7 @@ source "$AUTO_DETECT_ENV_SCRIPT"
 PARAM_CACHE_FOLDER_PREFIX="$(echo "$PARAM_CACHE_FOLDER_PREFIX" | circleci env subst)"
 detect_os
 set -x
-if [[ "$PARAM_CACHE_FOLDER_PREFIX" == ^/* ]]; then
+if [[ "$PARAM_CACHE_FOLDER_PREFIX" == /* ]]; then
     if [[ "$PLATFORM" == "windows" ]]; then
         CACHE_PREFIX="/c$PARAM_CACHE_FOLDER_PREFIX"
     else
@@ -12,8 +12,11 @@ if [[ "$PARAM_CACHE_FOLDER_PREFIX" == ^/* ]]; then
     fi
 
 else
-    # /home/circleci/project/sample
+    echo "$PARAM_CACHE_FOLDER_PREFIX"
+    echo "$PARAM_APP_SRC_DIR"
+    echo "$PWD"
     CACHE_PREFIX="${PWD%/"$PARAM_APP_SRC_DIR"}/$PARAM_CACHE_FOLDER_PREFIX"
+    echo "$CACHE_PREFIX"
 fi
 
 LOCKFILE_PATH="${CACHE_PREFIX}/.cci_pycache/lockfile"
