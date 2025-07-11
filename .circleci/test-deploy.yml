@@ -8,12 +8,24 @@ filters: &filters
 parameters:
   cache-version:
     type: string
-    default: v5
+    default: v7
 
 executors:
   macos:
     macos:
-      xcode: 16.1
+      xcode: 16.3
+  windows:
+    machine:
+      image: windows-server-2022-gui:current
+    resource_class: windows.medium
+  ubuntu:
+    machine:
+      image: ubuntu-2204:2024.11.1
+    resource_class: medium
+  arm:
+    machine:
+      image: ubuntu-2204:2024.11.1
+    resource_class: arm.medium
 
 jobs:
   pip-install-test:
@@ -24,13 +36,15 @@ jobs:
     executor: << parameters.executor >>
     steps:
       - checkout
+      - run: sudo mkdir -p /tmp/cache
       - python/install-packages:
           pkg-manager: pip
           cache-version: << pipeline.parameters.cache-version >>
-          app-dir: ~/project/sample_pip
+          app-dir: sample_pip
+          cache-folder-prefix: /tmp/cachetmp/cache
       - run:
           name: "Test"
-          working_directory: ~/project/sample_pip
+          working_directory: sample_pip
           command: |
             pytest
   pip-install-rel-dir:
@@ -43,7 +57,7 @@ jobs:
           app-dir: "./sample_pip"
       - run:
           name: "Test"
-          working_directory: ~/project/sample_pip
+          working_directory: sample_pip
           command: |
             pytest
   pip-install-test-no-packages:
@@ -52,7 +66,7 @@ jobs:
       - checkout
       - run:
           name: "Test"
-          working_directory: ~/project/sample_pip
+          working_directory: sample_pip
           command: |
             pytest
   pip-install-test-args:
@@ -61,13 +75,14 @@ jobs:
       - checkout
       - python/install-packages:
           pkg-manager: pip
-          app-dir: ~/project/sample_pip
+          app-dir: sample_pip
+          cache-folder-prefix: /tmp/cache
           cache-version: << pipeline.parameters.cache-version >>
           args: pytest
           pip-dependency-file: ""
       - run:
           name: "Test"
-          working_directory: ~/project/sample_pip
+          working_directory: sample_pip
           command: |
             pytest
   dist-test:
@@ -82,7 +97,7 @@ jobs:
       - checkout
       - python/dist:
           build-tool: << parameters.build-tool >>
-          app-dir: ~/project/sample_pip
+          app-dir: sample_pip
   dist-test-build-opts:
     executor: python/default
     steps:
@@ -93,17 +108,17 @@ jobs:
           sdist-separate: true
           no-isolation: true
           skip-dependency-check: true
-          app-dir: ~/project/sample_pip
+          app-dir: sample_pip
   pipenv-test:
     executor: python/default
     steps:
       - checkout
       - python/install-packages:
-          app-dir: ~/project/sample_pipenv
+          app-dir: sample_pipenv
           pkg-manager: "pipenv"
           cache-version: << pipeline.parameters.cache-version >>
       - run:
-          working_directory: ~/project/sample_pipenv
+          working_directory: sample_pipenv
           command: |
             cp Pipfile.lock Pipfile.lock.tmp
             cp Pipfile Pipfile.tmp
@@ -111,33 +126,34 @@ jobs:
           name: Ensure pipenv is working and copy lock file for cache testing
       - run:
           command: pipenv install pytest==4.6.1
-          working_directory: ~/project/sample_pipenv
+          working_directory: sample_pipenv
       - run:
-          working_directory: ~/project/sample_pipenv
+          working_directory: sample_pipenv
           command: |
             cp Pipfile.lock.tmp Pipfile.lock
             cp Pipfile.tmp Pipfile
           name: Overwrite the lockfile with the one that should load the cache.
       - python/install-packages:
-          app-dir: ~/project/sample_pipenv
+          app-dir: sample_pipenv
+          cache-folder-prefix: /tmp/cache
           pkg-manager: "pipenv"
           pypi-cache: false
           venv-cache: false
           cache-version: << pipeline.parameters.cache-version >>
       - run:
           command: pipenv run pytest
-          working_directory: ~/project/sample_pipenv
+          working_directory: sample_pipenv
   poetry-test:
     executor: python/default
     steps:
       - checkout
       - python/install-packages:
-          app-dir: ~/project/sample_poetry
+          app-dir: sample_poetry
           cache-version: << pipeline.parameters.cache-version >>
           pkg-manager: poetry
           args: --no-root
       - run:
-          working_directory: ~/project/sample_poetry
+          working_directory: sample_poetry
           command: |-
             poetry run pytest
   uv-test:
@@ -189,11 +205,14 @@ workflows:
           cache-version: poetry-<< pipeline.parameters.cache-version >>
           args: "--no-root | tee install_output.txt"
           include-branch-in-cache-key: false
-          app-dir: ~/project/sample_poetry
+          app-dir: sample_poetry
+          cache-folder-prefix: /tmp/cache
+          pre-steps:
+            - run: mkdir -p /tmp/cache
           post-steps:
             - run:
                 name: Verify cache was successful
-                working_directory: ~/project/sample_poetry
+                working_directory: sample_poetry
                 command: 'cat install_output.txt | grep "No dependencies to install or update"'
       - python/test:
           filters: *filters
@@ -214,7 +233,10 @@ workflows:
           pkg-manager: pipenv
           include-branch-in-cache-key: false
           cache-version: pipenv-<< pipeline.parameters.cache-version >>
-          app-dir: ~/project/sample_pipenv
+          app-dir: sample_pipenv
+          cache-folder-prefix: /tmp/cache
+          pre-steps:
+            - run: mkdir -p /tmp/cache
       - python/test:
           filters: *filters
           name: job-test-pip
@@ -222,12 +244,15 @@ workflows:
           include-branch-in-cache-key: false
           cache-version: pip-<< pipeline.parameters.cache-version >>
           test-tool: unittest
-          app-dir: ~/project/sample_pip
+          app-dir: sample_pip
+          cache-folder-prefix: /tmp/cache
+          pre-steps:
+            - run: mkdir -p /tmp/cache
           args: "| tee install_output.txt"
           post-steps:
             - run:
                 name: Verify cache was successful
-                working_directory: ~/project/sample_pip
+                working_directory: sample_pip
                 command: 'cat install_output.txt | grep "Requirement already satisfied: pytest"'
       - python/test:
           filters: *filters
@@ -235,11 +260,14 @@ workflows:
           cache-version: poetry-auto-<< pipeline.parameters.cache-version >>
           args: "--no-root | tee install_output.txt"
           include-branch-in-cache-key: false
-          app-dir: ~/project/sample_poetry
+          app-dir: sample_poetry
+          pre-steps:
+            - run: mkdir -p /tmp/cache
+          cache-folder-prefix: /tmp/cache
           post-steps:
             - run:
                 name: Verify cache was successful
-                working_directory: ~/project/sample_poetry
+                working_directory: sample_poetry
                 command: 'cat install_output.txt | grep "No dependencies to install or update"'
       - python/test:
           filters: *filters
@@ -257,7 +285,10 @@ workflows:
           filters: *filters
           name: job-auto-test-pipenv
           cache-version: pipenv-auto-<< pipeline.parameters.cache-version >>
-          app-dir: ~/project/sample_pipenv
+          app-dir: sample_pipenv
+          cache-folder-prefix: /tmp/cache
+          pre-steps:
+            - run: mkdir -p /tmp/cache
           include-branch-in-cache-key: false
       - python/test:
           filters: *filters
@@ -267,11 +298,14 @@ workflows:
           include-branch-in-cache-key: false
           args: "| tee install_output.txt"
           cache-version: pip-auto-<< pipeline.parameters.cache-version >>
-          app-dir: ~/project/sample_pip
+          app-dir: sample_pip
+          cache-folder-prefix: /tmp/cache
+          pre-steps:
+            - run: mkdir -p /tmp/cache
           post-steps:
             - run:
                 name: Verify cache was successful
-                working_directory: ~/project/sample_pip
+                working_directory: sample_pip
                 command: 'cat install_output.txt | grep "Requirement already satisfied: pytest"'
       - python/test:
           filters: *filters
@@ -281,7 +315,10 @@ workflows:
           include-branch-in-cache-key: false
           test-tool: unittest
           cache-version: pip-noreqs-<< pipeline.parameters.cache-version >>
-          app-dir: ~/project/sample_pip
+          app-dir: sample_pip
+          cache-folder-prefix: /tmp/cache
+          pre-steps:
+            - run: mkdir -p /tmp/cache
       - python/test:
           filters: *filters
           executor:
@@ -291,7 +328,10 @@ workflows:
           pkg-manager: pip-dist
           include-branch-in-cache-key: false
           cache-version: pip-dist-<< pipeline.parameters.cache-version >>
-          app-dir: ~/project/sample_pip
+          app-dir: sample_pip
+          cache-folder-prefix: /tmp/cache
+          pre-steps:
+            - run: mkdir -p /tmp/cache
           # pip-dependency-file: setup.py
           post-steps:
             - run:
@@ -311,7 +351,35 @@ workflows:
           pkg-manager: pip-dist
           include-branch-in-cache-key: false
           cache-version: pip-dist-pyproject-<< pipeline.parameters.cache-version >>
-          app-dir: ~/project/sample_pip_pyproject
+          app-dir: sample_pip_pyproject
+          cache-folder-prefix: /tmp/cache
+          pre-steps:
+            - run: mkdir -p /tmp/cache
+      - python/test:
+          filters: *filters
+          name: "Test-<<matrix.executor>>-<<matrix.cache-folder-prefix>>"
+          include-branch-in-cache-key: false
+          cache-version: << pipeline.parameters.cache-version >>
+          app-dir: sample_pip
+          cache-folder-prefix: /tmp/cache
+          pkg-manager: pip-dist
+          matrix:
+            alias: test-cache-folders
+            parameters:
+              executor: [ubuntu, arm, macos]
+              cache-folder-prefix: ["/tmp/cache", ".", ".tempo_cache"]
+      - python/test:
+          filters: *filters
+          name: "Test-windows-<<matrix.cache-folder-prefix>>"
+          include-branch-in-cache-key: false
+          cache-version: << pipeline.parameters.cache-version >>
+          app-dir: sample_pip
+          executor: windows
+          pkg-manager: pip-dist
+          matrix:
+            alias: test-cache-folders-windows
+            parameters:
+              cache-folder-prefix: ['.', '/tmp/cache', ".tempo_cache"]
       - orb-tools/pack:
           filters: *filters
       - orb-tools/publish:
@@ -321,6 +389,8 @@ workflows:
           pub-type: production
           requires:
             - orb-tools/pack
+            - test-cache-folders
+            - test-cache-folders-windows
             - pip-install-test
             - pip-install-macos
             - pip-install-test-args
