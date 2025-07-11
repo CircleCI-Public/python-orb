@@ -8,7 +8,7 @@ filters: &filters
 parameters:
   cache-version:
     type: string
-    default: v7
+    default: v8
 
 executors:
   macos:
