@@ -54,8 +54,9 @@ mkdir -p "${CACHE_DIR}"
 
 link_paths() {
     if [ -d "${1}" ]; then
-        echo "INFO: Cache directory already exists. Skipping..."
-        return
+        echo "INFO: Cache directory already exists. Deleting..."
+        rm -r "${1}"
+        # return
     fi
     
     mkdir "${1}"

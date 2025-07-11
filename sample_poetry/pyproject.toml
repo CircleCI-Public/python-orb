@@ -6,7 +6,7 @@ description="none"
 version = "0.0.1"
 
 [tool.poetry.dependencies]
-python = "*"
+python = ">=3.9"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "*"
