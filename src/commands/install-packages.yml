@@ -5,6 +5,14 @@ description: >
   For pipenv, no args are provided. Expect the default caching locations for packages and virtualenvs on a debian system with pyenv.
 
 parameters:
+  cache-key-override:
+    type: string
+    default: ""
+    description: |
+      Override the built-in cache key. If set, this value will be used as the cache key for restore_cache/save_cache steps.
+      You can use CircleCI template functions, e.g.:
+        cache-key-override: "pip-{{ checksum 'dev-requirements.txt' }}-{{ checksum 'requirements.txt' }}"
+      If not set, the default cache key logic will be used.
   pkg-manager:
     type: enum
     enum: [auto, poetry, pipenv, pip, pip-dist, uv]
@@ -112,8 +120,8 @@ steps:
             command: <<include(scripts/save-python-version.sh)>>
         - restore_cache:
             keys:
-              - <<parameters.cache-version>>-cci_pycache-<<#parameters.include-branch-in-cache-key>>{{ .Branch }}-<</parameters.include-branch-in-cache-key>><<#parameters.include-python-in-cache-key>>{{ checksum "<<parameters.cache-folder-prefix>>/.temp-python-version" }}-<</parameters.include-python-in-cache-key>>{{ checksum "<<parameters.cache-folder-prefix>>/.cci_pycache/lockfile" }}
-              - <<parameters.cache-version>>-cci_pycache-<<#parameters.include-branch-in-cache-key>>{{ .Branch }}-<</parameters.include-branch-in-cache-key>><<#parameters.include-python-in-cache-key>>{{ checksum "<<parameters.cache-folder-prefix>>/.temp-python-version" }}-<</parameters.include-python-in-cache-key>>
+              - <<#parameters.cache-key-override>><<parameters.cache-key-override>><</parameters.cache-key-override>><<^parameters.cache-key-override>><<parameters.cache-version>>-cci_pycache-<<#parameters.include-branch-in-cache-key>>{{ .Branch }}-<</parameters.include-branch-in-cache-key>><<#parameters.include-python-in-cache-key>>{{ checksum "<<parameters.cache-folder-prefix>>/.temp-python-version" }}-<</parameters.include-python-in-cache-key>>{{ checksum "<<parameters.cache-folder-prefix>>/.cci_pycache/lockfile" }}<</parameters.cache-key-override>>
+              - <<^parameters.cache-key-override>><<parameters.cache-version>>-cci_pycache-<<#parameters.include-branch-in-cache-key>>{{ .Branch }}-<</parameters.include-branch-in-cache-key>><<#parameters.include-python-in-cache-key>>{{ checksum "<<parameters.cache-folder-prefix>>/.temp-python-version" }}-<</parameters.include-python-in-cache-key>><</parameters.cache-key-override>>
         - run:
             name: Move restored cache
             working_directory: << parameters.app-dir >>
@@ -217,6 +225,6 @@ steps:
               SCRIPT_UTILS: "<<include(scripts/utils.sh)>>"
             command: <<include(scripts/cache-save.sh)>>
         - save_cache:
-            key: <<parameters.cache-version>>-cci_pycache-<<#parameters.include-branch-in-cache-key>>{{ .Branch }}-<</parameters.include-branch-in-cache-key>><<#parameters.include-python-in-cache-key>>{{ checksum "<<parameters.cache-folder-prefix>>/.temp-python-version" }}-<</parameters.include-python-in-cache-key>>{{ checksum "<<parameters.cache-folder-prefix>>/.cci_pycache/lockfile" }}
+            key: <<#parameters.cache-key-override>><<parameters.cache-key-override>><</parameters.cache-key-override>><<^parameters.cache-key-override>><<parameters.cache-version>>-cci_pycache-<<#parameters.include-branch-in-cache-key>>{{ .Branch }}-<</parameters.include-branch-in-cache-key>><<#parameters.include-python-in-cache-key>>{{ checksum "<<parameters.cache-folder-prefix>>/.temp-python-version" }}-<</parameters.include-python-in-cache-key>>{{ checksum "<<parameters.cache-folder-prefix>>/.cci_pycache/lockfile" }}<</parameters.cache-key-override>>
             paths:
               - <<parameters.cache-folder-prefix>>/.cci_pycache

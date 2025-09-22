@@ -16,6 +16,10 @@ usage:
         # Install requirements.txt
         - python/install-packages:
             pkg-manager: pip
+        # Install dev-requirements.txt with a custom cache key (example)
+        - python/install-packages:
+            pkg-manager: pip
+            cache-key-override: "pip-{{ checksum 'dev-requirements.txt' }}-{{ checksum 'requirements.txt' }}"
         # Install dev-requirements.txt
         - python/install-packages:
             pkg-manager: pip
