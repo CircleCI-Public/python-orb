@@ -10,7 +10,7 @@ Example use as well as a list of available executors, commands, and jobs are ava
 ## Resources
 
 [CircleCI Orb Registry Page][reg-page] - The official registry page of this orb for all versions, executors, commands, and jobs described.
-[CircleCI Orb Docs](https://circleci.com/docs/2.0/orb-intro/#section=configuration) - Docs for using and creating CircleCI Orbs.
+[CircleCI Orb Docs](orb-docs) - Docs for using and creating CircleCI Orbs.
 
 ## Contributing
 
@@ -22,3 +22,4 @@ For further questions/comments about this or other orbs, visit the Orb Category 
 New versions of this orb are published by pushing a [SemVer git tag](https://semver.org/) by the [Community & Partner Engineering Team](mailto:community-partner@circleci.com).
 
 [reg-page]: https://circleci.com/orbs/registry/orb/circleci/python
+[orb-docs]: https://circleci.com/docs/orbs/use/orb-intro
