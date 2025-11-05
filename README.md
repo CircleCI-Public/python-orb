@@ -10,7 +10,7 @@ Example use as well as a list of available executors, commands, and jobs are ava
 ## Resources
 
 [CircleCI Orb Registry Page][reg-page] - The official registry page of this orb for all versions, executors, commands, and jobs described.
-[CircleCI Orb Docs](orb-docs) - Docs for using and creating CircleCI Orbs.
+[CircleCI Orb Docs][orb-docs] - Docs for using and creating CircleCI Orbs.
 
 ## Contributing
 
