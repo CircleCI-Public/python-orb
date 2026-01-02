@@ -3,6 +3,6 @@ parameters:
   tag:
     description: "The `cimg/python` Docker image version tag."
     type: string
-    default: "3.9.22"
+    default: "3.14"
 docker:
   - image: cimg/python:<< parameters.tag >>
