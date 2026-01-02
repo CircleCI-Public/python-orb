@@ -3,14 +3,16 @@ description: |
 usage:
   version: 2.1
   orbs:
-    python: circleci/python@3.0.0
+    python: circleci/python@3.3.0
   workflows:
     main:
       jobs:
         - build
   jobs:
     build:
-      executor: python/default
+      executor:
+        name: python/default
+        tag: "3.14"
       steps:
         - checkout
         # Install requirements.txt
