@@ -1,11 +1,11 @@
 description: |
   An example of running a pipenv based project with pytest. And then using twine to publish to pypi.
-  The project using these args would have pytest as a dev dependecy in its Pipfile.
+  The project using these args would have pytest as a dev dependency in its Pipfile.
   The CircleCI project settings would have the environment variables for twine auth.
 usage:
   version: 2.1
   orbs:
-    python: circleci/python@3.0.0
+    python: circleci/python@3.3.0
   workflows:
     main:
       jobs:
@@ -17,7 +17,9 @@ usage:
 
   jobs:
     publish:
-      executor: python/default
+      executor:
+        name: python/default
+        tag: "3.14"
       steps:
         - checkout
         - python/dist
