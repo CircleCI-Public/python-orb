@@ -8,7 +8,7 @@ filters: &filters
 parameters:
   cache-version:
     type: string
-    default: v8
+    default: v9
 
 executors:
   macos:
@@ -384,6 +384,7 @@ workflows:
           filters: *filters
       - orb-tools/publish:
           orb-name: circleci/python
+          enable-pr-comment: false
           github-token: GHI_TOKEN
           vcs-type: << pipeline.project.type >>
           pub-type: production

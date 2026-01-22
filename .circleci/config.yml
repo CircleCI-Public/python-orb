@@ -23,6 +23,7 @@ workflows:
       - orb-tools/publish:
           orb-name: circleci/python
           vcs-type: << pipeline.project.type >>
+          enable-pr-comment: false
           github-token: GHI_TOKEN
           requires:
             [orb-tools/lint, orb-tools/review, orb-tools/pack, shellcheck/check]
