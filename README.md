@@ -3,6 +3,8 @@
 A python Orb for CircleCI.
 This orb allows you to do common python related tasks on CircleCI such as setup a pipenv or poetry env, manage global python dependencies, cache virtualenvs or global python packages.
 
+> **Starting a new config?** Use the [`setup-python` Function](https://github.com/circleci-functions/setup-python#readme) instead. See the [Functions overview](https://circleci.com/docs/functions/functions-intro/) and the [Functions catalog](https://circleci.com/docs/functions/functions-catalog/). This orb is still maintained for existing pipelines.
+
 ## Usage
 
 Example use as well as a list of available executors, commands, and jobs are available on this orb's [registry page][reg-page].
