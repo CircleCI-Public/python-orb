@@ -1,4 +1,6 @@
 description: |
+  Starting a new config? Use the `setup-python` Function instead: run `circleci function get setup-python`, or use `get_function` on the CircleCI MCP server. This orb is still maintained for existing pipelines.
+
   Common CircleCI tasks for the Python programming language.
   Supports Linux x86_64, MacOS, and Arm64 V8.
 display:
