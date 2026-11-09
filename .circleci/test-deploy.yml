@@ -13,7 +13,7 @@ parameters:
 executors:
   macos:
     macos:
-      xcode: 16.3
+      xcode: 16.4.0
   windows:
     machine:
       image: windows-server-2022-gui:current
